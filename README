@@ -1,0 +1,29 @@
+This repository contains a QML plugin which provides a convenience
+type to allow client applications to easily embed the Sailfish OS
+Browser WebView into their own application in order to render web
+webcontent.
+
+Note: currently you have to explicitly link against qtmozembed-qt5
+at build time, to avoid a symbol issue which leads to a crash:
+CONFIG += link_pkgconfig
+PKGCONFIG += qt5embedwidget
+
+Example:
+
+import QtQuick 2.0
+import Sailfish.Silica 1.0
+import Sailfish.WebView 1.0
+
+ApplicationWindow {
+    id: root
+    initialPage: Component {
+        Page {
+            id: page
+            WebView {
+                anchors.fill: parent
+                active: true
+                url: "http://www.sailfishos.org"
+            }
+        }
+    }
+}
