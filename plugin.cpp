@@ -12,6 +12,7 @@
 #include "plugin.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QStandardPaths>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
 
@@ -54,6 +55,8 @@ static QMozContext* setupMozillaContext(const QString &userAgent = QLatin1String
     } else {
         mozCtxt->setPixelRatio(envPixelRatio);
     }
+
+    mozCtxt->setProfile(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
 
     // Set various embedlite components
     mozCtxt->addComponentManifest(SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH + QString("/components/EmbedLiteBinComponents.manifest"));
