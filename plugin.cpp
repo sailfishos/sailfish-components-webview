@@ -102,6 +102,11 @@ void SailfishOSWebViewPlugin::onMozillaContextInitialized()
         mozCtxt->setPref("apz.asyncscroll.throttle", QVariant::fromValue<int>(40));
         mozCtxt->setPref("apz.asyncscroll.timeout", QVariant::fromValue<int>(400));
         mozCtxt->setPref("apz.fling_stopped_threshold", QLatin1String("0.13f"));
+
+        // Don't expose any protocol handlers by default and don't warn about those.
+        mozCtxt->setPref(QStringLiteral("network.protocol-handler.external-default"), false);
+        mozCtxt->setPref(QStringLiteral("network.protocol-handler.expose-all"), false);
+        mozCtxt->setPref(QStringLiteral("network.protocol-handler.warn-external-default"), false);
     }
 }
 
