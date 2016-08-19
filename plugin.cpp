@@ -12,6 +12,7 @@
 #include "plugin.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QStandardPaths>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
 
@@ -54,6 +55,8 @@ static QMozContext* setupMozillaContext(const QString &userAgent = QLatin1String
     } else {
         mozCtxt->setPixelRatio(envPixelRatio);
     }
+
+    mozCtxt->setProfile(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
 
     // Set various embedlite components
     mozCtxt->addComponentManifest(SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH + QString("/components/EmbedLiteBinComponents.manifest"));
@@ -102,6 +105,11 @@ void SailfishOSWebViewPlugin::onMozillaContextInitialized()
         mozCtxt->setPref("apz.asyncscroll.throttle", QVariant::fromValue<int>(40));
         mozCtxt->setPref("apz.asyncscroll.timeout", QVariant::fromValue<int>(400));
         mozCtxt->setPref("apz.fling_stopped_threshold", QLatin1String("0.13f"));
+
+        // Don't expose any protocol handlers by default and don't warn about those.
+        mozCtxt->setPref(QStringLiteral("network.protocol-handler.external-default"), false);
+        mozCtxt->setPref(QStringLiteral("network.protocol-handler.expose-all"), false);
+        mozCtxt->setPref(QStringLiteral("network.protocol-handler.warn-external-default"), false);
     }
 }
 

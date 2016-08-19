@@ -15,12 +15,16 @@ import Sailfish.WebView 1.0
 
 RawWebView {
     id: webview
+
+    signal linkClicked(string url)
+
     active: true
 
     onViewInitialized: {
         webview.loadFrameScript("chrome://embedlite/content/embedhelper.js");
         webview.loadFrameScript("chrome://embedlite/content/SelectAsyncHelper.js");
         webview.addMessageListeners([
+            "embed:linkclicked",
             "embed:filepicker",
             "embed:selectasync",
             "embed:alert",
@@ -34,6 +38,10 @@ RawWebView {
         var webView = webview
         var dialog = null
         switch(message) {
+            case "embed:linkclicked": {
+                webview.linkClicked(data.uri)
+                break
+            }
             case "embed:filepicker": {
                 filePicker.createObject(pageStack, {
                                            "pageStack": pageStack,
