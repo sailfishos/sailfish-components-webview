@@ -79,6 +79,11 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
 {
     Q_ASSERT(uri == QLatin1String("Sailfish.WebView"));
 
+    AppTranslator *engineeringEnglish = new AppTranslator(engine);
+    AppTranslator *translator = new AppTranslator(engine);
+    engineeringEnglish->load("sailfish_components_webview_qt5_eng_en", "/usr/share/translations");
+    translator->load(QLocale(), "sailfish_components_webview_qt5", "-", "/usr/share/translations");
+
     QMozContext *mozCtxt = setupMozillaContext();
     QObject::connect(mozCtxt, &QMozContext::onInitialized,
                      this, &SailfishOSWebViewPlugin::onMozillaContextInitialized);

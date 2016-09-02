@@ -12,6 +12,9 @@
 #ifndef SAILFISHOS_WEBVIEW_PLUGIN_H
 #define SAILFISHOS_WEBVIEW_PLUGIN_H
 
+#include <QtCore/QTranslator>
+#include <QtCore/QLocale>
+
 #include <QtQml/QQmlExtensionPlugin>
 #include <QtQuick/QQuickItem>
 
@@ -42,6 +45,24 @@ class RawWebView : public QuickMozView
 public:
     RawWebView(QQuickItem *parent = 0);
     ~RawWebView();
+};
+
+// using custom translator so it gets properly removed from qApp when engine is deleted
+class AppTranslator: public QTranslator
+{
+    Q_OBJECT
+
+public:
+    AppTranslator(QObject *parent)
+        : QTranslator(parent)
+    {
+        qApp->installTranslator(this);
+    }
+
+    virtual ~AppTranslator()
+    {
+        qApp->removeTranslator(this);
+    }
 };
 
 } // namespace WebView
