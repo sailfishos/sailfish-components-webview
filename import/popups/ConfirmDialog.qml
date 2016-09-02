@@ -15,9 +15,9 @@ import Sailfish.Silica 1.0
 UserPrompt {
     property alias text: label.text
 
-    //: Text on the Accept dialog button that accepts browser alert messages
+    //: Text on the Accept dialog button that accepts browser's confirm() messages
     //% "Ok"
-    acceptText: qsTrId("sailfish_components_webview-he-accept_alert")
+    acceptText: qsTrId("sailfish_components_webview_popups-he-accept_confirm")
 
     PromptLabel {
         id: label

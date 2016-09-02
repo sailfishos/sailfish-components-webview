@@ -9,7 +9,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
@@ -59,7 +58,7 @@ Dialog {
         header: DialogHeader {
             dialog: selectDialog
             //% "Select"
-            acceptText: qsTrId("sailfish_components_webview-he-select")
+            acceptText: qsTrId("sailfish_components_webview_pickers-he-select")
             _glassOnly: true
         }
 

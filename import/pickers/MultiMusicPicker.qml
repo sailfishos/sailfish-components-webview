@@ -12,11 +12,11 @@
 import QtQuick 2.1
 import Sailfish.Pickers 1.0
 
-ContentPickerPage {
+MultiMusicPickerDialog {
     property var creator
 
-    //: For choosing any file (document/image/video/audio) to send to the website from the device
-    //% "Upload file"
-    title: qsTrId("sailfish_components_webview-he-upload_file")
-    Component.onDestruction: creator.sendResponse(selectedContent)
+    //: For choosing audio files to send to the website from the device
+    //% "Upload audio files"
+    title: qsTrId("sailfish_components_webview_pickers-he-upload_audio_files")
+    Component.onDestruction: creator.sendResponseList(selectedContent)
 }

@@ -21,7 +21,7 @@ UserPrompt {
     canAccept: input.text.length > 0
     //: Text on the Accept dialog button that accepts browser's prompt() messages
     //% "Ok"
-    acceptText: qsTrId("sailfish_components_webview-he-accept_prompt")
+    acceptText: qsTrId("sailfish_components_webview_popups-he-accept_prompt")
 
     TextField {
         id: input

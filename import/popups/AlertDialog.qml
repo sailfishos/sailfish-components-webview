@@ -9,16 +9,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 UserPrompt {
     property alias text: label.text
 
-    //: Text on the Accept dialog button that accepts browser's confirm() messages
+    //: Text on the Accept dialog button that accepts browser alert messages
     //% "Ok"
-    acceptText: qsTrId("sailfish_components_webview-he-accept_confirm")
+    acceptText: qsTrId("sailfish_components_webview_popups-he-accept_alert")
 
     PromptLabel {
         id: label
