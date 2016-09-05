@@ -19,6 +19,8 @@ RawWebView {
     signal linkClicked(string url)
 
     active: true
+    property QtObject _page
+    property QtObject _pageStack
 
     onViewInitialized: {
         webview.loadFrameScript("chrome://embedlite/content/embedhelper.js");
@@ -93,6 +95,60 @@ RawWebView {
             default: break
         }
     }
+
+    function _findParentWithProperty(item, propertyName) {
+        var parentItem = item.parent
+        while (parentItem) {
+            if (parentItem.hasOwnProperty(propertyName)) {
+                return parentItem
+            }
+            parentItem = parentItem.parent
+        }
+        return null
+    }
+
+    function _findPageStack(item) {
+        return _findParentWithProperty(item, '_pageStackIndicator')
+    }
+
+    function _findPage(item) {
+        return _findParentWithProperty(item, '__silica_page')
+    }
+
+    Component.onCompleted: _initialisePageProperties()
+    onParentChanged: _initialisePageProperties()
+    function _initialisePageProperties() {
+        _page = _findPage(webview)
+        _pageStack = _findPageStack(webview)
+        if (!_page) {
+            console.log("No parent Page found. A Sailfish.Browser WebView should be declared inside a Page, as it overrides back and forward navigation bindings defined in Page.")
+        }
+    }
+
+    states: [
+        State {
+            name: "activeWithinPageStack"
+            when:webview.visible && webview.active && webview._page != null && webview._pageStack != null
+            PropertyChanges {
+                target: pageStack
+                _noGrabbing: webview.moving || webview.pinching || webview.dragging
+            }
+            PropertyChanges {
+                target: webview._page
+                backNavigation: webview.atXBeginning && !webview.pinching
+                forwardNavigation: webview._page._belowTop && webview.atXEnd && !webview.pinching
+            }
+        },
+        State {
+            name: "activeWithoutPageStack"
+            when:webview.visible && webview.active && webview._page != null && webview._pageStack == null
+            PropertyChanges {
+                target: webview._page
+                backNavigation: webview.atXBeginning && !webview.pinching
+                forwardNavigation: webview._page._belowTop && webview.atXEnd && !webview.pinching
+            }
+        }
+    ]
 
     BusyIndicator {
         id: busySpinner
