@@ -13,6 +13,8 @@
 
 #include <QtCore/QTimer>
 #include <QtCore/QStandardPaths>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
 
@@ -110,6 +112,18 @@ void SailfishOSWebViewPlugin::onMozillaContextInitialized()
         mozCtxt->setPref(QStringLiteral("network.protocol-handler.external-default"), false);
         mozCtxt->setPref(QStringLiteral("network.protocol-handler.expose-all"), false);
         mozCtxt->setPref(QStringLiteral("network.protocol-handler.warn-external-default"), false);
+
+        int screenWidth = QGuiApplication::primaryScreen()->size().width();
+        int tileSize = screenWidth;
+
+        // With bigger than qHD screen fill with two tiles in row (portrait).
+        // Landscape will be filled with same tile size.
+        if (screenWidth > 540) {
+            tileSize = screenWidth / 2;
+        }
+
+        mozCtxt->setPref(QStringLiteral("layers.tile-width"), QVariant(tileSize));
+        mozCtxt->setPref(QStringLiteral("layers.tile-height"), QVariant(tileSize));
     }
 }
 
