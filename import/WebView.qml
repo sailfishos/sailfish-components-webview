@@ -21,7 +21,10 @@ RawWebView {
     signal linkClicked(string url)
 
     active: true
+    property WebViewPage webViewPage
 
+    onActiveChanged: helper.setActiveInPage()
+    Component.onCompleted: helper.setActiveInPage()
     onViewInitialized: {
         webview.loadFrameScript("chrome://embedlite/content/embedhelper.js");
         webview.loadFrameScript("chrome://embedlite/content/SelectAsyncHelper.js");
@@ -246,6 +249,28 @@ RawWebView {
         interval: 600 // page transition delay.
         onTriggered: {
             openAuthDialog(authDialogWebView, authDialogData, authDialogWinId)
+        }
+
+        function findParentWithProperty(item, propertyName) {
+            var parentItem = item.parent
+            while (parentItem) {
+                if (parentItem.hasOwnProperty(propertyName)) {
+                    return parentItem
+                }
+                parentItem = parentItem.parent
+            }
+            return null
+        }
+
+        function setActiveInPage() {
+            if (webview.active) {
+                if (webview.webViewPage == null || webview.webViewPage == undefined) {
+                    webview.webViewPage = helper.findParentWithProperty(webview, '__sailfish_webviewpage')
+                }
+                if (webview.webViewPage != null && webview.webViewPage != undefined) {
+                    webview.webViewPage.activeWebView = webview
+                }
+            }
         }
     }
 

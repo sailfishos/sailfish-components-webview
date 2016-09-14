@@ -1,3 +1,4 @@
 module Sailfish.WebView
 plugin sailfishwebviewplugin
 WebView 1.0 WebView.qml
+WebViewPage 1.0 WebViewPage.qml
