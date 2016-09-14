@@ -14,14 +14,46 @@
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
 
+#include <QtCore/QFileInfo>
+#include <QtCore/QString>
+
 namespace SailfishOS {
 
 namespace WebView {
 
 namespace Popups {
 
-void SailfishOSWebViewPopupsPlugin::registerTypes(const char *)
+QString DownloadHelper::createUniqueFileUrl(const QString &fileName, const QString &path) const
 {
+    if (path.isEmpty() || fileName.isEmpty()) {
+        return QString();
+    }
+
+    const QFileInfo fileInfo(fileName);
+    const QString newFile("%1/%2(%3)%4%5");
+    const QString baseName = fileInfo.baseName();
+    const QString suffix = fileInfo.completeSuffix();
+
+    QString result(path + "/" + fileName);
+    int collisionCount(1);
+
+    while (QFileInfo::exists(result)) {
+        collisionCount++;
+        result = newFile.arg(path).arg(baseName).arg(collisionCount).arg(suffix.isEmpty() ? "" : ".").arg(suffix);
+    }
+
+    return result;
+}
+
+static QObject *DownloadHelper_factory(QQmlEngine *, QJSEngine *)
+{
+    return new DownloadHelper;
+}
+
+void SailfishOSWebViewPopupsPlugin::registerTypes(const char *uri)
+{
+    Q_ASSERT(uri == QLatin1String("Sailfish.WebView.Popups"));
+    qmlRegisterSingletonType<DownloadHelper>("Sailfish.WebView.Popups", 1, 0, "DownloadHelper", DownloadHelper_factory);
 }
 
 void SailfishOSWebViewPopupsPlugin::initializeEngine(QQmlEngine *engine, const char *uri)

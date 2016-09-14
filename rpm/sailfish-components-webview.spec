@@ -40,6 +40,7 @@ Requires:  %{name} = %{version}
 Summary:   Translation source for sailfish-components-webview-popups-qt5
 Group:     System/Libraries
 Requires:  %{name} = %{version}
+Requires:  declarative-transferengine-qt5
 
 %description popups-ts-devel
 %{summary}.
@@ -78,9 +79,15 @@ Requires:  %{name} = %{version}
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/UserPrompt.qml
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/AlertDialog.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/Popups/AuthDialog.qml
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/ConfirmDialog.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/Popups/LocationDialog.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/Popups/PasswordManagerDialog.qml
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/PromptDialog.qml
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/PromptLabel.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/Popups/ContextMenu.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/Popups/DownloadMenuItem.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/Popups/ShareLinkPage.qml
 
 %files pickers
 %defattr(-,root,root,-)
