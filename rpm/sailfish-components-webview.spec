@@ -1,5 +1,5 @@
 Name: sailfish-components-webview-qt5
-License: Mozilla License
+License: MPLv2
 Version: 0.0.1
 Release: 1
 Source0: %{name}-%{version}.tar.bz2
