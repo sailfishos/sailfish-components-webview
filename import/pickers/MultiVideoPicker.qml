@@ -12,11 +12,11 @@
 import QtQuick 2.1
 import Sailfish.Pickers 1.0
 
-ImagePickerPage {
+MultiVideoPickerDialog {
     property var creator
 
-    //: For choosing image to send to the website from the device
-    //% "Upload image"
-    title: qsTrId("sailfish_components_webview-he-upload_image")
-    Component.onDestruction: creator.sendResponse(selectedContent)
+    //: For choosing videos to send to the website from the device
+    //% "Upload videos"
+    title: qsTrId("sailfish_components_webview_pickers-he-upload_videos")
+    Component.onDestruction: creator.sendResponseList(selectedContent)
 }

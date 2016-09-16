@@ -11,7 +11,7 @@
 
 import QtQuick 2.1
 import Sailfish.Pickers 1.0
-import Sailfish.WebView 1.0
+import Sailfish.WebView.Pickers 1.0
 
 Item {
     id: pickerCreator
@@ -21,12 +21,12 @@ Item {
     property int mode
     property Item pageStack
 
-    property int _nsIFilePicker_modeOpen: 0
-    property int _nsIFilePicker_modeOpenMultiple: 3
-    property int _nsIFilePicker_filterAll: 1
-    property int _nsIFilePicker_filterImages: 8
-    property int _nsIFilePicker_filterAudio: 256
-    property int _nsIFilePicker_filterVideo: 512
+    readonly property int _nsIFilePicker_modeOpen: 0
+    readonly property int _nsIFilePicker_modeOpenMultiple: 3
+    readonly property int _nsIFilePicker_filterAll: 1
+    readonly property int _nsIFilePicker_filterImages: 8
+    readonly property int _nsIFilePicker_filterAudio: 256
+    readonly property int _nsIFilePicker_filterVideo: 512
 
 
     function sendResponse(selectedContent) {
