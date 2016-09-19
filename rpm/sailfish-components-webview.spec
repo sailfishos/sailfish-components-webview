@@ -61,8 +61,16 @@ Requires:  %{name} = %{version}
 %description pickers-ts-devel
 %{summary}.
 
+%package devel
+Summary:    Sailfish OS WebEngine development files
+Requires:   %{name} = %{version}-%{release}
+
+%description devel
+Development package which provides libsailfishwebengine
+
 %files
 %defattr(-,root,root,-)
+%{_libdir}/libsailfishwebengine.so.*
 %{_datadir}/translations/sailfish_components_webview_qt5_eng_en.qm
 %{_libdir}/qt5/qml/Sailfish/WebView/libsailfishwebviewplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/qmldir
@@ -114,6 +122,12 @@ Requires:  %{name} = %{version}
 %files pickers-ts-devel
 %defattr(-,root,root,-)
 %{_datadir}/translations/source/sailfish_components_webview_pickers_qt5.ts
+
+%files devel
+%defattr(-,root,root,-)
+%{_libdir}/libsailfishwebengine.so
+%{_libdir}/pkgconfig/sailfishwebengine.pc
+%{_includedir}/libsailfishwebengine/*
 
 %prep
 %setup -q -n %{name}-%{version}

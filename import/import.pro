@@ -12,6 +12,9 @@ PKGCONFIG += qt5embedwidget
 
 QMAKE_CXXFLAGS += -fPIC
 
+INCLUDEPATH += . src ../lib
+LIBS += -L../lib -lsailfishwebengine
+
 HEADERS += plugin.h
 SOURCES += plugin.cpp
 OTHER_FILES += qmldir WebView.qml WebViewPage.qml

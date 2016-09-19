@@ -1,0 +1,35 @@
+TEMPLATE = lib
+TARGET = sailfishwebengine
+TARGET = $$qtLibraryTarget($$TARGET)
+TARGETPATH = $$[QT_INSTALL_LIBS]
+
+CONFIG += qt c++11 create_pc create_prl no_install_prl link_pkgconfig
+QT += core gui
+PKGCONFIG += qt5embedwidget sailfishsilica
+
+INCLUDEPATH += $$system(pkg-config --cflags sailfishsilica)
+
+SOURCES += webengine.cpp \
+           webenginesettings.cpp
+
+HEADERS += webengine.h \
+           webengine_p.h \
+           webenginesettings.h \
+           webenginesettings_p.h
+
+develheaders.path = /usr/include/libsailfishwebengine
+develheaders.files = webengine.h \
+                     webenginesettings.h
+
+target.path = $$[QT_INSTALL_LIBS]
+pkgconfig.files = $$TARGET.pc
+pkgconfig.path = $$target.path/pkgconfig
+
+QMAKE_PKGCONFIG_NAME = lib$$TARGET
+QMAKE_PKGCONFIG_DESCRIPTION = Sailfish OS WebEngine development files
+QMAKE_PKGCONFIG_LIBDIR = $$target.path
+QMAKE_PKGCONFIG_INCDIR = $$develheaders.path
+QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+QMAKE_PKGCONFIG_REQUIRES = Qt5Core qt5embedwidget
+
+INSTALLS += target develheaders pkgconfig
