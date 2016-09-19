@@ -156,7 +156,7 @@ RawWebView {
                         privData.contextMenu.linkTitle = linkTitle.trim()
                         privData.contextMenu.linkProtocol = data.linkProtocol || ""
                         privData.contextMenu.contentType = contentType
-                        privData.contextMenu.viewId = privData.uniqueId()
+                        privData.contextMenu.viewId = webView.uniqueID()
                         privData.contextMenu.tabModel = null // TODO ??
                         // PageStack and WebView are currently always the same but
                         // let's update them regardless so that they will remain correct.
@@ -168,7 +168,7 @@ RawWebView {
                                 { "linkHref": linkHref, "imageSrc": imageSrc,
                                   "linkTitle": linkTitle.trim(), "linkProtocol": data.linkProtocol,
                                   "contentType": contentType, "tabModel": null,
-                                  "viewId": privData.uniqueId(),
+                                  "viewId": webView.uniqueID(),
                                   "pageStack": pageStack })
                         privData.hideVirtualKeyboard()
                         privData.contextMenu.show()
@@ -195,10 +195,6 @@ RawWebView {
         id: helper
         property var geolocationUrls: {{}}
         property var contextMenu
-
-        function uniqueId() {
-            return Math.floor((Math.random() * 10000000) + 1)
-        }
 
         function hideVirtualKeyboard() {
             if (Qt.inputMethod.visible) {
