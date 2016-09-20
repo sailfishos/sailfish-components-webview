@@ -67,6 +67,7 @@ Requires:  %{name} = %{version}
 %{_libdir}/qt5/qml/Sailfish/WebView/libsailfishwebviewplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/WebView.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/WebViewPage.qml
 
 %files ts-devel
 %defattr(-,root,root,-)

@@ -14,11 +14,11 @@ QMAKE_CXXFLAGS += -fPIC
 
 HEADERS += plugin.h
 SOURCES += plugin.cpp
-OTHER_FILES += qmldir WebView.qml
+OTHER_FILES += qmldir WebView.qml WebViewPage.qml
 
 include(translations.pri)
 
-import.files = qmldir WebView.qml
+import.files = qmldir WebView.qml WebViewPage.qml
 import.path = $$TARGETPATH
 target.path = $$TARGETPATH
 
