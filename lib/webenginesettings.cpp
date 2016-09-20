@@ -47,6 +47,11 @@ const int PressAndHoldDelay(getPressAndHoldDelay());
 
 void SailfishOS::WebEngineSettings::initialize()
 {
+    static bool isInitialized = false;
+    if (isInitialized) {
+        return;
+    }
+
     SailfishOS::WebEngineSettings *engineSettings = instance();
 
     // Standard settings.
@@ -105,6 +110,7 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("intl.accept_languages"),
                                   QVariant::fromValue<QString>(langs));
 
+    isInitialized = true;
 }
 
 SailfishOS::WebEngineSettings *SailfishOS::WebEngineSettings::instance()

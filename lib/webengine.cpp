@@ -20,6 +20,11 @@ Q_GLOBAL_STATIC(SailfishOS::WebEngine, webEngineInstance)
 
 void SailfishOS::WebEngine::initialize(const QString &profilePath, const QString &userAgent)
 {
+    static bool isInitialized = false;
+    if (isInitialized) {
+        return;
+    }
+
     // Workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=929879
     setenv("LC_NUMERIC", "C", 1);
     setlocale(LC_NUMERIC, "C");
@@ -48,6 +53,8 @@ void SailfishOS::WebEngine::initialize(const QString &profilePath, const QString
     webEngine->addComponentManifest(SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH + QString("/chrome/EmbedLiteOverrides.manifest"));
 
     QTimer::singleShot(0, webEngine, SLOT(runEmbedding()));
+
+    isInitialized = true;
 }
 
 SailfishOS::WebEngine *SailfishOS::WebEngine::instance()

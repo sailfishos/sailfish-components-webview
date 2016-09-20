@@ -61,8 +61,6 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
     engineSettings->setPreference(QStringLiteral("network.protocol-handler.expose-all"), false);
     engineSettings->setPreference(QStringLiteral("network.protocol-handler.warn-external-default"), false);
 
-    engine->rootContext()->setContextProperty("MozContext", webEngine);
-
     // TODO : Stop embedding after lastWindow is destroyed.
     connect(engine, SIGNAL(destroyed()), webEngine, SLOT(stopEmbedding()));
 }

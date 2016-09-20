@@ -72,6 +72,8 @@ Development package which provides libsailfishwebengine
 %defattr(-,root,root,-)
 %{_libdir}/libsailfishwebengine.so.*
 %{_datadir}/translations/sailfish_components_webview_qt5_eng_en.qm
+%{_libdir}/qt5/qml/Sailfish/WebEngine/libsailfishwebengineplugin.so
+%{_libdir}/qt5/qml/Sailfish/WebEngine/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/libsailfishwebviewplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/WebView.qml

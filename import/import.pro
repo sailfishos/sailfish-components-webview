@@ -1,5 +1,6 @@
 TEMPLATE=subdirs
-SUBDIRS+=webview pickers popups
+SUBDIRS+=webengine webview pickers popups
 
+webview.depends = webengine
 pickers.depends = webview
 popups.depends = webview
