@@ -12,7 +12,7 @@
 #include "webengine.h"
 #include "webenginesettings.h"
 
-#include <QtCore/QStandardPaths>>
+#include <QtCore/QStandardPaths>
 #include <QQmlExtensionPlugin>
 #include <qqml.h>
 #include <QtQml/QQmlEngine>
