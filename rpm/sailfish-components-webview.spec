@@ -11,6 +11,7 @@ BuildRequires:  pkgconfig(Qt5Network)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(qt5embedwidget)
+BuildRequires:  pkgconfig(sailfishsilica)
 BuildRequires:  qt5-qttools
 BuildRequires:  qt5-qttools-linguist
 Requires: sailfishsilica-qt5
