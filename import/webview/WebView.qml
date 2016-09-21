@@ -22,6 +22,7 @@ RawWebView {
 
     active: true
     property WebViewPage webViewPage
+    property int __sailfish_webview
 
     onActiveChanged: helper.setActiveInPage()
     Component.onCompleted: helper.setActiveInPage()
