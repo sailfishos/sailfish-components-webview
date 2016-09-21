@@ -1,3 +1,5 @@
 TEMPLATE=subdirs
-SUBDIRS+=import import/popups import/pickers
+SUBDIRS+=lib import
 OTHER_FILES += $$PWD/rpm/sailfish-components-webview.spec
+
+import.depends = lib
