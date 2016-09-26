@@ -109,6 +109,8 @@ void SailfishOS::WebEngineSettings::initialize()
     }
     engineSettings->setPreference(QStringLiteral("intl.accept_languages"),
                                   QVariant::fromValue<QString>(langs));
+    engineSettings->setPreference(QStringLiteral("browser.enable_automatic_image_resizing"),
+                                  QVariant::fromValue<bool>(true));
 
     isInitialized = true;
 }
