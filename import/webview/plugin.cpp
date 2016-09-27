@@ -10,20 +10,17 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "plugin.h"
+#include "rawwebview.h"
 #include "webengine.h"
 #include "webenginesettings.h"
 
-#include <QtCore/QTimer>
 #include <QtCore/QStandardPaths>
-#include <QtGui/QGuiApplication>
-#include <QtGui/QScreen>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
 
 #include <QQuickWindow>
 
 #define SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH QLatin1String("/usr/lib/mozembedlite/")
-#define CONTENT_ORIENTATION_CHANGED QLatin1String("embed:contentOrientationChanged")
 
 namespace SailfishOS {
 
@@ -66,74 +63,6 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
 
     // TODO : Stop embedding after lastWindow is destroyed.
     connect(engine, SIGNAL(destroyed()), webEngine, SLOT(stopEmbedding()));
-}
-
-RawWebView::RawWebView(QQuickItem *parent)
-    : QuickMozView(parent)
-    , m_vkbMargin(0.0)
-{
-    addMessageListener(CONTENT_ORIENTATION_CHANGED);
-
-    connect(qGuiApp->inputMethod(), &QInputMethod::visibleChanged, this, [=]() {
-        if (qGuiApp->inputMethod()->isVisible()) {
-            setFollowItemGeometry(false);
-        }
-    });
-
-    connect(this, &QuickMozView::recvAsyncMessage, this, &RawWebView::onAsyncMessage);
-}
-
-RawWebView::~RawWebView()
-{
-}
-
-qreal RawWebView::virtualKeyboardMargin() const
-{
-    return m_vkbMargin;
-}
-
-void RawWebView::setVirtualKeyboardMargin(qreal vkbMargin)
-{
-    if (m_vkbMargin != vkbMargin) {
-        m_vkbMargin = vkbMargin;
-        QMargins margins;
-        margins.setBottom(m_vkbMargin);
-        setMargins(margins);
-        emit virtualKeyboardMarginChanged();
-
-        QVariantMap map;
-        map.insert("imOpen", m_vkbMargin > 0);
-        map.insert("pixelRatio", SailfishOS::WebEngineSettings::instance()->pixelRatio());
-        map.insert("bottomMargin", m_vkbMargin);
-        // These map to max css composition size. Item's geometry might update right after this
-        // meaning that height() + m_vkbMargin doesn't yet equal to available max space.
-        // Nevertheless, it is not a big deal if we loose a pixel or two from
-        // max composition size.
-        map.insert("screenWidth", width());
-        map.insert("screenHeight", (height() + m_vkbMargin));
-        QVariant data(map);
-        sendAsyncMessage("embedui:vkbOpenCompositionMetrics", data);
-
-        if (m_vkbMargin == 0) {
-            setFollowItemGeometry(true);
-        }
-    }
-}
-
-void RawWebView::onAsyncMessage(const QString &message, const QVariant &data)
-{
-    if (message == CONTENT_ORIENTATION_CHANGED) {
-        QString orientation = data.toMap().value("orientation").toString();
-        Qt::ScreenOrientation mappedOrientation = Qt::PortraitOrientation;
-        if (orientation == QStringLiteral("landscape-primary")) {
-            mappedOrientation = Qt::LandscapeOrientation;
-        } else if (orientation == QStringLiteral("landscape-secondary")) {
-            mappedOrientation = Qt::InvertedLandscapeOrientation;
-        } else if (orientation == QStringLiteral("portrait-secondary")) {
-            mappedOrientation = Qt::InvertedPortraitOrientation;
-        }
-        emit contentOrientationChanged(mappedOrientation);
-    }
 }
 
 } // namespace WebView

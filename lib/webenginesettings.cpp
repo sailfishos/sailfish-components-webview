@@ -60,8 +60,8 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("embedlite.azpc.handle.longtap"), QVariant::fromValue<bool>(false));
     engineSettings->setPreference(QStringLiteral("embedlite.azpc.json.longtap"), QVariant::fromValue<bool>(true));
     engineSettings->setPreference(QStringLiteral("embedlite.azpc.json.viewport"), QVariant::fromValue<bool>(true));
-    engineSettings->setPreference(QStringLiteral("apz.asyncscroll.throttle"), QVariant::fromValue<int>(400));
-    engineSettings->setPreference(QStringLiteral("apz.asyncscroll.timeout"), QVariant::fromValue<int>(400));
+    engineSettings->setPreference(QStringLiteral("apz.asyncscroll.throttle"), QVariant::fromValue<int>(15));
+    engineSettings->setPreference(QStringLiteral("apz.asyncscroll.timeout"), QVariant::fromValue<int>(15));
     engineSettings->setPreference(QStringLiteral("apz.fling_stopped_threshold"), QLatin1String("0.13f"));
 
     // Make long press timeout equal to the one in Qt

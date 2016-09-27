@@ -9,7 +9,7 @@ TARGETPATH = $$[QT_INSTALL_QML]/$$MODULENAME
 include(../../defaults.pri)
 
 CONFIG += link_pkgconfig plugin
-QT += quick
+QT += quick quick-private
 PKGCONFIG += qt5embedwidget
 
 QMAKE_CXXFLAGS += -fPIC
@@ -17,8 +17,10 @@ QMAKE_CXXFLAGS += -fPIC
 INCLUDEPATH += . src ../../lib
 LIBS += -L../../lib -lsailfishwebengine
 
-HEADERS += plugin.h
-SOURCES += plugin.cpp
+HEADERS += plugin.h \
+            rawwebview.h
+SOURCES += plugin.cpp \
+            rawwebview.cpp
 OTHER_FILES += qmldir *.qml
 
 include(translations.pri)

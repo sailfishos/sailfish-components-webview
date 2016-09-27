@@ -2,7 +2,7 @@ TS_FILE = $$OUT_PWD/sailfish_components_webview_qt5.ts
 EE_QM = $$OUT_PWD/sailfish_components_webview_qt5_eng_en.qm
 
 translations.commands += lupdate $$PWD -ts $$TS_FILE
-translations.depends = $$PWD/WebView.qml $$PWD/WebViewPage.qml
+translations.depends = $$PWD/WebView.qml
 translations.CONFIG += no_check_exist no_link
 translations.output = $$TS_FILE
 translations.input = .
