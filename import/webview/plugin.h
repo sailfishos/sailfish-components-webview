@@ -38,10 +38,23 @@ public:
 class RawWebView : public QuickMozView
 {
     Q_OBJECT
+    Q_PROPERTY(QQuickItem *flickable READ flickable WRITE setFlickable NOTIFY flickableChanged FINAL)
 
 public:
     RawWebView(QQuickItem *parent = 0);
     ~RawWebView();
+
+    QQuickItem *flickable() const;
+    void setFlickable(QQuickItem *flickable);
+    bool eventFilter(QObject *object, QEvent *event);
+
+Q_SIGNALS:
+    void flickableChanged();
+
+private:
+    QQuickItem *m_flickable;
+    QPointF m_startPos;
+    QPointF m_movePos;
 };
 
 // using custom translator so it gets properly removed from qApp when engine is deleted
