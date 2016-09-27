@@ -67,11 +67,78 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
 
 RawWebView::RawWebView(QQuickItem *parent)
     : QuickMozView(parent)
+    , m_flickable(0)
+    , m_startPos(-1.0, -1.0)
+    , m_movePos(-1.0, -1.0)
 {
 }
 
 RawWebView::~RawWebView()
 {
+}
+
+QQuickItem *RawWebView::flickable() const
+{
+    return m_flickable;
+}
+
+void RawWebView::setFlickable(QQuickItem *flickable)
+{
+    if (m_flickable != flickable) {
+        m_flickable = flickable;
+        if (m_flickable) {
+            m_flickable->installEventFilter(this);
+        }
+        emit flickableChanged();
+    }
+}
+
+// This event filter exists to handle the case where the WebView
+// is within a WebViewFlickable, and the user has panned the WebView
+// to atYBeginning() and there is a PullDownMenu available.
+// In this case, the WebViewFlickable will be interactive (and thus
+// steal touch events), but in the case that the user attempts to
+// pan the WebView downwards, we want to let the WebView rather than
+// the WebViewFlickable handle the touch event.
+// (Similarly for when the WebView is atYEnd() with a PushUpMenu.)
+bool RawWebView::eventFilter(QObject *, QEvent *event)
+{
+    if (event->type() == QEvent::TouchBegin ||
+            event->type() == QEvent::TouchCancel ||
+            event->type() == QEvent::TouchEnd ||
+            event->type() == QEvent::TouchUpdate) {
+qWarning() << "received touch event!!";
+        if (m_flickable->property("interactive").toBool() && (atYBeginning() || atYEnd())) {
+qWarning() << "and the flickable is interactive, and we're atYBeginning() or atYEnd()";
+            QTouchEvent *te = static_cast<QTouchEvent *>(event);
+            if (te->touchPoints().size() == 1) {
+                const QTouchEvent::TouchPoint &tp = te->touchPoints().at(0);
+                QPointF currentPos = tp.pos();
+                if ((m_startPos.x() != -1.0) && (m_startPos.y() != -1.0)             // ignore the first touch event
+                        && ((atYBeginning() && currentPos.y() < m_startPos.y()) ||   // if we're at the top and the user is panning down
+                            (atYEnd() && currentPos.y() > m_startPos.y()))) {        // or we're at the bottom and the user is panning up
+qWarning() << "and the user is panning away from the pulley manu!  synthesising a touch point at:" << currentPos.x() << "," << currentPos.y();
+                    // pass the touch through to the underlying webview.
+                    QList<QVariant> list;
+                    list.append(QVariant::fromValue<QPointF>(QPointF(currentPos.x(), currentPos.y())));
+                    if (m_movePos.x() == -1.0 && m_movePos.y() == -1.0) {
+                        synthTouchBegin(list);
+                        m_movePos = currentPos;
+                    } else {
+                        // hopefully this doesn't overwrite the binding...
+                        m_flickable->setProperty("interactive", QVariant::fromValue<bool>(false));
+                        synthTouchMove(list);
+                        m_startPos = QPointF(-1.0, -1.0);
+                        m_movePos = QPointF(-1.0, -1.0);
+                    }
+                    return true;
+                } else {
+                    m_startPos = currentPos;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 } // namespace WebView
