@@ -38,10 +38,20 @@ public:
 class RawWebView : public QuickMozView
 {
     Q_OBJECT
+    Q_PROPERTY(qreal virtualKeyboardMargin READ virtualKeyboardMargin WRITE setVirtualKeyboardMargin NOTIFY virtualKeyboardMarginChanged)
 
 public:
     RawWebView(QQuickItem *parent = 0);
     ~RawWebView();
+
+    qreal virtualKeyboardMargin() const;
+    void setVirtualKeyboardMargin(qreal vkbMargin);
+
+Q_SIGNALS:
+    void virtualKeyboardMarginChanged();
+
+private:
+    qreal m_vkbMargin;
 };
 
 // using custom translator so it gets properly removed from qApp when engine is deleted

@@ -20,6 +20,8 @@
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
 
+#include <QQuickWindow>
+
 #define SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH QLatin1String("/usr/lib/mozembedlite/")
 
 namespace SailfishOS {
@@ -67,11 +69,46 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
 
 RawWebView::RawWebView(QQuickItem *parent)
     : QuickMozView(parent)
+    , m_vkbMargin(0.0)
 {
+    connect(qGuiApp->inputMethod(), &QInputMethod::visibleChanged, this, [=]() {
+        if (qGuiApp->inputMethod()->isVisible()) {
+            setFollowItemGeometry(false);
+        }
+    });
 }
 
 RawWebView::~RawWebView()
 {
+}
+
+qreal RawWebView::virtualKeyboardMargin() const
+{
+    return m_vkbMargin;
+}
+
+void RawWebView::setVirtualKeyboardMargin(qreal vkbMargin)
+{
+    if (m_vkbMargin != vkbMargin) {
+        m_vkbMargin = vkbMargin;
+        QMargins margins;
+        margins.setBottom(m_vkbMargin);
+        setMargins(margins);
+        emit virtualKeyboardMarginChanged();
+
+        QVariantMap map;
+        map.insert("imOpen", m_vkbMargin > 0);
+        map.insert("pixelRatio", SailfishOS::WebEngineSettings::instance()->pixelRatio());
+        map.insert("bottomMargin", m_vkbMargin);
+        map.insert("screenWidth", window()->width());
+        map.insert("screenHeight", window()->height());
+        QVariant data(map);
+        sendAsyncMessage("embedui:vkbOpenCompositionMetrics", data);
+
+        if (m_vkbMargin == 0) {
+            setFollowItemGeometry(true);
+        }
+    }
 }
 
 } // namespace WebView

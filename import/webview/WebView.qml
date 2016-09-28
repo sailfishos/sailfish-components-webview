@@ -11,6 +11,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import Sailfish.Silica.private 1.0 as SilicaPrivate
 import Sailfish.WebView 1.0
 import Sailfish.WebView.Popups 1.0
 import Sailfish.WebView.Pickers 1.0
@@ -267,6 +268,42 @@ RawWebView {
                 if (webview.webViewPage != null && webview.webViewPage != undefined) {
                     webview.webViewPage.activeWebView = webview
                 }
+            }
+        }
+    }
+
+    SilicaPrivate.VirtualKeyboardObserver {
+        id: virtualKeyboardObserver
+        active: webview.enabled
+        transpose: __silica_applicationwindow_instance._transpose
+        onImSizeChanged: {
+            if (imSize > 0 && opened) {
+                webview.virtualKeyboardMargin = virtualKeyboardObserver.imSize
+            }
+        }
+
+        orientation: {
+            if (webview.webViewPage != null) {
+                return webview.webViewPage.orientation
+            } else if (pageStack != undefined && pageStack != null) {
+                if (pageStack.currentPage !== undefined && pageStack.currentPage !== null) {
+                    return pageStack.currentPage.orientation
+                } else {
+                    return Orientation.Portrait
+                }
+            } else {
+                return Orientation.Portrait
+            }
+        }
+
+        onOpenedChanged: {
+            if (opened) {
+                webview.virtualKeyboardMargin = virtualKeyboardObserver.panelSize
+            }
+        }
+        onClosedChanged: {
+            if (closed) {
+                webview.virtualKeyboardMargin = 0
             }
         }
     }
