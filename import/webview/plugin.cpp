@@ -23,6 +23,7 @@
 #include <QQuickWindow>
 
 #define SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH QLatin1String("/usr/lib/mozembedlite/")
+#define CONTENT_ORIENTATION_CHANGED QLatin1String("embed:contentOrientationChanged")
 
 namespace SailfishOS {
 
@@ -71,11 +72,15 @@ RawWebView::RawWebView(QQuickItem *parent)
     : QuickMozView(parent)
     , m_vkbMargin(0.0)
 {
+    addMessageListener(CONTENT_ORIENTATION_CHANGED);
+
     connect(qGuiApp->inputMethod(), &QInputMethod::visibleChanged, this, [=]() {
         if (qGuiApp->inputMethod()->isVisible()) {
             setFollowItemGeometry(false);
         }
     });
+
+    connect(this, &QuickMozView::recvAsyncMessage, this, &RawWebView::onAsyncMessage);
 }
 
 RawWebView::~RawWebView()
@@ -108,6 +113,22 @@ void RawWebView::setVirtualKeyboardMargin(qreal vkbMargin)
         if (m_vkbMargin == 0) {
             setFollowItemGeometry(true);
         }
+    }
+}
+
+void RawWebView::onAsyncMessage(const QString &message, const QVariant &data)
+{
+    if (message == CONTENT_ORIENTATION_CHANGED) {
+        QString orientation = data.toMap().value("orientation").toString();
+        Qt::ScreenOrientation mappedOrientation = Qt::PortraitOrientation;
+        if (orientation == QStringLiteral("landscape-primary")) {
+            mappedOrientation = Qt::LandscapeOrientation;
+        } else if (orientation == QStringLiteral("landscape-secondary")) {
+            mappedOrientation = Qt::InvertedLandscapeOrientation;
+        } else if (orientation == QStringLiteral("portrait-secondary")) {
+            mappedOrientation = Qt::InvertedPortraitOrientation;
+        }
+        emit contentOrientationChanged(mappedOrientation);
     }
 }
 

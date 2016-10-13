@@ -47,8 +47,12 @@ public:
     qreal virtualKeyboardMargin() const;
     void setVirtualKeyboardMargin(qreal vkbMargin);
 
-Q_SIGNALS:
+signals:
     void virtualKeyboardMarginChanged();
+    void contentOrientationChanged(Qt::ScreenOrientation orientation);
+
+private slots:
+    void onAsyncMessage(const QString &message, const QVariant &data);
 
 private:
     qreal m_vkbMargin;
