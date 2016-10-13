@@ -17,11 +17,11 @@ LIBS += -L../../lib -lsailfishwebengine
 
 HEADERS += plugin.h
 SOURCES += plugin.cpp
-OTHER_FILES += qmldir WebView.qml WebViewFlickable.qml WebViewPage.qml
+OTHER_FILES += qmldir *.qml
 
 include(translations.pri)
 
-import.files = qmldir WebView.qml WebViewFlickable.qml WebViewPage.qml
+import.files = qmldir *.qml
 import.path = $$TARGETPATH
 target.path = $$TARGETPATH
 

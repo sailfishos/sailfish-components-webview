@@ -182,7 +182,6 @@ RawWebView {
                 break
             }
             default: {
-                console.log("unhandled async message received: " + message)
                 break
             }
         }
@@ -260,22 +259,34 @@ RawWebView {
             return null
         }
 
+        function hasWebViewPage() {
+            return (webview.webViewPage != null && webview.webViewPage != undefined)
+        }
+
         function setActiveInPage() {
             if (webview.active) {
-                if (webview.webViewPage == null || webview.webViewPage == undefined) {
+                if (!hasWebViewPage()) {
                     webview.webViewPage = helper.findParentWithProperty(webview, '__sailfish_webviewpage')
                 }
-                if (webview.webViewPage != null && webview.webViewPage != undefined) {
+
+                if (hasWebViewPage()) {
                     webview.webViewPage.activeWebView = webview
                 }
+            }
+
+            if (!hasWebViewPage()) {
+                console.warn("WebView.qml it is mandatory to declare webViewPage property to get orientation change working correctly!")
             }
         }
     }
 
     SilicaPrivate.VirtualKeyboardObserver {
         id: virtualKeyboardObserver
+
+        readonly property QtObject appWindow: helper.findParentWithProperty(webview, "__silica_applicationwindow_instance")
+
         active: webview.enabled
-        transpose: __silica_applicationwindow_instance._transpose
+        transpose: appWindow ? appWindow._transpose : false
         onImSizeChanged: {
             if (imSize > 0 && opened) {
                 webview.virtualKeyboardMargin = virtualKeyboardObserver.imSize
