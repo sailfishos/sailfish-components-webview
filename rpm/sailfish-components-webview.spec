@@ -77,9 +77,7 @@ Development package which provides libsailfishwebengine
 %{_libdir}/qt5/qml/Sailfish/WebEngine/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/libsailfishwebviewplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/qmldir
-%{_libdir}/qt5/qml/Sailfish/WebView/WebView.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/WebViewFlickable.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/WebViewPage.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/*.qml
 
 %files ts-devel
 %defattr(-,root,root,-)
@@ -90,34 +88,14 @@ Development package which provides libsailfishwebengine
 %{_datadir}/translations/sailfish_components_webview_popups_qt5_eng_en.qm
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/libsailfishwebviewpopupsplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/qmldir
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/UserPrompt.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/AlertDialog.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/AuthDialog.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/ConfirmDialog.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/LocationDialog.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/PasswordManagerDialog.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/PromptDialog.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/PromptLabel.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/ContextMenu.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/DownloadMenuItem.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/ShareLinkPage.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/Popups/*.qml
 
 %files pickers
 %defattr(-,root,root,-)
 %{_datadir}/translations/sailfish_components_webview_pickers_qt5_eng_en.qm
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/libsailfishwebviewpickersplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/qmldir
-%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/MultiSelectDialog.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/SingleSelectPage.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/PickerCreator.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/ContentPicker.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/ImagePicker.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/MusicPicker.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/VideoPicker.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/MultiContentPicker.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/MultiImagePicker.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/MultiMusicPicker.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/MultiVideoPicker.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/*.qml
 
 %files popups-ts-devel
 %defattr(-,root,root,-)
