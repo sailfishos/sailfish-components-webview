@@ -32,8 +32,6 @@ RawWebView {
         webview.loadFrameScript("chrome://embedlite/content/SelectAsyncHelper.js");
         webview.addMessageListeners([
             "embed:linkclicked",
-            "embed:filepicker",
-            "embed:selectasync",
             "embed:alert",
             "embed:confirm",
             "embed:prompt",
@@ -43,7 +41,20 @@ RawWebView {
             "Content:ContextMenu"]);
     }
 
+    PickerOpener {
+        id: pickerOpener
+
+        property QtObject pageStackOwner: helper.findParentWithProperty(webView, "pageStack")
+
+        pageStack: pageStackOwner ? pageStackOwner.pageStack : undefined
+        contentItem: webview
+    }
+
     onRecvAsyncMessage: {
+        if (pickerOpener.handlesMessage(message)) {
+            return
+        }
+
         // cache some symbol resolutions in var properties in the function closure
         var privData = helper
         var webView = webview
@@ -52,20 +63,6 @@ RawWebView {
         switch(message) {
             case "embed:linkclicked": {
                 webView.linkClicked(data.uri)
-                break
-            }
-            case "embed:filepicker": {
-                filePicker.createObject(pageStack, {
-                                           "pageStack": pageStack,
-                                           "winid": winid,
-                                           "webView": webView,
-                                           "filter": data.filter,
-                                           "mode": data.mode})
-                break
-            }
-            case "embed:selectasync": {
-                pageStack.push(data.multiple ? multiSelectDialog : singleSelectPage,
-                               { "options": data.options, "webview": webView });
                 break
             }
             case "embed:alert": {
@@ -318,10 +315,6 @@ RawWebView {
             }
         }
     }
-
-    Component { id: filePicker; PickerCreator {} }
-    Component { id: multiSelectDialog; MultiSelectDialog {} }
-    Component { id: singleSelectPage; SingleSelectPage {} }
 
     Component { id: authDialog; AuthDialog {} }
     Component { id: alertDialog; AlertDialog {} }
