@@ -3,6 +3,7 @@ plugin sailfishwebviewpickersplugin
 MultiSelectDialog 1.0 MultiSelectDialog.qml
 SingleSelectPage 1.0 SingleSelectPage.qml
 PickerCreator 1.0 PickerCreator.qml
+PickerOpener 1.0 PickerOpener.qml
 ContentPicker 1.0 ContentPicker.qml
 ImagePicker 1.0 ImagePicker.qml
 MultiContentPicker 1.0 MultiContentPicker.qml
