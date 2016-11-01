@@ -3,22 +3,27 @@ TARGET = sailfishwebengine
 TARGET = $$qtLibraryTarget($$TARGET)
 TARGETPATH = $$[QT_INSTALL_LIBS]
 
-CONFIG += qt c++11 create_pc create_prl no_install_prl link_pkgconfig
-QT += core gui
+include(../defaults.pri)
+
+CONFIG += qt create_pc create_prl no_install_prl link_pkgconfig
+QT += gui
 PKGCONFIG += qt5embedwidget sailfishsilica
 
 INCLUDEPATH += $$system(pkg-config --cflags sailfishsilica)
 
-SOURCES += webengine.cpp \
+SOURCES += downloadhelper.cpp \
+           webengine.cpp \
            webenginesettings.cpp
 
-HEADERS += webengine.h \
+HEADERS += downloadhelper.h \
+           webengine.h \
            webengine_p.h \
            webenginesettings.h \
            webenginesettings_p.h
 
 develheaders.path = /usr/include/libsailfishwebengine
-develheaders.files = webengine.h \
+develheaders.files = downloadhelper.h \
+                     webengine.h \
                      webenginesettings.h
 
 target.path = $$[QT_INSTALL_LIBS]

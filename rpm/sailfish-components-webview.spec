@@ -69,6 +69,16 @@ Requires:   %{name} = %{version}-%{release}
 %description devel
 Development package which provides libsailfishwebengine
 
+%package tests
+Summary:    Sailfish OS WebView / WebEngine tests
+BuildRequires:  pkgconfig(Qt5Test)
+Requires:   %{name} = %{version}-%{release}
+Requires:   qt5-qtdeclarative-import-qttest
+Requires:   nemo-test-tools
+
+%description tests
+Unit tests and functional tests of Sailfish OS WebView / WebEngine
+
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libsailfishwebengine.so.*
@@ -110,6 +120,10 @@ Development package which provides libsailfishwebengine
 %{_libdir}/libsailfishwebengine.so
 %{_libdir}/pkgconfig/sailfishwebengine.pc
 %{_includedir}/libsailfishwebengine/*
+
+%files tests
+%defattr(-,root,root,-)
+/opt/tests/sailfish-components-webview/*
 
 %prep
 %setup -q -n %{name}-%{version}
