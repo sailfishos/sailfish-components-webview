@@ -18,7 +18,7 @@ Timer {
     property var geolocationUrls: {{}}
     property var pageStack
     property Item parentItem
-    property var tabModel
+    property QtObject tabModel: null
     property QtObject contentItem
     readonly property bool active: contextMenu && contextMenu.active || false
     property Item contextMenu
@@ -90,7 +90,7 @@ Timer {
                 contextMenu.linkTitle = linkTitle.trim()
                 contextMenu.linkProtocol = data.linkProtocol || ""
                 contextMenu.contentType = contentType
-                contextMenu.tabModel = tabModel
+                contextMenu.tabModel = root.tabModel
                 contextMenu.viewId = contentItem.uniqueID()
                 contextMenu.pageStack = root.pageStack
                 hideVirtualKeyboard()
@@ -105,7 +105,7 @@ Timer {
                                                                 "linkTitle": linkTitle.trim(),
                                                                 "linkProtocol": data.linkProtocol,
                                                                 "contentType": contentType,
-                                                                "tabModel": tabModel,
+                                                                "tabModel": root.tabModel,
                                                                 "viewId": contentItem.uniqueID(),
                                                                 "pageStack": pageStack
                                                             })
