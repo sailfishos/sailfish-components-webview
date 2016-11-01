@@ -22,7 +22,7 @@ Rectangle {
     property string imageSrc
     property string contentType
     property PageStack pageStack
-    property var tabModel // TODO: what about this one?
+    property QtObject tabModel: null
 
     property int viewId
     readonly property bool active: visible
@@ -133,15 +133,13 @@ Rectangle {
         }
 
         MenuItem {
-            visible: root.isNavigable
+            visible: root.isNavigable && !!tabModel
             //: Open link in a new tab from browser context menu
             //% "Open link in a new tab"
             text: qsTrId("sailfish_components_webview_popups-me-open_link_in_new_tab")
             onClicked: {
-                if (tabModel != null && tabModel != undefined) {
-                    root._hide()
-                    tabModel.newTab(root.linkHref, root.linkTitle)
-                }
+                root._hide()
+                tabModel.newTab(root.linkHref, root.linkTitle)
             }
         }
 
@@ -187,15 +185,13 @@ Rectangle {
         }
 
         MenuItem {
-            visible: root.isImage
+            visible: root.isImage && !!tabModel
             //: Open image in a new tab from browser context menu
             //% "Open image in a new tab"
             text: qsTrId("sailfish_components_webview_popups-me-open_image_in_new_tab")
             onClicked: {
-                if (tabModel != null && tabModel != undefined) {
-                    root._hide()
-                    tabModel.newTab(root.imageSrc, "")
-                }
+                root._hide()
+                tabModel.newTab(root.imageSrc, "")
             }
         }
 
