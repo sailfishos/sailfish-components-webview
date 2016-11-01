@@ -105,8 +105,12 @@ void RawWebView::setVirtualKeyboardMargin(qreal vkbMargin)
         map.insert("imOpen", m_vkbMargin > 0);
         map.insert("pixelRatio", SailfishOS::WebEngineSettings::instance()->pixelRatio());
         map.insert("bottomMargin", m_vkbMargin);
-        map.insert("screenWidth", window()->width());
-        map.insert("screenHeight", window()->height());
+        // These map to max css composition size. Item's geometry might update right after this
+        // meaning that height() + m_vkbMargin doesn't yet equal to available max space.
+        // Nevertheless, it is not a big deal if we loose a pixel or two from
+        // max composition size.
+        map.insert("screenWidth", width());
+        map.insert("screenHeight", (height() + m_vkbMargin));
         QVariant data(map);
         sendAsyncMessage("embedui:vkbOpenCompositionMetrics", data);
 
