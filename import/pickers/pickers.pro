@@ -6,8 +6,10 @@ TARGET = $$qtLibraryTarget($$TARGET)
 MODULENAME = Sailfish/WebView/Pickers
 TARGETPATH = $$[QT_INSTALL_QML]/$$MODULENAME
 
-CONFIG += qt plugin
-QT += core qml quick
+include(../../defaults.pri)
+
+CONFIG += plugin
+QT += qml quick
 
 QMAKE_CXXFLAGS += -fPIC
 

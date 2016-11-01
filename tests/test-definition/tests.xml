@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testdefinition version="1.0">
+   <suite name="sailfish-components-webview" domain="ui">
+       <description>Sailfish WebView/WebEngine automatic tests</description>
+       <set name="unit-tests" feature="Sailfish WebView/WebEngine">
+           <pre_steps>
+               <step>/usr/bin/start-ui-test.sh</step>
+           </pre_steps>
+           <description>Sailfish WebView/WebEngine unit tests</description>
+           <case manual="false" name="tst_downloadhelper">
+               <step>/opt/tests/sailfish-components-webview/auto/tst_downloadhelper</step>
+           </case>
+           <post_steps>
+               <step>/usr/bin/stop-ui-test.sh</step>
+           </post_steps>
+       </set>
+   </suite>
+</testdefinition>

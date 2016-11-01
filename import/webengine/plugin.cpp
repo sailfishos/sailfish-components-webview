@@ -11,6 +11,7 @@
 
 #include "webengine.h"
 #include "webenginesettings.h"
+#include "downloadhelper.h"
 
 #include <QtCore/QStandardPaths>
 #include <QQmlExtensionPlugin>
@@ -41,8 +42,13 @@ public:
     {
         Q_ASSERT(uri == QLatin1String("Sailfish.WebEngine"));
 
-        qmlRegisterSingletonType<SailfishOS::WebEngine>("Sailfish.WebEngine", 1, 0, "WebEngine", singletonApiFactory<SailfishOS::WebEngine>);
-        qmlRegisterSingletonType<SailfishOS::WebEngineSettings>("Sailfish.WebEngine", 1, 0, "WebEngineSettings", singletonApiFactory<SailfishOS::WebEngineSettings>);
+        qmlRegisterSingletonType<SailfishOS::WebEngine>("Sailfish.WebEngine", 1, 0, "WebEngine",
+                                                        singletonApiFactory<SailfishOS::WebEngine>);
+        qmlRegisterSingletonType<SailfishOS::WebEngineSettings>("Sailfish.WebEngine", 1, 0, "WebEngineSettings",
+                                                                singletonApiFactory<SailfishOS::WebEngineSettings>);
+        qmlRegisterSingletonType<SailfishOS::WebEngineUtils::DownloadHelper>("Sailfish.WebEngine", 1, 0,
+                                                                             "DownloadHelper",
+                                                                             singletonApiFactory<SailfishOS::WebEngineUtils::DownloadHelper>);
     }
 };
 

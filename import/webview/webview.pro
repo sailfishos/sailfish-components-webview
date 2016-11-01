@@ -6,8 +6,10 @@ TARGET = $$qtLibraryTarget($$TARGET)
 MODULENAME = Sailfish/WebView
 TARGETPATH = $$[QT_INSTALL_QML]/$$MODULENAME
 
-CONFIG += qt link_pkgconfig plugin
-QT += core qml quick
+include(../../defaults.pri)
+
+CONFIG += link_pkgconfig plugin
+QT += quick
 PKGCONFIG += qt5embedwidget
 
 QMAKE_CXXFLAGS += -fPIC

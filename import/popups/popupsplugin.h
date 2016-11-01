@@ -36,15 +36,6 @@ public:
     void initializeEngine(QQmlEngine *engine, const char *uri);
 };
 
-class DownloadHelper : public QObject
-{
-    Q_OBJECT
-
-public:
-    DownloadHelper(QObject *parent = Q_NULLPTR) : QObject(parent) {}
-    Q_INVOKABLE QString createUniqueFileUrl(const QString &fileName, const QString &path) const;
-};
-
 // using custom translator so it gets properly removed from qApp when engine is deleted
 class AppTranslator: public QTranslator
 {
