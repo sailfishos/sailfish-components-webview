@@ -24,9 +24,40 @@ RawWebView {
 
     signal linkClicked(string url)
 
+    function _findParentWithProperty(item, propertyName) {
+        var parentItem = item.parent
+        while (parentItem) {
+            if (parentItem.hasOwnProperty(propertyName)) {
+                return parentItem
+            }
+            parentItem = parentItem.parent
+        }
+        return null
+    }
+
+    function _hasWebViewPage() {
+        return (webview.webViewPage != null && webview.webViewPage != undefined)
+    }
+
+    function _setActiveInPage() {
+        if (webview.active) {
+            if (!_hasWebViewPage()) {
+                webview.webViewPage = webview._findParentWithProperty(webview, '__sailfish_webviewpage')
+            }
+
+            if (_hasWebViewPage()) {
+                webview.webViewPage.activeWebView = webview
+            }
+        }
+
+        if (!_hasWebViewPage()) {
+            console.warn("WebView.qml it is mandatory to declare webViewPage property to get orientation change working correctly!")
+        }
+    }
+
     active: true
-    onActiveChanged: helper.setActiveInPage()
-    Component.onCompleted: helper.setActiveInPage()
+    onActiveChanged: webview._setActiveInPage()
+    Component.onCompleted: webview._setActiveInPage()
     onViewInitialized: {
         webview.loadFrameScript("chrome://embedlite/content/embedhelper.js");
         webview.loadFrameScript("chrome://embedlite/content/SelectAsyncHelper.js");
@@ -40,11 +71,6 @@ RawWebView {
             return
         }
 
-        // cache some symbol resolutions in var properties in the function closure
-        var privData = helper
-        var webView = webview
-        var winid = data.winid
-        var dialog = null
         switch(message) {
             case "embed:linkclicked": {
                 webView.linkClicked(data.uri)
@@ -59,7 +85,7 @@ RawWebView {
     PickerOpener {
         id: pickerOpener
 
-        property QtObject pageStackOwner: helper.findParentWithProperty(webView, "pageStack")
+        property QtObject pageStackOwner: webview._findParentWithProperty(webView, "pageStack")
 
         pageStack: pageStackOwner ? pageStackOwner.pageStack : undefined
         contentItem: webview
@@ -81,45 +107,10 @@ RawWebView {
         size: BusyIndicatorSize.Large
     }
 
-    Timer {
-        id: helper
-
-        function findParentWithProperty(item, propertyName) {
-            var parentItem = item.parent
-            while (parentItem) {
-                if (parentItem.hasOwnProperty(propertyName)) {
-                    return parentItem
-                }
-                parentItem = parentItem.parent
-            }
-            return null
-        }
-
-        function hasWebViewPage() {
-            return (webview.webViewPage != null && webview.webViewPage != undefined)
-        }
-
-        function setActiveInPage() {
-            if (webview.active) {
-                if (!hasWebViewPage()) {
-                    webview.webViewPage = helper.findParentWithProperty(webview, '__sailfish_webviewpage')
-                }
-
-                if (hasWebViewPage()) {
-                    webview.webViewPage.activeWebView = webview
-                }
-            }
-
-            if (!hasWebViewPage()) {
-                console.warn("WebView.qml it is mandatory to declare webViewPage property to get orientation change working correctly!")
-            }
-        }
-    }
-
     SilicaPrivate.VirtualKeyboardObserver {
         id: virtualKeyboardObserver
 
-        readonly property QtObject appWindow: helper.findParentWithProperty(webview, "__silica_applicationwindow_instance")
+        readonly property QtObject appWindow: webview._findParentWithProperty(webview, "__silica_applicationwindow_instance")
 
         active: webview.enabled
         transpose: appWindow ? appWindow._transpose : false
