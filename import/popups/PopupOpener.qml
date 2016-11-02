@@ -34,6 +34,119 @@ Timer {
 
     signal aboutToOpenContextMenu(var data)
 
+    // Returns true if message is handled.
+    function message(topic, data) {
+        if (!handlesMessage(topic)) {
+            return false
+        }
+
+        if (!contentItem) {
+            console.warn("Picker has no contentItem. Assign / Bind contentItem for each PickerOpener.")
+            return false
+        }
+
+        if (!pageStack) {
+            console.log("PopupOpener has no pageStack. Add missing binding.")
+            return false
+        }
+
+        var winid = data.winid
+        var dialog
+        switch (topic) {
+        case "embed:alert": {
+            dialog = pageStack.push(Qt.resolvedUrl("AlertDialog.qml"), { "text": data.text })
+            // TODO: also the Async message must be sent when window gets closed
+            dialog.done.connect(function() {
+                contentItem.sendAsyncMessage("alertresponse", {"winid": winid})
+            })
+            break
+        }
+        case "embed:confirm": {
+            dialog = pageStack.push(Qt.resolvedUrl("ConfirmDialog.qml"), { "text": data.text })
+            // TODO: also the Async message must be sent when window gets closed
+            dialog.accepted.connect(function() {
+                webView.sendAsyncMessage("confirmresponse",
+                                         { "winid": winid, "accepted": true })
+            })
+            dialog.rejected.connect(function() {
+                webView.sendAsyncMessage("confirmresponse",
+                                         { "winid": winid, "accepted": false })
+            })
+            break
+        }
+        case "embed:prompt": {
+            dialog = pageStack.push(Qt.resolvedUrl("PromptDialog.qml"), { "text": data.text, "value": data.defaultValue })
+            // TODO: also the Async message must be sent when window gets closed
+            dialog.accepted.connect(function() {
+                webView.sendAsyncMessage("promptresponse",
+                                         { "winid": winid, "accepted": true, "promptvalue": dialog.value })
+            })
+            dialog.rejected.connect(function() {
+                webView.sendAsyncMessage("promptresponse",
+                                         { "winid": winid, "accepted": false })
+            })
+            break
+        }
+        case "embed:login": {
+            dialog = pageStack.push(Qt.resolvedUrl("PasswordManagerDialog.qml"),
+                                    { "webView": contentItem, "requestId": data.id,
+                                      "notificationType": data.name, "formData": data.formdata })
+            break
+        }
+        case "embed:auth": {
+            root.openAuthDialog(contentItem, data, winid)
+            break
+        }
+        case "embed:permissions": {
+            if (data.title === "geolocation"
+                    && Popups.LocationSettings.enabled
+                    && Popups.LocationSettings.gpsPowered) {
+                switch (root.geolocationUrls[data.host]) {
+                    case "accepted": {
+                        contentItem.sendAsyncMessage("embedui:premissions",
+                                                 { "allow": true, "checkedDontAsk": false, "id": data.id })
+                        break
+                    }
+                    case "rejected": {
+                        contentItem.sendAsyncMessage("embedui:premissions",
+                                                 { "allow": false, "checkedDontAsk": false, "id": data.id })
+                        break
+                    }
+                    default: {
+                        dialog = pageStack.push(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
+                        dialog.accepted.connect(function() {
+                            contentItem.sendAsyncMessage("embedui:premissions",
+                                                     { "allow": true, "checkedDontAsk": false, "id": data.id })
+                            root.geolocationUrls[data.host] = "accepted"
+                        })
+                        dialog.rejected.connect(function() {
+                            contentItem.sendAsyncMessage("embedui:premissions",
+                                                     { "allow": false, "checkedDontAsk": false, "id": data.id })
+                            root.geolocationUrls[data.host] = "rejected"
+                        })
+                        break
+                    }
+                }
+            } else {
+                // Currently we don't support other permission requests.
+                sendAsyncMessage("embedui:premissions",
+                                 { "allow": false, "checkedDontAsk": false, "id": data.id })
+            }
+            break
+        }
+        case "Content:ContextMenu": {
+            root._openContextMenu(data)
+            break
+        }
+        }
+        // If we end up here, message has been handled.
+        return true
+    }
+
+    function handlesMessage(topic) {
+        return listeners.indexOf(topic) >= 0
+    }
+
     function hideVirtualKeyboard() {
         if (Qt.inputMethod.visible) {
             contentItem.focus = true
@@ -70,10 +183,6 @@ Timer {
             contentItem.sendAsyncMessage("authresponse",
                                      { "winid": winid, "accepted": false})
         })
-    }
-
-    function handlesMessage(message) {
-        return listeners.indexOf(message) >= 0
     }
 
     function _openContextMenu(data) {
@@ -122,116 +231,6 @@ Timer {
     running: false
     interval: 600 // page transition delay.
     onTriggered: openAuthDialog(authDialogContentItem, authDialogData, authDialogWinId)
-
-    property var _messageHandler: Connections {
-        target: contentItem
-
-        onRecvAsyncMessage: {
-            if (!handlesMessage(message)) {
-                return
-            }
-
-            if (!contentItem) {
-                console.warn("Picker has no contentItem. Assign / Bind contentItem for each PickerOpener.")
-                return
-            }
-
-            if (!pageStack) {
-                console.log("PopupOpener has no pageStack. Add missing binding.")
-                return
-            }
-
-            var winid = data.winid
-            var dialog
-            switch (message) {
-            case "embed:alert": {
-                dialog = pageStack.push(Qt.resolvedUrl("AlertDialog.qml"), { "text": data.text })
-                // TODO: also the Async message must be sent when window gets closed
-                dialog.done.connect(function() {
-                    contentItem.sendAsyncMessage("alertresponse", {"winid": winid})
-                })
-                break
-            }
-            case "embed:confirm": {
-                dialog = pageStack.push(Qt.resolvedUrl("ConfirmDialog.qml"), { "text": data.text })
-                // TODO: also the Async message must be sent when window gets closed
-                dialog.accepted.connect(function() {
-                    webView.sendAsyncMessage("confirmresponse",
-                                             { "winid": winid, "accepted": true })
-                })
-                dialog.rejected.connect(function() {
-                    webView.sendAsyncMessage("confirmresponse",
-                                             { "winid": winid, "accepted": false })
-                })
-                break
-            }
-            case "embed:prompt": {
-                dialog = pageStack.push(Qt.resolvedUrl("PromptDialog.qml"), { "text": data.text, "value": data.defaultValue })
-                // TODO: also the Async message must be sent when window gets closed
-                dialog.accepted.connect(function() {
-                    webView.sendAsyncMessage("promptresponse",
-                                             { "winid": winid, "accepted": true, "promptvalue": dialog.value })
-                })
-                dialog.rejected.connect(function() {
-                    webView.sendAsyncMessage("promptresponse",
-                                             { "winid": winid, "accepted": false })
-                })
-                break
-            }
-            case "embed:login": {
-                dialog = pageStack.push(Qt.resolvedUrl("PasswordManagerDialog.qml"),
-                                        { "webView": contentItem, "requestId": data.id,
-                                          "notificationType": data.name, "formData": data.formdata })
-                break
-            }
-            case "embed:auth": {
-                root.openAuthDialog(contentItem, data, winid)
-                break
-            }
-            case "embed:permissions": {
-                if (data.title === "geolocation"
-                        && Popups.LocationSettings.enabled
-                        && Popups.LocationSettings.gpsPowered) {
-                    switch (root.geolocationUrls[data.host]) {
-                        case "accepted": {
-                            contentItem.sendAsyncMessage("embedui:premissions",
-                                                     { "allow": true, "checkedDontAsk": false, "id": data.id })
-                            break
-                        }
-                        case "rejected": {
-                            contentItem.sendAsyncMessage("embedui:premissions",
-                                                     { "allow": false, "checkedDontAsk": false, "id": data.id })
-                            break
-                        }
-                        default: {
-                            dialog = pageStack.push(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
-                            dialog.accepted.connect(function() {
-                                contentItem.sendAsyncMessage("embedui:premissions",
-                                                         { "allow": true, "checkedDontAsk": false, "id": data.id })
-                                root.geolocationUrls[data.host] = "accepted"
-                            })
-                            dialog.rejected.connect(function() {
-                                contentItem.sendAsyncMessage("embedui:premissions",
-                                                         { "allow": false, "checkedDontAsk": false, "id": data.id })
-                                root.geolocationUrls[data.host] = "rejected"
-                            })
-                            break
-                        }
-                    }
-                } else {
-                    // Currently we don't support other permission requests.
-                    sendAsyncMessage("embedui:premissions",
-                                     { "allow": false, "checkedDontAsk": false, "id": data.id })
-                }
-                break
-            }
-            case "Content:ContextMenu": {
-                root._openContextMenu(data)
-                break
-            }
-            }
-        }
-    }
 
     Component.onCompleted: {
         // Warmup location settings.

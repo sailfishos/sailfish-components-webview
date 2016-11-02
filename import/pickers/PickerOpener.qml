@@ -22,52 +22,54 @@ QtObject {
     readonly property string _filePickerComponentUrl: Qt.resolvedUrl("PickerCreator.qml")
     property Component _filePickerComponent
 
-    property var _messageHandler: Connections {
-        target: contentItem
-
-        onRecvAsyncMessage: {
-            if (!contentItem) {
-                console.warn("PickerOpener has no contentItem. Assign / Bind contentItem for each PickerOpener.")
-                return
-            }
-
-            if (!pageStack) {
-                console.log("PickerOpener has no pageStack. Add missing binding.")
-                return
-            }
-
-            var winid = data.winid
-            switch (message) {
-            case "embed:selectasync": {
-                pageStack.push(data.multiple ? _multiSelectComponentUrl : _singleSelectComponentUrl,
-                                               { "options": data.options, "webview": contentItem })
-                break
-            }
-            case "embed:filepicker": {
-                if (!_filePickerComponent) {
-                    _filePickerComponent = Qt.createComponent(_filePickerComponentUrl)
-                }
-
-                if (_filePickerComponent.status === Component.Ready) {
-                    _filePickerComponent.createObject(pageStack, {
-                                                          "pageStack": pageStack,
-                                                          "winid": winid,
-                                                          "webView": contentItem,
-                                                          "filter": data.filter,
-                                                          "mode": data.mode})
-                } else if (_filePickerComponent.status === Component.Error) {
-                    // Component development time issue, component creation should newer fail.
-                    console.warn("PickerOpener failed to create PickerOpener: ", _filePickerComponent.errorString())
-                }
-
-                break
-            }
-            }
+    // Returns true if message is handled.
+    function message(topic, data) {
+        if (!handlesMessage(topic)) {
+            return false
         }
+
+        if (!contentItem) {
+            console.warn("PickerOpener has no contentItem. Assign / Bind contentItem for each PickerOpener.")
+            return false
+        }
+
+        if (!pageStack) {
+            console.log("PickerOpener has no pageStack. Add missing binding.")
+            return false
+        }
+
+        var winid = data.winid
+        switch (topic) {
+        case "embed:selectasync": {
+            pageStack.push(data.multiple ? _multiSelectComponentUrl : _singleSelectComponentUrl,
+                                           { "options": data.options, "webview": contentItem })
+            break
+        }
+        case "embed:filepicker": {
+            if (!_filePickerComponent) {
+                _filePickerComponent = Qt.createComponent(_filePickerComponentUrl)
+            }
+
+            if (_filePickerComponent.status === Component.Ready) {
+                _filePickerComponent.createObject(pageStack, {
+                                                      "pageStack": pageStack,
+                                                      "winid": winid,
+                                                      "webView": contentItem,
+                                                      "filter": data.filter,
+                                                      "mode": data.mode})
+            } else if (_filePickerComponent.status === Component.Error) {
+                // Component development time issue, component creation should newer fail.
+                console.warn("PickerOpener failed to create PickerOpener: ", _filePickerComponent.errorString())
+            }
+            break
+        }
+        }
+        // If we end up here, message has been handled.
+        return true
     }
 
-    function handlesMessage(message) {
-        return listeners.indexOf(message) >= 0
+    function handlesMessage(topic) {
+        return listeners.indexOf(topic) >= 0
     }
 
     Component.onCompleted: {
