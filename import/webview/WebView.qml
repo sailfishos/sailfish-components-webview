@@ -19,12 +19,12 @@ import Sailfish.WebView.Pickers 1.0
 RawWebView {
     id: webview
 
-    signal linkClicked(string url)
-
-    active: true
     property WebViewPage webViewPage
     property int __sailfish_webview
 
+    signal linkClicked(string url)
+
+    active: true
     onActiveChanged: helper.setActiveInPage()
     Component.onCompleted: helper.setActiveInPage()
     onViewInitialized: {
@@ -33,23 +33,6 @@ RawWebView {
         webview.addMessageListeners([
                                         "embed:linkclicked",
                                     ]);
-    }
-
-    PickerOpener {
-        id: pickerOpener
-
-        property QtObject pageStackOwner: helper.findParentWithProperty(webView, "pageStack")
-
-        pageStack: pageStackOwner ? pageStackOwner.pageStack : undefined
-        contentItem: webview
-    }
-
-    PopupOpener {
-        id: popupOpener
-
-        pageStack: pickerOpener.pageStack
-        parentItem: webview
-        contentItem: webview
     }
 
     onRecvAsyncMessage: {
@@ -71,6 +54,23 @@ RawWebView {
                 break
             }
         }
+    }
+
+    PickerOpener {
+        id: pickerOpener
+
+        property QtObject pageStackOwner: helper.findParentWithProperty(webView, "pageStack")
+
+        pageStack: pageStackOwner ? pageStackOwner.pageStack : undefined
+        contentItem: webview
+    }
+
+    PopupOpener {
+        id: popupOpener
+
+        pageStack: pickerOpener.pageStack
+        parentItem: webview
+        contentItem: webview
     }
 
     BusyIndicator {
