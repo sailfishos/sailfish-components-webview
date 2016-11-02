@@ -20,7 +20,6 @@ Dialog {
     property QtObject webview
 
     onOpened: {
-        console.log("Have webview: " + webview)
         for (var i=0; i < options.length; i++) {
             selectModel.append(options[i])
         }
