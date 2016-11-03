@@ -97,6 +97,12 @@ RawWebView {
         pageStack: pickerOpener.pageStack
         parentItem: webview
         contentItem: webview
+
+        onAboutToOpenContextMenu: {
+            if (Qt.inputMethod.visible) {
+                webview.parent.focus = true
+            }
+        }
     }
 
     BusyIndicator {

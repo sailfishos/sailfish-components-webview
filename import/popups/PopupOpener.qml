@@ -147,12 +147,6 @@ Timer {
         return listeners.indexOf(topic) >= 0
     }
 
-    function hideVirtualKeyboard() {
-        if (Qt.inputMethod.visible) {
-            contentItem.focus = true
-        }
-    }
-
     function openAuthDialog(contentItem, data, winid) {
         if (pageStack.busy) {
             root._delayedOpenAuthDialog(contentItem, data, winid)
@@ -202,7 +196,6 @@ Timer {
                 contextMenu.tabModel = root.tabModel
                 contextMenu.viewId = contentItem.uniqueID()
                 contextMenu.pageStack = root.pageStack
-                hideVirtualKeyboard()
                 contextMenu.show()
             } else {
                 _contextMenuComponent = Qt.createComponent(Qt.resolvedUrl("ContextMenu.qml"))
@@ -218,7 +211,6 @@ Timer {
                                                                 "viewId": contentItem.uniqueID(),
                                                                 "pageStack": pageStack
                                                             })
-                    hideVirtualKeyboard()
                     contextMenu.show()
                 } else {
                     console.log("Can't load ContextMenu.qml")
