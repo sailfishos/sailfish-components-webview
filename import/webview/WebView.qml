@@ -73,7 +73,7 @@ RawWebView {
 
         switch(message) {
             case "embed:linkclicked": {
-                webView.linkClicked(data.uri)
+                webview.linkClicked(data.uri)
                 break
             }
             default: {
@@ -85,7 +85,7 @@ RawWebView {
     PickerOpener {
         id: pickerOpener
 
-        property QtObject pageStackOwner: webview._findParentWithProperty(webView, "pageStack")
+        property QtObject pageStackOwner: webview._findParentWithProperty(webview, "pageStack")
 
         pageStack: pageStackOwner ? pageStackOwner.pageStack : undefined
         contentItem: webview

@@ -65,11 +65,11 @@ Timer {
             dialog = pageStack.push(Qt.resolvedUrl("ConfirmDialog.qml"), { "text": data.text })
             // TODO: also the Async message must be sent when window gets closed
             dialog.accepted.connect(function() {
-                webView.sendAsyncMessage("confirmresponse",
+                contentItem.sendAsyncMessage("confirmresponse",
                                          { "winid": winid, "accepted": true })
             })
             dialog.rejected.connect(function() {
-                webView.sendAsyncMessage("confirmresponse",
+                contentItem.sendAsyncMessage("confirmresponse",
                                          { "winid": winid, "accepted": false })
             })
             break
@@ -78,18 +78,18 @@ Timer {
             dialog = pageStack.push(Qt.resolvedUrl("PromptDialog.qml"), { "text": data.text, "value": data.defaultValue })
             // TODO: also the Async message must be sent when window gets closed
             dialog.accepted.connect(function() {
-                webView.sendAsyncMessage("promptresponse",
+                contentItem.sendAsyncMessage("promptresponse",
                                          { "winid": winid, "accepted": true, "promptvalue": dialog.value })
             })
             dialog.rejected.connect(function() {
-                webView.sendAsyncMessage("promptresponse",
+                contentItem.sendAsyncMessage("promptresponse",
                                          { "winid": winid, "accepted": false })
             })
             break
         }
         case "embed:login": {
             dialog = pageStack.push(Qt.resolvedUrl("PasswordManagerDialog.qml"),
-                                    { "webView": contentItem, "requestId": data.id,
+                                    { "contentItem": contentItem, "requestId": data.id,
                                       "notificationType": data.name, "formData": data.formdata })
             break
         }

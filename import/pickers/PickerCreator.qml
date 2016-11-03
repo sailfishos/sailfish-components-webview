@@ -15,7 +15,7 @@ import Sailfish.Pickers 1.0
 Item {
     id: pickerCreator
     property int winid
-    property QtObject webView
+    property QtObject contentItem
     property int filter: _nsIFilePicker_filterAll
     property int mode
     property Item pageStack
@@ -36,7 +36,7 @@ Item {
             filePath = filePath.slice(scheme.length, filePath.length)
         }
 
-        webView.sendAsyncMessage("filepickerresponse",
+        contentItem.sendAsyncMessage("filepickerresponse",
                                  {
                                      "winid": winid,
                                      "accepted": filePath ? true : false,
@@ -56,7 +56,7 @@ Item {
             result.push(filePath)
         }
 
-        webView.sendAsyncMessage("filepickerresponse",
+        contentItem.sendAsyncMessage("filepickerresponse",
                                  {
                                      "winid": winid,
                                      "accepted": result.length > 0,

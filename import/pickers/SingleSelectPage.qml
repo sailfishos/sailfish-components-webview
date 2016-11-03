@@ -17,7 +17,7 @@ Page {
 
     // input data
     property var options
-    property QtObject webview
+    property QtObject contentItem
 
     Component.onCompleted: {
         for (var i=0; i < options.length; i++) {
@@ -39,14 +39,14 @@ Page {
                 "index": item.index
             })
         }
-        webview.sendAsyncMessage("embedui:selectresponse", {"result": result})
+        contentItem.sendAsyncMessage("embedui:selectresponse", {"result": result})
         pageStack.pop()
     }
 
     on_NavigationChanged: {
         if (_navigation == PageNavigation.Back) {
             // swiped back
-            webview.sendAsyncMessage("embedui:selectresponse", {"result": -1})
+            contentItem.sendAsyncMessage("embedui:selectresponse", {"result": -1})
         }
     }
 
