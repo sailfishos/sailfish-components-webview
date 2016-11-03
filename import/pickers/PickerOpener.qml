@@ -42,7 +42,7 @@ QtObject {
         switch (topic) {
         case "embed:selectasync": {
             pageStack.push(data.multiple ? _multiSelectComponentUrl : _singleSelectComponentUrl,
-                                           { "options": data.options, "webview": contentItem })
+                                           { "options": data.options, "contentItem": contentItem })
             break
         }
         case "embed:filepicker": {
@@ -54,7 +54,7 @@ QtObject {
                 _filePickerComponent.createObject(pageStack, {
                                                       "pageStack": pageStack,
                                                       "winid": winid,
-                                                      "webView": contentItem,
+                                                      "contentItem": contentItem,
                                                       "filter": data.filter,
                                                       "mode": data.mode})
             } else if (_filePickerComponent.status === Component.Error) {

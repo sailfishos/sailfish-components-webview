@@ -17,7 +17,7 @@ Dialog {
 
     // input data
     property var options
-    property QtObject webview
+    property QtObject contentItem
 
     onOpened: {
         for (var i=0; i < options.length; i++) {
@@ -36,11 +36,11 @@ Dialog {
                 "index": item.index
             })
         }
-        webview.sendAsyncMessage("embedui:selectresponse", {"result": result})
+        contentItem.sendAsyncMessage("embedui:selectresponse", {"result": result})
     }
 
     onRejected: {
-        webview.sendAsyncMessage("embedui:selectresponse", {"result": -1})
+        contentItem.sendAsyncMessage("embedui:selectresponse", {"result": -1})
     }
 
     ListModel {
