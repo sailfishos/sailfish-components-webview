@@ -16,7 +16,6 @@
 #include <QtCore/QLocale>
 
 #include <QtQml/QQmlExtensionPlugin>
-#include <QtQuick/QQuickItem>
 
 //mozembedlite-qt5
 #include <quickmozview.h>
@@ -33,29 +32,6 @@ class SailfishOSWebViewPlugin : public QQmlExtensionPlugin
 public:
     void registerTypes(const char *uri);
     void initializeEngine(QQmlEngine *engine, const char *uri);
-};
-
-class RawWebView : public QuickMozView
-{
-    Q_OBJECT
-    Q_PROPERTY(qreal virtualKeyboardMargin READ virtualKeyboardMargin WRITE setVirtualKeyboardMargin NOTIFY virtualKeyboardMarginChanged)
-
-public:
-    RawWebView(QQuickItem *parent = 0);
-    ~RawWebView();
-
-    qreal virtualKeyboardMargin() const;
-    void setVirtualKeyboardMargin(qreal vkbMargin);
-
-signals:
-    void virtualKeyboardMarginChanged();
-    void contentOrientationChanged(Qt::ScreenOrientation orientation);
-
-private slots:
-    void onAsyncMessage(const QString &message, const QVariant &data);
-
-private:
-    qreal m_vkbMargin;
 };
 
 // using custom translator so it gets properly removed from qApp when engine is deleted

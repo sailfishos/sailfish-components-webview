@@ -58,6 +58,7 @@ RawWebView {
     active: true
     onActiveChanged: webview._setActiveInPage()
     Component.onCompleted: webview._setActiveInPage()
+
     onViewInitialized: {
         webview.loadFrameScript("chrome://embedlite/content/embedhelper.js");
         webview.loadFrameScript("chrome://embedlite/content/SelectAsyncHelper.js");
