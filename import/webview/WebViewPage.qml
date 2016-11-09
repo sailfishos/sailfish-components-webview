@@ -4,7 +4,7 @@ import Sailfish.Silica 1.0
 Page {
     id: webViewPage
 
-    property var activeWebView
+    property QtObject activeWebView
 
     property int __sailfish_webviewpage
     default property alias _contentChildren: content.data

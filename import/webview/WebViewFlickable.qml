@@ -6,7 +6,9 @@ import Sailfish.WebView 1.0
 Item {
     property alias webView: webView
 
-    // TODO: add header once WebView::setMargins() works
+    property alias header: headerLoader.sourceComponent
+    property Item headerItem: headerLoader.item
+
     property alias footer: footerLoader.sourceComponent
     property Item footerItem: footerLoader.item
 
@@ -18,6 +20,7 @@ Item {
         height: parent.height
         flickable: flickable
         bottomMargin: footerItem && footerItem.height || 0
+        topMargin: headerItem && headerItem.height || 0
         clip: false
 
         y: Math.min(Math.max(0, -flickable.contentY), flickable.contentHeight-flickable.height - flickable.contentY)
@@ -27,17 +30,25 @@ Item {
         SilicaFlickable {
             id: flickable
 
-            y: -webView.y
+            y: -webView.y // include pulley menu as it's made visible
 
             width: parent.width
             height: parent.height
 
-            contentHeight: Math.max(webView.contentHeight+webView.bottomMargin, webView.height)
+            contentHeight: Math.max(webView.contentHeight+webView.bottomMargin+webView.topMargin, webView.height)
             contentWidth: width
 
             quickScrollEnabled: false
 
             onContentYChanged: if (flickable.moving) webView.scrollTo(webView.scrollableOffset.x, flickable.contentY)
+
+            SilicaPrivate.Wallpaper {
+                anchors.fill: headerLoader
+            }
+            Loader {
+                id: headerLoader
+                width: flickable.width
+            }
 
             SilicaPrivate.Wallpaper {
                 anchors.fill: footerLoader
