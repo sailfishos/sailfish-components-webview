@@ -33,6 +33,7 @@ Requires:  %{name} = %{version}
 Summary:   Popup and alert QML components used by sailfish-components-webview
 Group:     System/Libraries
 Requires:  %{name} = %{version}
+Requires:  declarative-transferengine-qt5 >= 0.2.3
 
 %description popups
 %{summary}.
@@ -41,7 +42,6 @@ Requires:  %{name} = %{version}
 Summary:   Translation source for sailfish-components-webview-popups-qt5
 Group:     System/Libraries
 Requires:  %{name} = %{version}
-Requires:  declarative-transferengine-qt5
 
 %description popups-ts-devel
 %{summary}.
