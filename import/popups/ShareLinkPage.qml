@@ -35,7 +35,7 @@ Page {
         }
 
         ViewPlaceholder {
-            enabled: shareMethodList.model.count === 0
+            enabled: shareMethodList.model.count === 0 && shareMethodList.model.ready
 
             //: Empty state for share link page
             //% "No sharing accounts available. You can add accounts in settings"
