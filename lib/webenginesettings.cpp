@@ -64,6 +64,9 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("apz.asyncscroll.timeout"), QVariant::fromValue<int>(15));
     engineSettings->setPreference(QStringLiteral("apz.fling_stopped_threshold"), QLatin1String("0.13f"));
 
+    // Theme settings.
+    engineSettings->setPreference(QStringLiteral("ui.textSelectBackground"), QLatin1String("#878787"));
+
     // Make long press timeout equal to the one in Qt
     engineSettings->setPreference(QStringLiteral("ui.click_hold_context_menus.delay"), QVariant(PressAndHoldDelay));
 
