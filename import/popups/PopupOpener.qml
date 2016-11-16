@@ -11,11 +11,11 @@
 
 import QtQuick 2.2
 import Sailfish.WebView.Popups 1.0 as Popups
+import "GeolocationHosts.js" as Geolocation
 
 Timer {
     id: root
 
-    property var geolocationUrls: {{}}
     property var pageStack
     property Item parentItem
     property QtObject tabModel: null
@@ -101,7 +101,7 @@ Timer {
             if (data.title === "geolocation"
                     && Popups.LocationSettings.enabled
                     && Popups.LocationSettings.gpsPowered) {
-                switch (root.geolocationUrls[data.host]) {
+                switch (Geolocation.response(data.host)) {
                     case "accepted": {
                         contentItem.sendAsyncMessage("embedui:premissions",
                                                  { "allow": true, "checkedDontAsk": false, "id": data.id })
@@ -117,12 +117,12 @@ Timer {
                         dialog.accepted.connect(function() {
                             contentItem.sendAsyncMessage("embedui:premissions",
                                                      { "allow": true, "checkedDontAsk": false, "id": data.id })
-                            root.geolocationUrls[data.host] = "accepted"
+                            Geolocation.addResponse(data.host, "accepted")
                         })
                         dialog.rejected.connect(function() {
                             contentItem.sendAsyncMessage("embedui:premissions",
                                                      { "allow": false, "checkedDontAsk": false, "id": data.id })
-                            root.geolocationUrls[data.host] = "rejected"
+                            Geolocation.addResponse(data.host, "rejected")
                         })
                         break
                     }

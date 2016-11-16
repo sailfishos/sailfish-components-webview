@@ -15,11 +15,11 @@ QMAKE_CXXFLAGS += -fPIC
 
 HEADERS += popupsplugin.h
 SOURCES += popupsplugin.cpp
-OTHER_FILES += qmldir *qml
+OTHER_FILES += qmldir *.qml *.js
 
 include(popupstranslations.pri)
 
-import.files = qmldir *.qml
+import.files = qmldir *.qml *.js
 import.path = $$TARGETPATH
 target.path = $$TARGETPATH
 
