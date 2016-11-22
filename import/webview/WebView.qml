@@ -59,12 +59,31 @@ RawWebView {
     onActiveChanged: webview._setActiveInPage()
     Component.onCompleted: webview._setActiveInPage()
 
+
+    topMargin: 200
+    bottomMargin: 100
+
+    Rectangle {
+        height: topMargin
+        width: parent.width
+        color: "red"
+    }
+
+    Rectangle {
+        anchors.bottom: parent.bottom
+        height: bottomMargin
+        width: parent.width
+        color: "red"
+    }
+
     onViewInitialized: {
         webview.loadFrameScript("chrome://embedlite/content/embedhelper.js");
         webview.loadFrameScript("chrome://embedlite/content/SelectAsyncHelper.js");
         webview.addMessageListeners([
                                         "embed:linkclicked",
                                     ]);
+        //url = "file:///opt/tests/sailfish-browser/manual/foobar.html"
+        url = "file:///opt/tests/sailfish-browser/manual/testpage.html"
     }
 
     onRecvAsyncMessage: {

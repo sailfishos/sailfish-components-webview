@@ -25,7 +25,7 @@ class RawWebView : public QuickMozView
 {
     Q_OBJECT
     Q_PROPERTY(qreal virtualKeyboardMargin READ virtualKeyboardMargin WRITE setVirtualKeyboardMargin NOTIFY virtualKeyboardMarginChanged)
-    Q_PROPERTY(QQuickItem *flickable READ flickable WRITE setFlickable NOTIFY flickableChanged FINAL)
+//    Q_PROPERTY(QQuickItem *flickable READ flickable WRITE setFlickable NOTIFY flickableChanged FINAL)
     Q_PROPERTY(qreal topMargin READ topMargin WRITE setTopMargin NOTIFY topMarginChanged)
     Q_PROPERTY(qreal bottomMargin READ bottomMargin WRITE setBottomMargin NOTIFY bottomMarginChanged)
 
@@ -36,8 +36,8 @@ public:
     qreal virtualKeyboardMargin() const;
     void setVirtualKeyboardMargin(qreal vkbMargin);
 
-    QQuickItem *flickable() const;
-    void setFlickable(QQuickItem *flickable);
+//    QQuickItem *flickable() const;
+//    void setFlickable(QQuickItem *flickable);
 
     qreal topMargin() const;
     void setTopMargin(qreal margin);
@@ -45,11 +45,10 @@ public:
     qreal bottomMargin() const;
     void setBottomMargin(qreal margin);
 
-protected:
-    void handleTouchEvent(QTouchEvent *event);
-
-    void touchEvent(QTouchEvent *event);
-    bool childMouseEventFilter(QQuickItem *i, QEvent *e);
+//protected:
+//    void handleTouchEvent(QTouchEvent *event);
+//    void touchEvent(QTouchEvent *event);
+//    bool childMouseEventFilter(QQuickItem *i, QEvent *e);
 
 signals:
     void virtualKeyboardMarginChanged();
@@ -63,15 +62,15 @@ private slots:
 
 private:
     void updateMargins();
-    int findTouch(int id) const;
-    void clearTouch();
+//    int findTouch(int id) const;
+//    void clearTouch();
 
     qreal m_vkbMargin;
-    QQuickItem *m_flickable;
+//    QQuickItem *m_flickable;
     QPointF m_startPos;
     qreal m_topMargin;
     qreal m_bottomMargin;
-    QList<QTouchEvent::TouchPoint> m_touchPoints;
+//    QList<QTouchEvent::TouchPoint> m_touchPoints;
 };
 
 } // namespace WebView
