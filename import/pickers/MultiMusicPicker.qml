@@ -15,8 +15,5 @@ import Sailfish.Pickers 1.0
 MultiMusicPickerDialog {
     property var creator
 
-    //: For choosing audio files to send to the website from the device
-    //% "Upload audio files"
-    title: qsTrId("sailfish_components_webview_pickers-he-upload_audio_files")
     Component.onDestruction: creator.sendResponseList(selectedContent)
 }
