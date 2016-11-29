@@ -15,8 +15,5 @@ import Sailfish.Pickers 1.0
 MultiImagePickerDialog {
     property var creator
 
-    //: For choosing images to send to the website from the device
-    //% "Upload images"
-    title: qsTrId("sailfish_components_webview_pickers-he-upload_images")
     Component.onDestruction: creator.sendResponseList(selectedContent)
 }

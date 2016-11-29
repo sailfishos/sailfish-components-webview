@@ -15,8 +15,5 @@ import Sailfish.Pickers 1.0
 MultiVideoPickerDialog {
     property var creator
 
-    //: For choosing videos to send to the website from the device
-    //% "Upload videos"
-    title: qsTrId("sailfish_components_webview_pickers-he-upload_videos")
     Component.onDestruction: creator.sendResponseList(selectedContent)
 }
