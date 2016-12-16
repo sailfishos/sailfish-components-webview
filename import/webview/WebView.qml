@@ -19,6 +19,7 @@ import Sailfish.WebView.Pickers 1.0
 RawWebView {
     id: webview
 
+    property PageStack webViewPageStack
     property WebViewPage webViewPage
     property int __sailfish_webview
 
@@ -39,6 +40,10 @@ RawWebView {
         return (webview.webViewPage != null && webview.webViewPage != undefined)
     }
 
+    function _hasWebViewPageStack() {
+        return (webview.webViewPageStack != null && webview.webViewPageStack != undefined)
+    }
+
     function _setActiveInPage() {
         if (webview.active) {
             if (!_hasWebViewPage()) {
@@ -53,11 +58,16 @@ RawWebView {
         if (!_hasWebViewPage()) {
             console.warn("WebView.qml it is mandatory to declare webViewPage property to get orientation change working correctly!")
         }
+
+        if (!_hasWebViewPageStack()) {
+            webview.webViewPageStack = webview._findParentWithProperty(webview, "_pageStackIndicator")
+        }
     }
 
     active: true
     onActiveChanged: webview._setActiveInPage()
     Component.onCompleted: webview._setActiveInPage()
+    onParentChanged: webview._setActiveInPage()
 
     onViewInitialized: {
         webview.loadFrameScript("chrome://embedlite/content/embedhelper.js");
@@ -130,9 +140,9 @@ RawWebView {
         orientation: {
             if (webview.webViewPage != null) {
                 return webview.webViewPage.orientation
-            } else if (pageStack != undefined && pageStack != null) {
-                if (pageStack.currentPage !== undefined && pageStack.currentPage !== null) {
-                    return pageStack.currentPage.orientation
+            } else if (webViewPageStack != undefined && webViewPageStack != null) {
+                if (webViewPageStack.currentPage !== undefined && webViewPageStack.currentPage !== null) {
+                    return webViewPageStack.currentPage.orientation
                 } else {
                     return Orientation.Portrait
                 }
