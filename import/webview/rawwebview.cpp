@@ -45,6 +45,7 @@ RawWebView::RawWebView(QQuickItem *parent)
     connect(this, &QuickMozView::recvAsyncMessage, this, &RawWebView::onAsyncMessage);
 
     setFiltersChildMouseEvents(true);
+    qApp->installEventFilter(this);
 }
 
 RawWebView::~RawWebView()
@@ -256,6 +257,15 @@ void RawWebView::handleTouchEvent(QTouchEvent *event)
         clearTouch();
 }
 
+bool RawWebView::eventFilter(QObject *obj, QEvent *event)
+{
+    Q_UNUSED(obj);
+    if (event->type() == QEvent::TouchEnd) {
+        handleTouchEvent(static_cast<QTouchEvent*>(event));
+    }
+    return false;
+}
+
 bool RawWebView::childMouseEventFilter(QQuickItem *i, QEvent *e)
 {
     if (!isVisible())
@@ -268,6 +278,8 @@ bool RawWebView::childMouseEventFilter(QQuickItem *i, QEvent *e)
         return keepMouseGrab();
     case QEvent::TouchEnd:
         handleTouchEvent(static_cast<QTouchEvent*>(e));
+        break;
+    case QEvent::TouchCancel:
         break;
     default:
         break;

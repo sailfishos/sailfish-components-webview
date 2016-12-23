@@ -48,6 +48,7 @@ public:
 protected:
     void handleTouchEvent(QTouchEvent *event);
 
+    bool eventFilter(QObject *obj, QEvent *event);
     void touchEvent(QTouchEvent *event);
     bool childMouseEventFilter(QQuickItem *i, QEvent *e);
 
