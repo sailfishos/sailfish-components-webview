@@ -103,24 +103,24 @@ Timer {
                     && Popups.LocationSettings.gpsPowered) {
                 switch (Geolocation.response(data.host)) {
                     case "accepted": {
-                        contentItem.sendAsyncMessage("embedui:premissions",
+                        contentItem.sendAsyncMessage("embedui:permissions",
                                                  { "allow": true, "checkedDontAsk": false, "id": data.id })
                         break
                     }
                     case "rejected": {
-                        contentItem.sendAsyncMessage("embedui:premissions",
+                        contentItem.sendAsyncMessage("embedui:permissions",
                                                  { "allow": false, "checkedDontAsk": false, "id": data.id })
                         break
                     }
                     default: {
                         dialog = pageStack.push(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
                         dialog.accepted.connect(function() {
-                            contentItem.sendAsyncMessage("embedui:premissions",
+                            contentItem.sendAsyncMessage("embedui:permissions",
                                                      { "allow": true, "checkedDontAsk": false, "id": data.id })
                             Geolocation.addResponse(data.host, "accepted")
                         })
                         dialog.rejected.connect(function() {
-                            contentItem.sendAsyncMessage("embedui:premissions",
+                            contentItem.sendAsyncMessage("embedui:permissions",
                                                      { "allow": false, "checkedDontAsk": false, "id": data.id })
                             Geolocation.addResponse(data.host, "rejected")
                         })
@@ -129,7 +129,7 @@ Timer {
                 }
             } else {
                 // Currently we don't support other permission requests.
-                sendAsyncMessage("embedui:premissions",
+                sendAsyncMessage("embedui:permissions",
                                  { "allow": false, "checkedDontAsk": false, "id": data.id })
             }
             break
