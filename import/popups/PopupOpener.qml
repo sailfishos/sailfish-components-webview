@@ -99,8 +99,7 @@ Timer {
         }
         case "embed:permissions": {
             if (data.title === "geolocation"
-                    && Popups.LocationSettings.enabled
-                    && Popups.LocationSettings.gpsPowered) {
+                    && Popups.LocationSettings.locationEnabled) {
                 switch (Geolocation.response(data.host)) {
                     case "accepted": {
                         contentItem.sendAsyncMessage("embedui:permissions",
@@ -226,7 +225,7 @@ Timer {
 
     Component.onCompleted: {
         // Warmup location settings.
-        Popups.LocationSettings.enabled
+        Popups.LocationSettings.locationEnabled
         if (contentItem) {
             contentItem.addMessageListeners(listeners)
         } else {

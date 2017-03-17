@@ -11,21 +11,17 @@
 
 pragma Singleton
 import QtQml 2.2
-import com.jolla.settings.system 1.0
-import MeeGo.Connman 0.2
+import org.nemomobile.systemsettings 1.0
 
 QtObject {
     id: root
 
-    property alias enabled: locationSettings.locationEnabled
-    property alias gpsPowered: gpsTechModel.powered
+    property bool locationEnabled: locationSettings.locationEnabled
+                                   && ((locationSettings.gpsEnabled && !locationSettings.gpsFlightMode)
+                                       || locationSettings.mlsEnabled
+                                       || locationSettings.hereState == LocationSettings.OnlineAGpsEnabled)
 
     property LocationSettings l: LocationSettings {
         id: locationSettings
-    }
-
-    property TechnologyModel t: TechnologyModel {
-        id: gpsTechModel
-        name: "gps"
     }
 }

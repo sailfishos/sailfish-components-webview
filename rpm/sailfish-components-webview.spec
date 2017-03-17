@@ -34,6 +34,7 @@ Summary:   Popup and alert QML components used by sailfish-components-webview
 Group:     System/Libraries
 Requires:  %{name} = %{version}
 Requires:  declarative-transferengine-qt5 >= 0.2.3
+Requires:  nemo-qml-plugin-systemsettings
 
 %description popups
 %{summary}.
