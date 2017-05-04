@@ -38,7 +38,6 @@ Dialog {
     }
 
     Item {
-        id: contentItem
         anchors.fill: parent
 
         DialogHeader {
