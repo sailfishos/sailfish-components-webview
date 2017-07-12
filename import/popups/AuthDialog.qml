@@ -22,7 +22,6 @@ UserPrompt {
     property alias password: password.text
     property alias dontsave: dontsaveCheck.checked
 
-    canAccept: username.text.length > 0
     //: Text on the Accept dialog button that accepts browser's auth request
     //% "Log In"
     acceptText: qsTrId("sailfish_components_webview_popups-he-accept_login")
@@ -63,13 +62,7 @@ UserPrompt {
             placeholderText: qsTrId("sailfish_components_webview_popups-la-enter_password")
             EnterKey.iconSource: (username.text.length > 0 && text.length > 0) ? "image://theme/icon-m-enter-accept"
                                                                                : "image://theme/icon-m-enter-next"
-            EnterKey.onClicked: {
-                if (username.text.length > 0) {
-                    dialog.accept()
-                } else {
-                    username.focus = true
-                }
-            }
+            EnterKey.onClicked: dialog.accept()
         }
 
         TextSwitch {
