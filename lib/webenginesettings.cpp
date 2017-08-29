@@ -76,22 +76,24 @@ void SailfishOS::WebEngineSettings::initialize()
     // Round to nearest even rounding factor
     pixelRatio = qRound(pixelRatio / 0.5) * 0.5;
 
-    // If we're on hdpi and calcaluted pixel ratio doesn't result integer dimensions, let's try to floor it.
-    if (pixelRatio >= 2.0 && !testScreenDimensions(pixelRatio)) {
+    int screenWidth = QGuiApplication::primaryScreen()->size().width();
+
+    if (!testScreenDimensions(pixelRatio)) {
         qreal tempPixelRatio = qFloor(pixelRatio);
         if (testScreenDimensions(tempPixelRatio)) {
             pixelRatio = tempPixelRatio;
         }
+    } else if (screenWidth >= 1080) {
+        pixelRatio = qRound(pixelRatio);
     }
 
     engineSettings->setPixelRatio(pixelRatio);
 
-    int screenWidth = QGuiApplication::primaryScreen()->size().width();
     int tileSize = screenWidth;
 
-    // With bigger than qHD screen fill with two tiles in row (portrait).
+    // With bigger than FullHD screen fill with two tiles in row (portrait).
     // Landscape will be filled with same tile size.
-    if (screenWidth > 540) {
+    if (screenWidth > 1080) {
         tileSize = screenWidth / 2;
     }
     engineSettings->setTileSize(QSize(tileSize, tileSize));
