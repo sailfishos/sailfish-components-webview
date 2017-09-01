@@ -19,6 +19,7 @@
 #include <QtCore/QtMath>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
+#include <QtGui/QStyleHints>
 
 Q_GLOBAL_STATIC(SailfishOS::WebEngineSettings, webEngineSettingsInstance)
 
@@ -73,6 +74,12 @@ void SailfishOS::WebEngineSettings::initialize()
 
     // Make long press timeout equal to the one in Qt
     engineSettings->setPreference(QStringLiteral("ui.click_hold_context_menus.delay"), QVariant(PressAndHoldDelay));
+
+    // DPI is passed to Gecko's View and APZTreeManager.
+    // Touch tolerance is calculated with formula: dpi * tolerance = pixel threshold
+    const int dragThreshold = QGuiApplication::styleHints()->startDragDistance();
+    qreal touchStartTolerance = dragThreshold / QGuiApplication::primaryScreen()->physicalDotsPerInch();
+    engineSettings->setPreference(QString("apz.touch_start_tolerance"), QString("%1f").arg(touchStartTolerance));
 
     Silica::Theme *silicaTheme = Silica::Theme::instance();
 
