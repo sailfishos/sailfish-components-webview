@@ -60,8 +60,12 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("embedlite.azpc.handle.longtap"), QVariant::fromValue<bool>(false));
     engineSettings->setPreference(QStringLiteral("embedlite.azpc.json.longtap"), QVariant::fromValue<bool>(true));
     engineSettings->setPreference(QStringLiteral("embedlite.azpc.json.viewport"), QVariant::fromValue<bool>(true));
+    // TODO: Fix this so that it can be applied during runtime when QQuickItem based WebView is used with QQuickFlickable.
+    // At the moment just disable it to avoid unnecessary events being fired. JB#39581
+#if 0
     engineSettings->setPreference(QStringLiteral("apz.asyncscroll.throttle"), QVariant::fromValue<int>(15));
     engineSettings->setPreference(QStringLiteral("apz.asyncscroll.timeout"), QVariant::fromValue<int>(15));
+#endif
     engineSettings->setPreference(QStringLiteral("apz.fling_stopped_threshold"), QLatin1String("0.13f"));
 
     // Theme settings.
