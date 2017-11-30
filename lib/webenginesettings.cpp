@@ -89,7 +89,8 @@ void SailfishOS::WebEngineSettings::initialize()
 
     int screenWidth = QGuiApplication::primaryScreen()->size().width();
 
-    if (!testScreenDimensions(pixelRatio)) {
+    // Do not floor the pixel ratio if the pixel ratio less than 2.0 (1.5 is minimum).
+    if (pixelRatio >= 2.0 && !testScreenDimensions(pixelRatio)) {
         qreal tempPixelRatio = qFloor(pixelRatio);
         if (testScreenDimensions(tempPixelRatio)) {
             pixelRatio = tempPixelRatio;
