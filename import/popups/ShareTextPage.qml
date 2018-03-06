@@ -46,5 +46,7 @@ Page {
             //% "No sharing accounts available. You can add accounts in settings"
             text: qsTrId("sailfish_components_webview_popups-no-share-methods")
         }
+
+        showAddAccount: false
     }
 }
