@@ -108,7 +108,6 @@ Rectangle {
             visible: !isHyperTextLink && !isImage
             text: {
                 if (isMailto) {
-                    //: Write email
                     //% "Write email"
                     return qsTrId("sailfish_components_webview_popups-me-write-email")
                 } else if (isTel) {
