@@ -154,7 +154,7 @@ Rectangle {
             onClicked: {
                 root._hide()
                 if (pageStack != null && pageStack != undefined) {
-                    pageStack.push(shareLinkPage, {"link" : root.linkHref, "linkTitle": root.linkTitle})
+                    pageStack.animatorPush(shareLinkPage, {"link" : root.linkHref, "linkTitle": root.linkTitle})
                 }
             }
         }
