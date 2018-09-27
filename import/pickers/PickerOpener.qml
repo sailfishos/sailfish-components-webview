@@ -12,15 +12,12 @@
 import QtQuick 2.2
 
 QtObject {
-    property var pageStack
+    property var pushMethod
     property QtObject contentItem
     readonly property var listeners: ["embed:filepicker", "embed:selectasync"]
 
     // Defer compilation of picker components
-    readonly property string _multiSelectComponentUrl: Qt.resolvedUrl("MultiSelectDialog.qml")
-    readonly property string _singleSelectComponentUrl: Qt.resolvedUrl("SingleSelectPage.qml")
-    readonly property string _filePickerComponentUrl: Qt.resolvedUrl("PickerCreator.qml")
-    property Component _filePickerComponent
+    property Component _contentPickerCreatorComponent
 
     // Returns true if message is handled.
     function message(topic, data) {
@@ -33,33 +30,33 @@ QtObject {
             return false
         }
 
-        if (!pageStack) {
-            console.log("PickerOpener has no pageStack. Add missing binding.")
+        if (!pushMethod) {
+            console.warn("PickerOpener has no PageStack pushMethod. Add missing binding.")
             return false
         }
 
         var winid = data.winid
         switch (topic) {
         case "embed:selectasync": {
-            pageStack.animatorPush(data.multiple ? _multiSelectComponentUrl : _singleSelectComponentUrl,
-                                           { "options": data.options, "contentItem": contentItem })
+            pushMethod(data.multiple ? Qt.resolvedUrl("MultiSelectDialog.qml") : Qt.resolvedUrl("SingleSelectPage.qml"),
+                                       { "options": data.options, "contentItem": contentItem })
             break
         }
         case "embed:filepicker": {
-            if (!_filePickerComponent) {
-                _filePickerComponent = Qt.createComponent(_filePickerComponentUrl)
+            if (!_contentPickerCreatorComponent) {
+                _contentPickerCreatorComponent = Qt.createComponent(Qt.resolvedUrl("PickerCreator.qml"))
             }
 
-            if (_filePickerComponent.status === Component.Ready) {
-                _filePickerComponent.createObject(pageStack, {
-                                                      "pageStack": pageStack,
+            if (_contentPickerCreatorComponent.status === Component.Ready) {
+                _contentPickerCreatorComponent.createObject(contentItem, {
+                                                      "pushMethod": pushMethod,
                                                       "winid": winid,
                                                       "contentItem": contentItem,
                                                       "filter": data.filter,
                                                       "mode": data.mode})
-            } else if (_filePickerComponent.status === Component.Error) {
+            } else if (_contentPickerCreatorComponent.status === Component.Error) {
                 // Component development time issue, component creation should newer fail.
-                console.warn("PickerOpener failed to create PickerOpener: ", _filePickerComponent.errorString())
+                console.warn("PickerOpener failed to create PickerOpener: ", _contentPickerCreatorComponent.errorString())
             }
             break
         }
@@ -73,6 +70,11 @@ QtObject {
     }
 
     Component.onCompleted: {
+        if (!pushMethod) {
+            console.warn("PickerOpener has no PageStack pushMethod.")
+            return
+        }
+
         if (contentItem) {
             contentItem.addMessageListeners(listeners)
         } else {

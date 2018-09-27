@@ -16,7 +16,6 @@ import "GeolocationHosts.js" as Geolocation
 Timer {
     id: root
 
-    property var pageStack
     property Item parentItem
     property QtObject tabModel: null
     property QtObject contentItem
@@ -30,6 +29,9 @@ Timer {
     property var authDialogData
     property var authDialogWinId
 
+    property bool busy
+    property var pushMethod
+
     property Component _contextMenuComponent
 
     signal aboutToOpenContextMenu(var data)
@@ -41,19 +43,19 @@ Timer {
         }
 
         if (!contentItem) {
-            console.warn("Picker has no contentItem. Assign / Bind contentItem for each PickerOpener.")
+            console.warn("PopupOpener has no contentItem. Assign / Bind contentItem for each PopupOpener.")
             return false
         }
 
-        if (!pageStack) {
-            console.log("PopupOpener has no pageStack. Add missing binding.")
+        if (!pushMethod) {
+            console.log("PopupOpener has no PageStack pushMethod. Add missing binding.")
             return false
         }
 
         var winid = data.winid
         switch (topic) {
         case "embed:alert": {
-            var obj = pageStack.animatorPush(Qt.resolvedUrl("AlertDialog.qml"), { "text": data.text })
+            var obj = pushMethod(Qt.resolvedUrl("AlertDialog.qml"), { "text": data.text })
             obj.pageCompleted.connect(function(dialog) {
                 // TODO: also the Async message must be sent when window gets closed
                 dialog.done.connect(function() {
@@ -63,7 +65,7 @@ Timer {
             break
         }
         case "embed:confirm": {
-            var obj = pageStack.animatorPush(Qt.resolvedUrl("ConfirmDialog.qml"), { "text": data.text })
+            var obj = pushMethod(Qt.resolvedUrl("ConfirmDialog.qml"), { "text": data.text })
             obj.pageCompleted.connect(function(dialog) {
                 // TODO: also the Async message must be sent when window gets closed
                 dialog.accepted.connect(function() {
@@ -78,7 +80,7 @@ Timer {
             break
         }
         case "embed:prompt": {
-            var obj = pageStack.animatorPush(Qt.resolvedUrl("PromptDialog.qml"), { "text": data.text, "value": data.defaultValue })
+            var obj = pushMethod(Qt.resolvedUrl("PromptDialog.qml"), { "text": data.text, "value": data.defaultValue })
             obj.pageCompleted.connect(function(dialog) {
                 // TODO: also the Async message must be sent when window gets closed
                 dialog.accepted.connect(function() {
@@ -93,9 +95,9 @@ Timer {
             break
         }
         case "embed:login": {
-            var obj = pageStack.animatorPush(Qt.resolvedUrl("PasswordManagerDialog.qml"),
-                                    { "contentItem": contentItem, "requestId": data.id,
-                                      "notificationType": data.name, "formData": data.formdata })
+            var obj = pushMethod(Qt.resolvedUrl("PasswordManagerDialog.qml"),
+                                 { "contentItem": contentItem, "requestId": data.id,
+                                     "notificationType": data.name, "formData": data.formdata })
             break
         }
         case "embed:auth": {
@@ -117,7 +119,7 @@ Timer {
                         break
                     }
                     default: {
-                        var obj = pageStack.animatorPush(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
+                        var obj = pushMethod(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
                         obj.pageCompleted.connect(function(dialog) {
                             dialog.accepted.connect(function() {
                                 contentItem.sendAsyncMessage("embedui:permissions",
@@ -154,7 +156,7 @@ Timer {
     }
 
     function openAuthDialog(contentItem, data, winid) {
-        if (pageStack.busy) {
+        if (busy) {
             root._delayedOpenAuthDialog(contentItem, data, winid)
         } else {
             root._immediateOpenAuthDialog(contentItem, data, winid)
@@ -169,20 +171,27 @@ Timer {
     }
 
     function _immediateOpenAuthDialog(contentItem, data, winid) {
-        var obj = pageStack.animatorPush(Qt.resolvedUrl("AuthDialog.qml"),
-                                    {"hostname": data.text, "realm": data.title,
-                                     "username": data.storedUsername, "password": data.storedPassword,
-                                     "passwordOnly": data.passwordOnly })
+        var obj = pushMethod(Qt.resolvedUrl("AuthDialog.qml"),
+                             {
+                                 "hostname": data.text,
+                                 "realm": data.title,
+                                 "username": data.storedUsername,
+                                 "password": data.storedPassword,
+                                 "passwordOnly": data.passwordOnly
+                             })
         obj.pageCompleted.connect(function(dialog) {
             dialog.accepted.connect(function () {
                 contentItem.sendAsyncMessage("authresponse",
-                                             { "winid": winid, "accepted": true,
-                                                 "username": dialog.username, "password": dialog.password,
-                                                 "dontsave": dialog.dontsave })
+                                             {
+                                                 "winid": winid,
+                                                 "accepted": true,
+                                                 "username": dialog.username,
+                                                 "password": dialog.password,
+                                                 "dontsave": dialog.dontsave
+                                             })
             })
             dialog.rejected.connect(function() {
-                contentItem.sendAsyncMessage("authresponse",
-                                             { "winid": winid, "accepted": false})
+                contentItem.sendAsyncMessage("authresponse", { "winid": winid, "accepted": false})
             })
         })
     }
@@ -203,7 +212,7 @@ Timer {
                 contextMenu.contentType = contentType
                 contextMenu.tabModel = root.tabModel
                 contextMenu.viewId = contentItem.uniqueID()
-                contextMenu.pageStack = root.pageStack
+                contextMenu.pushMethod = root.pushMethod
                 contextMenu.show()
             } else {
                 _contextMenuComponent = Qt.createComponent(Qt.resolvedUrl("ContextMenu.qml"))
@@ -217,7 +226,7 @@ Timer {
                                                                 "contentType": contentType,
                                                                 "tabModel": root.tabModel,
                                                                 "viewId": contentItem.uniqueID(),
-                                                                "pageStack": pageStack
+                                                                "pushMethod": pushMethod
                                                             })
                     contextMenu.show()
                 } else {
