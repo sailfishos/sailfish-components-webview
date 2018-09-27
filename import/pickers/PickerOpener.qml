@@ -12,7 +12,7 @@
 import QtQuick 2.2
 
 QtObject {
-    property var pageStack
+    property var pushMethod
     property QtObject contentItem
     readonly property var listeners: ["embed:filepicker", "embed:selectasync"]
 
@@ -33,16 +33,16 @@ QtObject {
             return false
         }
 
-        if (!pageStack) {
-            console.log("PickerOpener has no pageStack. Add missing binding.")
+        if (!pushMethod) {
+            console.warn("PickerOpener has no PageStack pushMethod. Add missing binding.")
             return false
         }
 
         var winid = data.winid
         switch (topic) {
         case "embed:selectasync": {
-            pageStack.animatorPush(data.multiple ? _multiSelectComponentUrl : _singleSelectComponentUrl,
-                                           { "options": data.options, "contentItem": contentItem })
+            pushMethod(data.multiple ? _multiSelectComponentUrl : _singleSelectComponentUrl,
+                                       { "options": data.options, "contentItem": contentItem })
             break
         }
         case "embed:filepicker": {
@@ -52,7 +52,7 @@ QtObject {
 
             if (_filePickerComponent.status === Component.Ready) {
                 _filePickerComponent.createObject(pageStack, {
-                                                      "pageStack": pageStack,
+                                                      "pushMethod": pushMethod,
                                                       "winid": winid,
                                                       "contentItem": contentItem,
                                                       "filter": data.filter,
@@ -73,6 +73,11 @@ QtObject {
     }
 
     Component.onCompleted: {
+        if (!pushMethod) {
+            console.warn("PickerOpener has no PageStack pushMethod.")
+            return
+        }
+
         if (contentItem) {
             contentItem.addMessageListeners(listeners)
         } else {

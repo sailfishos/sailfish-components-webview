@@ -86,16 +86,18 @@ RawWebView {
     PickerOpener {
         id: pickerOpener
 
-        property QtObject pageStackOwner: webview._findParentWithProperty(webview, "pageStack")
+        readonly property QtObject pageStackOwner: webview._findParentWithProperty(webview, "pageStack")
+        readonly property QtObject pageStack: pageStackOwner ? pageStackOwner.pageStack : null
 
-        pageStack: pageStackOwner ? pageStackOwner.pageStack : undefined
+        pushMethod: pageStack ? pageStack.animatorPush : null
         contentItem: webview
     }
 
     PopupOpener {
         id: popupOpener
 
-        pageStack: pickerOpener.pageStack
+        busy: pickerOpener.pageStack.busy
+        pushMethod: pickerOpener.pushMethod
         parentItem: webview
         contentItem: webview
 

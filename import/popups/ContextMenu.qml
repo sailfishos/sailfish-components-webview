@@ -21,7 +21,7 @@ Rectangle {
     property string linkProtocol
     property string imageSrc
     property string contentType
-    property PageStack pageStack
+    property var pushMethod
     property QtObject tabModel: null
 
     property int viewId
@@ -153,9 +153,12 @@ Rectangle {
             }
             onClicked: {
                 root._hide()
-                if (pageStack != null && pageStack != undefined) {
-                    pageStack.animatorPush(shareLinkPage, {"link" : root.linkHref, "linkTitle": root.linkTitle})
+                if (!pushMethod) {
+                    console.warn("ContextMenu has no PageStack pushMethod. Cannot open sharing page.")
+                    return
                 }
+
+                pushMethod(shareLinkPage, {"link" : root.linkHref, "linkTitle": root.linkTitle})
             }
         }
 
