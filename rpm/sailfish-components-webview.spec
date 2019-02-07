@@ -1,6 +1,6 @@
 Name: sailfish-components-webview-qt5
 License: MPLv2
-Version: 0.0.15
+Version: 1.0.0
 Release: 1
 Source0: %{name}-%{version}.tar.bz2
 Summary: Allows embedding Sailfish OS Browser WebView into applications
@@ -131,8 +131,8 @@ Unit tests and functional tests of Sailfish OS WebView / WebEngine
 %setup -q -n %{name}-%{version}
 
 %build
-%qmake5
-make
+%qmake5 VERSION=`echo %{version} | sed 's/+.*//'`
+make %{?_smp_mflags}
 
 %install
 %qmake5_install
