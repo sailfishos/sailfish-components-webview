@@ -1,5 +1,6 @@
 Name: sailfish-components-webview-qt5
-License: MPLv2
+License: MPLv2.0
+Url:     https://github.com/sailfishos/sailfish-components-webview
 Version: 1.0.0
 Release: 1
 Source0: %{name}-%{version}.tar.bz2
