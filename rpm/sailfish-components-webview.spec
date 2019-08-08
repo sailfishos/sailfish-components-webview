@@ -15,7 +15,7 @@ BuildRequires:  pkgconfig(qt5embedwidget)
 BuildRequires:  pkgconfig(sailfishsilica)
 BuildRequires:  qt5-qttools
 BuildRequires:  qt5-qttools-linguist
-Requires: sailfishsilica-qt5 >= 0.27.0
+Requires: sailfishsilica-qt5 >= 1.1.46
 Requires: sailfish-components-media-qt5
 Requires: sailfish-components-pickers-qt5
 
