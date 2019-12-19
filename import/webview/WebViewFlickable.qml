@@ -1,50 +1,46 @@
+/****************************************************************************
+**
+** Copyright (c) 2016 - 2020 Jolla Ltd.
+** Copyright (c) 2020 Open Mobile Platform LLC.
+**
+****************************************************************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import QtQuick 2.1
 import Sailfish.Silica 1.0
 import Sailfish.Silica.private 1.0 as SilicaPrivate
 import Sailfish.WebView 1.0
 
-Item {
+SilicaFlickable {
+    id: viewFlickable
+
     property alias webView: webView
 
     property alias header: headerLoader.sourceComponent
     property Item headerItem: headerLoader.item
 
-    default property alias _data: flickable.data
+    contentWidth: width
+    contentHeight: height
+
+    quickScrollEnabled: false
+    pressDelay: 0
+
+    interactive: !webView.textSelectionActive
+
+    Loader {
+        id: headerLoader
+        y: -webView.scrollableOffset.y
+        width: viewFlickable.width
+    }
 
     WebView {
         id: webView
-        width: parent.width
-        height: parent.height
-        flickable: flickable
-        topMargin: headerItem && headerItem.height || 0
-        clip: false
 
-        y: Math.min(Math.max(0, -flickable.contentY), flickable.contentHeight-flickable.height - flickable.contentY)
-
-        onScrollableOffsetChanged: if (!flickable.moving) flickable.contentY = scrollableOffset.y
-
-        SilicaFlickable {
-            id: flickable
-
-            y: -webView.y // include pulley menu as it's made visible
-
-            width: parent.width
-            height: parent.height
-
-            contentHeight: Math.max(webView.contentHeight+webView.bottomMargin+webView.topMargin, webView.height)
-            contentWidth: width
-
-            quickScrollEnabled: false
-
-            onContentYChanged: if (flickable.moving) webView.scrollTo(webView.scrollableOffset.x, flickable.contentY)
-
-            SilicaPrivate.Wallpaper {
-                anchors.fill: headerLoader
-            }
-            Loader {
-                id: headerLoader
-                width: flickable.width
-            }
-        }
+        y: headerLoader.implicitHeight
+        width: viewFlickable.width
+        height: viewFlickable.contentHeight - headerLoader.implicitHeight
     }
 }

@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 Jolla Ltd.
-** Contact: Chris Adams <chris.adams@jollamobile.com>
+** Copyright (c) 2016 - 2020 Jolla Ltd.
+** Copyright (c) 2019 - 2020 Open Mobile Platform LLC.
 **
 ****************************************************************************/
 
@@ -13,6 +13,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Sailfish.Silica.private 1.0 as SilicaPrivate
 import Sailfish.WebView 1.0
+import Sailfish.WebView.Controls 1.0
 import Sailfish.WebView.Popups 1.0
 import Sailfish.WebView.Pickers 1.0
 
@@ -22,6 +23,10 @@ RawWebView {
     property PageStack webViewPageStack
     property WebViewPage webViewPage
     property int __sailfish_webview
+    property bool canShowSelectionMarkers: true
+
+    readonly property bool textSelectionActive: textSelectionController && textSelectionController.active
+    property Item textSelectionController: null
 
     signal linkClicked(string url)
 
@@ -42,6 +47,12 @@ RawWebView {
 
     function _hasWebViewPageStack() {
         return (webview.webViewPageStack != null && webview.webViewPageStack != undefined)
+    }
+
+    function clearSelection() {
+        if (textSelectionActive) {
+            textSelectionController.clearSelection()
+        }
     }
 
     function _setActiveInPage() {
@@ -65,15 +76,20 @@ RawWebView {
     }
 
     active: true
+    _acceptTouchEvents: !textSelectionActive
+
     onActiveChanged: webview._setActiveInPage()
     Component.onCompleted: webview._setActiveInPage()
     onParentChanged: webview._setActiveInPage()
 
     onViewInitialized: {
         webview.loadFrameScript("chrome://embedlite/content/embedhelper.js");
-        webview.loadFrameScript("chrome://embedlite/content/SelectAsyncHelper.js");
         webview.addMessageListeners([
                                         "embed:linkclicked",
+                                        "Content:ContextMenu",
+                                        "Content:SelectionRange",
+                                        "Content:SelectionCopied",
+                                        "Content:SelectionSwap"
                                     ]);
     }
 
@@ -87,9 +103,51 @@ RawWebView {
                 webview.linkClicked(data.uri)
                 break
             }
+            case "Content:SelectionRange": {
+                if (textSelectionController === null) {
+                    textSelectionController = textSelectionControllerComponent.createObject(
+                                webview, {"contentItem" : webview})
+                }
+                textSelectionController.selectionRangeUpdated(data)
+                break
+            }
+            case "Content:SelectionSwap": {
+                if (textSelectionController) {
+                    textSelectionController.swap()
+                }
+
+                break
+            }
             default: {
                 break
             }
+        }
+    }
+    onRecvSyncMessage: {
+        // sender expects that this handler will update `response` argument
+        switch (message) {
+        case "Content:SelectionCopied": {
+            if (data.succeeded && textSelectionController) {
+                textSelectionController.showNotification()
+            }
+            response.message = {"": ""}
+            break
+        }
+        }
+    }
+
+    Component {
+        id: textSelectionControllerComponent
+
+        TextSelectionController {
+            opacity: canShowSelectionMarkers ? 1.0 : 0.0
+            contentWidth: webview.webViewPage ? webview.webViewPage.width : webview.width
+            contentHeight: Math.max(webview.contentHeight+webview.bottomMargin+webview.topMargin, webview.height)
+            anchors {
+                fill: parent
+            }
+
+            Behavior on opacity { FadeAnimator {} }
         }
     }
 
@@ -112,6 +170,11 @@ RawWebView {
         onAboutToOpenContextMenu: {
             if (Qt.inputMethod.visible) {
                 webview.parent.focus = true
+            }
+
+            if (data.types.indexOf("content-text") !== -1) {
+                // we want to select some content text
+                webview.sendAsyncMessage("Browser:SelectionStart", {"xPos": data.xPos, "yPos": data.yPos})
             }
         }
     }

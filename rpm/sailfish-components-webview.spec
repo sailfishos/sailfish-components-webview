@@ -85,15 +85,20 @@ Unit tests and functional tests of Sailfish OS WebView / WebEngine
 %defattr(-,root,root,-)
 %{_libdir}/libsailfishwebengine.so.*
 %{_datadir}/translations/sailfish_components_webview_qt5_eng_en.qm
+%{_datadir}/translations/sailfish_components_webview_controls_qt5_eng_en.qm
 %{_libdir}/qt5/qml/Sailfish/WebEngine/libsailfishwebengineplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebEngine/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/libsailfishwebviewplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/*.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/Controls/libsailfishwebviewcontrolsplugin.so
+%{_libdir}/qt5/qml/Sailfish/WebView/Controls/qmldir
+%{_libdir}/qt5/qml/Sailfish/WebView/Controls/*.qml
 
 %files ts-devel
 %defattr(-,root,root,-)
 %{_datadir}/translations/source/sailfish_components_webview_qt5.ts
+%{_datadir}/translations/source/sailfish_components_webview_controls_qt5.ts
 
 %files popups
 %defattr(-,root,root,-)
