@@ -31,16 +31,16 @@ Row {
             buttons.push({
                 "icon": "image://theme/icon-m-answer",
                 "action": function () {
-                    call()
                     clear()
+                    call()
                 }
             })
         }
         buttons.push({
             "icon": "image://theme/icon-m-share",
             "action": function () {
-                share()
                 clear()
+                share()
             }
         })
 
@@ -52,8 +52,8 @@ Row {
             buttons.push({
                 "icon": "image://theme/icon-m-search",
                 "action": function () {
-                    search()
                     clear()
+                    search()
                 }
             })
         }

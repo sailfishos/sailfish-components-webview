@@ -34,12 +34,6 @@ RawWebView::RawWebView(QQuickItem *parent)
 {
     addMessageListener(CONTENT_ORIENTATION_CHANGED);
 
-    connect(qGuiApp->inputMethod(), &QInputMethod::visibleChanged, this, [=]() {
-        if (qGuiApp->inputMethod()->isVisible()) {
-            setFollowItemGeometry(false);
-        }
-    });
-
     connect(this, &QuickMozView::recvAsyncMessage, this, &RawWebView::onAsyncMessage);
 }
 
@@ -67,14 +61,10 @@ void RawWebView::setVirtualKeyboardMargin(qreal vkbMargin)
         // meaning that height() + m_vkbMargin doesn't yet equal to available max space.
         // Nevertheless, it is not a big deal if we loose a pixel or two from
         // max composition size.
-        map.insert("screenWidth", width());
-        map.insert("screenHeight", (height() + m_vkbMargin));
+        map.insert("screenWidth", viewportWidth());
+        map.insert("screenHeight", viewportHeight());
         QVariant data(map);
         sendAsyncMessage("embedui:vkbOpenCompositionMetrics", data);
-
-        if (m_vkbMargin == 0) {
-            setFollowItemGeometry(true);
-        }
     }
 }
 
@@ -124,7 +114,7 @@ void RawWebView::touchEvent(QTouchEvent *event)
                     const int dragThreshold = QGuiApplication::styleHints()->startDragDistance();
                     QPointF delta = touchPoint.scenePos() - m_startPos;
 
-                    switch (window()->contentOrientation()) {
+                    switch (orientation()) {
                     case Qt::LandscapeOrientation:
                         delta = QPointF(delta.y(), -delta.x());
                         break;

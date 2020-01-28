@@ -20,7 +20,7 @@ SilicaFlickable {
     property alias webView: webView
 
     property alias header: headerLoader.sourceComponent
-    property Item headerItem: headerLoader.item
+    property alias headerItem: headerLoader.item
 
     contentWidth: width
     contentHeight: height
@@ -30,17 +30,20 @@ SilicaFlickable {
 
     interactive: !webView.textSelectionActive
 
-    Loader {
-        id: headerLoader
-        y: -webView.scrollableOffset.y
-        width: viewFlickable.width
-    }
-
     WebView {
         id: webView
 
         y: headerLoader.implicitHeight
         width: viewFlickable.width
         height: viewFlickable.contentHeight - headerLoader.implicitHeight
+
+        viewportHeight: Math.max(viewFlickable.contentHeight, (webViewPage
+                ? ((webViewPage.orientation & Orientation.PortraitMask) ? Screen.height : Screen.width)
+                : viewFlickable.height)) - headerLoader.implicitHeight
+    }
+
+    Loader {
+        id: headerLoader
+        width: viewFlickable.width
     }
 }

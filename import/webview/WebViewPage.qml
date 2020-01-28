@@ -12,37 +12,10 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Sailfish.Silica.private 1.0
+import Sailfish.WebView 1.0
 
 Page {
     id: webViewPage
 
-    property QtObject activeWebView
-
     property int __sailfish_webviewpage
-
-    orientationTransitions: PageOrientationTransition {
-        targetPage: webViewPage
-        orientationChangeActions: [
-            ScriptAction {
-                script: {
-                    if (activeWebView
-                            && activeWebView.virtualKeyboardMargin > 0) {
-                        activeWebView.updateContentSize(Qt.size(
-                                    activeWebView.width,
-                                    (activeWebView.virtualKeyboardMargin + activeWebView.height)))
-                    }
-                }
-            },
-            PauseAnimation {
-                id: orientationChangeWait
-                duration: 500
-            }
-        ]
-    }
-
-    Connections {
-        target: activeWebView
-        ignoreUnknownSignals: true
-        onContentOrientationChanged: orientationChangeWait.complete()
-    }
 }

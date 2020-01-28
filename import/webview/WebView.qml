@@ -20,13 +20,12 @@ import Sailfish.WebView.Pickers 1.0
 RawWebView {
     id: webview
 
-    property PageStack webViewPageStack
-    property WebViewPage webViewPage
-    property int __sailfish_webview
+    property WebViewPage webViewPage: _findParentWithProperty(webview, '__sailfish_webviewpage')
     property bool canShowSelectionMarkers: true
 
     readonly property bool textSelectionActive: textSelectionController && textSelectionController.active
     property Item textSelectionController: null
+    readonly property int _pageOrientation: webViewPage ? webViewPage.orientation : Orientation.None
 
     signal linkClicked(string url)
 
@@ -45,42 +44,41 @@ RawWebView {
         return (webview.webViewPage != null && webview.webViewPage != undefined)
     }
 
-    function _hasWebViewPageStack() {
-        return (webview.webViewPageStack != null && webview.webViewPageStack != undefined)
-    }
-
     function clearSelection() {
         if (textSelectionActive) {
             textSelectionController.clearSelection()
         }
     }
 
-    function _setActiveInPage() {
-        if (webview.active) {
-            if (!_hasWebViewPage()) {
-                webview.webViewPage = webview._findParentWithProperty(webview, '__sailfish_webviewpage')
-            }
+    active: !webViewPage
+            || webViewPage.status === PageStatus.Active
+            || webViewPage.status === PageStatus.Deactivating
+    _acceptTouchEvents: !textSelectionActive
 
-            if (_hasWebViewPage()) {
-                webview.webViewPage.activeWebView = webview
-            }
-        }
+    viewportHeight: webViewPage
+            ? ((webViewPage.orientation & Orientation.PortraitMask) ? Screen.height : Screen.width)
+            : undefined
 
-        if (!_hasWebViewPage()) {
-            console.warn("WebView.qml it is mandatory to declare webViewPage property to get orientation change working correctly!")
-        }
-
-        if (!_hasWebViewPageStack()) {
-            webview.webViewPageStack = webview._findParentWithProperty(webview, "_pageStackIndicator")
+    orientation: {
+        switch (_pageOrientation) {
+        case Orientation.Portrait:
+            return Qt.PortraitOrientation
+        case Orientation.Landscape:
+            return Qt.LandscapeOrientation
+        case Orientation.PortraitInverted:
+            return Qt.InvertedPortraitOrientation
+        case Orientation.LandscapeInverted:
+            return Qt.InvertedLandscapeOrientation
+        default:
+            return Qt.PrimaryOrientation
         }
     }
 
-    active: true
-    _acceptTouchEvents: !textSelectionActive
-
-    onActiveChanged: webview._setActiveInPage()
-    Component.onCompleted: webview._setActiveInPage()
-    onParentChanged: webview._setActiveInPage()
+    onOrientationChanged: {
+        if (visible) {
+            orientationDelayOverlay.opacity = 1
+        }
+    }
 
     onViewInitialized: {
         webview.loadFrameScript("chrome://embedlite/content/embedhelper.js");
@@ -91,6 +89,10 @@ RawWebView {
                                         "Content:SelectionCopied",
                                         "Content:SelectionSwap"
                                     ]);
+    }
+
+    onContentOrientationChanged: {
+        orientationFadeOut.restart()
     }
 
     onRecvAsyncMessage: {
@@ -141,8 +143,8 @@ RawWebView {
 
         TextSelectionController {
             opacity: canShowSelectionMarkers ? 1.0 : 0.0
-            contentWidth: webview.webViewPage ? webview.webViewPage.width : webview.width
-            contentHeight: Math.max(webview.contentHeight+webview.bottomMargin+webview.topMargin, webview.height)
+            contentWidth: Math.max(webview.contentWidth, webview.width)
+            contentHeight: Math.max(webview.contentHeight, webview.height)
             anchors {
                 fill: parent
             }
@@ -179,6 +181,35 @@ RawWebView {
         }
     }
 
+    Rectangle {
+        id: orientationDelayOverlay
+
+        width: webview.width
+        height: webview.height
+
+        opacity: 0
+        color: webview.bgcolor
+
+        NumberAnimation on opacity {
+            id: orientationFadeOut
+
+            running: false
+            duration: 200
+            easing.type: Easing.InOutQuad
+
+            to: 0
+        }
+    }
+
+    Timer {
+        id: orientationDelayFailsafe
+        running: !orientationFadeOut.running && orientationDelayOverlay.opacity === 1
+        onTriggered: {
+            orientationFadeOut.start()
+        }
+        interval: 1000
+    }
+
     BusyIndicator {
         id: busySpinner
         anchors.centerIn: parent
@@ -200,19 +231,7 @@ RawWebView {
             }
         }
 
-        orientation: {
-            if (webview.webViewPage != null) {
-                return webview.webViewPage.orientation
-            } else if (webViewPageStack != undefined && webViewPageStack != null) {
-                if (webViewPageStack.currentPage !== undefined && webViewPageStack.currentPage !== null) {
-                    return webViewPageStack.currentPage.orientation
-                } else {
-                    return Orientation.Portrait
-                }
-            } else {
-                return Orientation.Portrait
-            }
-        }
+        orientation: webview._pageOrientation
 
         onOpenedChanged: {
             if (opened) {
