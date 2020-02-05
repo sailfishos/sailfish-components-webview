@@ -56,11 +56,6 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
     // correctly.
     engineSettings->setPreference("layers.low-precision-buffer", QVariant::fromValue<bool>(false));
 
-    // Don't expose any protocol handlers by default and don't warn about those.
-    engineSettings->setPreference(QStringLiteral("network.protocol-handler.external-default"), false);
-    engineSettings->setPreference(QStringLiteral("network.protocol-handler.expose-all"), false);
-    engineSettings->setPreference(QStringLiteral("network.protocol-handler.warn-external-default"), false);
-
     // TODO : Stop embedding after lastWindow is destroyed.
     connect(engine, SIGNAL(destroyed()), webEngine, SLOT(stopEmbedding()));
 }
