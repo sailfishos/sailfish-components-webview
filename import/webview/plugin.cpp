@@ -19,6 +19,8 @@
 #include <QtQml/QQmlContext>
 
 #include <QQuickWindow>
+#include <QClipboard>
+#include <QGuiApplication>
 
 #define SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH QLatin1String("/usr/lib/mozembedlite/")
 
@@ -58,6 +60,21 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
 
     // TODO : Stop embedding after lastWindow is destroyed.
     connect(engine, SIGNAL(destroyed()), webEngine, SLOT(stopEmbedding()));
+
+    connect(webEngine, &SailfishOS::WebEngine::recvObserve, [](const QString &message, const QVariant &data) {
+        const QVariantMap dataMap = data.toMap();
+        if (message == "clipboard:setdata") {
+            QClipboard *clipboard = QGuiApplication::clipboard();
+
+            // check if we copied password
+            if (!dataMap.value("private").toBool()) {
+                clipboard->setText(dataMap.value("data").toString());
+            }
+        }
+    });
+
+    // subscribe to gecko messages
+    webEngine->addObservers({ QStringLiteral("clipboard:setdata") });
 }
 
 } // namespace WebView

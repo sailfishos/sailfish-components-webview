@@ -1,0 +1,6 @@
+module Sailfish.WebView.Controls
+plugin sailfishwebviewcontrolsplugin
+depends Sailfish.WebEngine 1.0
+TextSelectionController 1.0 TextSelectionController.qml
+TextSelectionHandle 1.0 TextSelectionHandle.qml
+TextSelectionToolbar 1.0 TextSelectionToolbar.qml
