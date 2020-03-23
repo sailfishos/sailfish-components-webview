@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 Jolla Ltd.
-** Contact: Raine Makelainen <raine.makelaine@jolla.com>
+** Copyright (c) 2016 - 2020 Jolla Ltd.
+** Copyright (c) 2030 Open Mobile Platform LLC.
 **
 ****************************************************************************/
 
@@ -10,9 +10,12 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "webenginesettings.h"
+#include "webengine.h"
+#include "opensearchconfigs.h"
 
 #include <silicatheme.h>
 
+#include <QtCore/QDebug>
 #include <QtCore/QLocale>
 #include <QtCore/QSettings>
 #include <QtCore/QSize>
@@ -20,6 +23,8 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtGui/QStyleHints>
+
+#include <MGConfItem>
 
 Q_GLOBAL_STATIC(SailfishOS::WebEngineSettings, webEngineSettingsInstance)
 
@@ -45,6 +50,15 @@ int getPressAndHoldDelay()
 }
 
 const int PressAndHoldDelay(getPressAndHoldDelay());
+
+class SailfishOS::WebEngineSettingsPrivate
+{
+public:
+    MGConfItem searchEngineConfItem { QLatin1String("/apps/sailfish-browser/settings/search_engine") };
+
+    QStringList *addedSearchEngines = nullptr;
+    bool searchEnginesInitialized = false;
+};
 
 void SailfishOS::WebEngineSettings::initialize()
 {
@@ -129,6 +143,8 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("browser.enable_automatic_image_resizing"),
                                   QVariant::fromValue<bool>(true));
 
+    SailfishOS::WebEngine::instance()->addObserver(QLatin1String("embed:search"));
+
     isInitialized = true;
 }
 
@@ -139,10 +155,98 @@ SailfishOS::WebEngineSettings *SailfishOS::WebEngineSettings::instance()
 
 SailfishOS::WebEngineSettings::WebEngineSettings(QObject *parent)
     : QMozEngineSettings(parent)
+    , d_ptr(new WebEngineSettingsPrivate)
 {
+    connect(&d_ptr->searchEngineConfItem, &MGConfItem::valueChanged,
+            this, &WebEngineSettings::setSearchEngine);
+    connect(SailfishOS::WebEngine::instance(), &SailfishOS::WebEngine::recvObserve,
+            this, &WebEngineSettings::handleObserve);
 }
 
 SailfishOS::WebEngineSettings::~WebEngineSettings()
 {
-
 }
+
+void SailfishOS::WebEngineSettings::setSearchEngine()
+{
+    if (d_ptr->searchEnginesInitialized) {
+        QVariant searchEngine = d_ptr->searchEngineConfItem.value(QVariant(QString("Google")));
+
+        setPreference(QString("browser.search.defaultenginename"), searchEngine);
+
+        // Let nsSearchService update the search engine (through EmbedLiteSearchEngine).
+        QVariantMap defaultSearchEngine;
+        defaultSearchEngine.insert(QLatin1String("msg"), QLatin1String("setdefault"));
+        defaultSearchEngine.insert(QLatin1String("name"), searchEngine);
+        SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
+        webEngine->notifyObservers(QLatin1String("embedui:search"), QVariant(defaultSearchEngine));
+    }
+}
+
+void SailfishOS::WebEngineSettings::handleObserve(const QString &message, const QVariant &data)
+{
+    const QVariantMap dataMap = data.toMap();
+    if (message == QLatin1String("embed:search")) {
+        QString msg = dataMap.value("msg").toString();
+        if (msg == QLatin1String("init")) {
+            const QMap<QString, QString> configs(OpenSearchConfigs::getAvailableOpenSearchConfigs());
+            const QStringList configuredEngines = configs.keys();
+            QStringList registeredSearches(dataMap.value(QLatin1String("engines")).toStringList());
+            QString defaultSearchEngine = dataMap.value(QLatin1String("defaultEngine")).toString();
+            d_ptr->searchEnginesInitialized = !registeredSearches.isEmpty();
+
+            // Upon first start, engine doesn't know about the search engines.
+            // Engine load requests are send within the for loop below.
+            if (!d_ptr->searchEnginesInitialized) {
+                d_ptr->addedSearchEngines = new QStringList(configuredEngines);
+            }
+
+            SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
+
+            // Add newly installed configs
+            for (QString searchName : configuredEngines) {
+                if (registeredSearches.contains(searchName)) {
+                    registeredSearches.removeAll(searchName);
+                } else {
+                    QVariantMap loadsearch;
+                    // load opensearch descriptions
+                    loadsearch.insert(QLatin1String("msg"), QVariant(QLatin1String("loadxml")));
+                    loadsearch.insert(QLatin1String("uri"), QVariant(QString("file://%1").arg(configs[searchName])));
+                    loadsearch.insert(QLatin1String("confirm"), QVariant(false));
+                    webEngine->notifyObservers(QLatin1String("embedui:search"), QVariant(loadsearch));
+                }
+            }
+
+            // Remove uninstalled OpenSearch configs
+            for (QString searchName : registeredSearches) {
+                QVariantMap removeMsg;
+                removeMsg.insert(QLatin1String("msg"), QVariant(QLatin1String("remove")));
+                removeMsg.insert(QLatin1String("name"), QVariant(searchName));
+                webEngine->notifyObservers(QLatin1String("embedui:search"), QVariant(removeMsg));
+            }
+
+            // Try to set search engine. After first start we can update the default search
+            // engine immediately.
+            setSearchEngine();
+        } else if (msg == QLatin1String("search-engine-added")) {
+            // We're only interrested about the very first start. Then the d_ptr->addedSearchEngines
+            // contains engines.
+            int errorCode = dataMap.value(QLatin1String("errorCode")).toInt();
+            bool firstStart = d_ptr->addedSearchEngines && !d_ptr->addedSearchEngines->isEmpty();
+            if (errorCode != 0) {
+                qWarning() << "An error occurred while adding a search engine, error code: " << errorCode << ", see nsIBrowserSearchService for more details.";
+            } else if (d_ptr->addedSearchEngines) {
+                QString engine = dataMap.value(QLatin1String("engine")).toString();
+                d_ptr->addedSearchEngines->removeAll(engine);
+                d_ptr->searchEnginesInitialized = d_ptr->addedSearchEngines->isEmpty();
+                // All engines are added.
+                if (firstStart && d_ptr->searchEnginesInitialized) {
+                    setSearchEngine();
+                    delete d_ptr->addedSearchEngines;
+                    d_ptr->addedSearchEngines = 0;
+                }
+            }
+        }
+    }
+}
+
