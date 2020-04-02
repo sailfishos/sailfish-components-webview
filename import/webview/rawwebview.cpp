@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 Jolla Ltd.
-** Contact: Martin Jones <martin.jones@jollamobile.com>
+** Copyright (c) 2016 - 2020 Jolla Ltd.
+** Copyright (c) 2020 Open Mobile Platform LLC.
 **
 ****************************************************************************/
 
@@ -14,6 +14,8 @@
 #include "webengine.h"
 #include "webenginesettings.h"
 
+#include <qmozviewcreator.h>
+
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtGui/QStyleHints>
@@ -21,17 +23,71 @@
 #include <QtQuick/QQuickWindow>
 #include <private/qquickwindow_p.h>
 
+#include <algorithm>
+
 #define CONTENT_ORIENTATION_CHANGED QLatin1String("embed:contentOrientationChanged")
 
 namespace SailfishOS {
 
 namespace WebView {
 
+class ViewCreator : public QMozViewCreator
+{
+public:
+    ViewCreator();
+    ~ViewCreator();
+
+    quint32 createView(const QString &url, const quint32 &parentId) override;
+
+    static std::shared_ptr<ViewCreator> instance();
+
+    std::vector<RawWebView *> views;
+};
+
+ViewCreator::ViewCreator()
+{
+    SailfishOS::WebEngine::instance()->setViewCreator(this);
+}
+
+ViewCreator::~ViewCreator()
+{
+    SailfishOS::WebEngine::instance()->setViewCreator(nullptr);
+}
+
+quint32 ViewCreator::createView(const QString &url, const quint32 &parentId)
+{
+    for (RawWebView *view : views) {
+        if (view->uniqueID() == parentId) {
+            view->openUrlInNewWindow(url);
+            break;
+        }
+    }
+
+    return 0;
+}
+
+std::shared_ptr<ViewCreator> ViewCreator::instance()
+{
+    static std::weak_ptr<ViewCreator> instance;
+
+    std::shared_ptr<ViewCreator> creator = instance.lock();
+    if (!creator) {
+        creator = std::make_shared<ViewCreator>();
+        instance = creator;
+    }
+
+    return creator;
+}
+
+
 RawWebView::RawWebView(QQuickItem *parent)
     : QuickMozView(parent)
+    , m_viewCreator(ViewCreator::instance())
     , m_vkbMargin(0.0)
     , m_acceptTouchEvents(true)
 {
+    m_viewCreator->views.push_back(this);
+
     addMessageListener(CONTENT_ORIENTATION_CHANGED);
 
     connect(this, &QuickMozView::recvAsyncMessage, this, &RawWebView::onAsyncMessage);
@@ -39,6 +95,7 @@ RawWebView::RawWebView(QQuickItem *parent)
 
 RawWebView::~RawWebView()
 {
+    m_viewCreator->views.erase(std::find(m_viewCreator->views.begin(), m_viewCreator->views.end(), this));
 }
 
 qreal RawWebView::virtualKeyboardMargin() const

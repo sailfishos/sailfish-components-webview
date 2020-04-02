@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 Jolla Ltd.
-** Contact: Martin Jones <martin.jones@jollamobile.com>
+** Copyright (c) 2016 - 2020 Jolla Ltd.
+** Copyright (c) 2020 Open Mobile Platform LLC.
 **
 ****************************************************************************/
 
@@ -16,10 +16,13 @@
 
 //mozembedlite-qt5
 #include <quickmozview.h>
+#include <memory>
 
 namespace SailfishOS {
 
 namespace WebView {
+
+class ViewCreator;
 
 class RawWebView : public QuickMozView
 {
@@ -44,10 +47,12 @@ signals:
     void virtualKeyboardMarginChanged();
     void contentOrientationChanged(Qt::ScreenOrientation orientation);
     void acceptTouchEventsChanged();
+    void openUrlInNewWindow(const QUrl &url);
 
 private:
     void onAsyncMessage(const QString &message, const QVariant &data);
 
+    std::shared_ptr<ViewCreator> m_viewCreator;
     qreal m_vkbMargin;
     QPointF m_startPos;
     bool m_acceptTouchEvents;
