@@ -37,7 +37,7 @@ public:
     ViewCreator();
     ~ViewCreator();
 
-    quint32 createView(const QString &url, const quint32 &parentId) override;
+    quint32 createView(const quint32 &parentId) override;
 
     static std::shared_ptr<ViewCreator> instance();
 
@@ -54,11 +54,11 @@ ViewCreator::~ViewCreator()
     SailfishOS::WebEngine::instance()->setViewCreator(nullptr);
 }
 
-quint32 ViewCreator::createView(const QString &url, const quint32 &parentId)
+quint32 ViewCreator::createView(const quint32 &parentId)
 {
     for (RawWebView *view : views) {
         if (view->uniqueID() == parentId) {
-            view->openUrlInNewWindow(url);
+            view->openUrlInNewWindow();
             break;
         }
     }
