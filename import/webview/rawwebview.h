@@ -47,7 +47,7 @@ signals:
     void virtualKeyboardMarginChanged();
     void contentOrientationChanged(Qt::ScreenOrientation orientation);
     void acceptTouchEventsChanged();
-    void openUrlInNewWindow(const QUrl &url);
+    void openUrlInNewWindow();
 
 private:
     void onAsyncMessage(const QString &message, const QVariant &data);
