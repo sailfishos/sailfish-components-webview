@@ -34,6 +34,7 @@ SilicaFlickable {
         id: webView
 
         y: headerLoader.implicitHeight
+        _indicatorVerticalOffset: -y
         width: viewFlickable.width
         height: viewFlickable.contentHeight - headerLoader.implicitHeight
 
