@@ -34,7 +34,7 @@ public:
     {
         // TODO : How to deal with custom default UA. We have also means to customize
         // site specific UA overrides.
-        SailfishOS::WebEngine::initialize(QString());
+        SailfishOS::WebEngine::initialize(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
         SailfishOS::WebEngineSettings::initialize();
     }
 

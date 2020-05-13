@@ -22,6 +22,7 @@ RawWebView {
 
     property WebViewPage webViewPage: _findParentWithProperty(webview, '__sailfish_webviewpage')
     property bool canShowSelectionMarkers: true
+    property real _indicatorVerticalOffset
 
     readonly property bool textSelectionActive: textSelectionController && textSelectionController.active
     property Item textSelectionController: null
@@ -212,7 +213,9 @@ RawWebView {
 
     BusyIndicator {
         id: busySpinner
-        anchors.centerIn: parent
+        x: (webview.viewportWidth - width) / 2
+        y: webview._indicatorVerticalOffset
+           + ((webview.viewportHeight - webview._indicatorVerticalOffset - height) / 2)
         running: true
         visible: webview.loading
         size: BusyIndicatorSize.Large
