@@ -55,7 +55,7 @@ QtObject {
                                                       "pageStack": pageStack,
                                                       "winid": winid,
                                                       "contentItem": contentItem,
-                                                      "filter": data.filter,
+                                                      "mimeType": data.mimeType,
                                                       "mode": data.mode})
             } else if (_filePickerComponent.status === Component.Error) {
                 // Component development time issue, component creation should newer fail.
