@@ -50,14 +50,14 @@ Timer {
             return false
         }
 
-        var winid = data.winid
+        var winId = data.winId
         switch (topic) {
         case "embed:alert": {
             var obj = pageStack.animatorPush(Qt.resolvedUrl("AlertDialog.qml"), { "text": data.text })
             obj.pageCompleted.connect(function(dialog) {
                 // TODO: also the Async message must be sent when window gets closed
                 dialog.done.connect(function() {
-                    contentItem.sendAsyncMessage("alertresponse", {"winid": winid})
+                    contentItem.sendAsyncMessage("alertresponse", {"winId": winId})
                 })
             })
             break
@@ -68,11 +68,11 @@ Timer {
                 // TODO: also the Async message must be sent when window gets closed
                 dialog.accepted.connect(function() {
                     contentItem.sendAsyncMessage("confirmresponse",
-                                                 { "winid": winid, "accepted": true })
+                                                 { "winId": winId, "accepted": true })
                 })
                 dialog.rejected.connect(function() {
                     contentItem.sendAsyncMessage("confirmresponse",
-                                                 { "winid": winid, "accepted": false })
+                                                 { "winId": winId, "accepted": false })
                 })
             })
             break
@@ -83,11 +83,11 @@ Timer {
                 // TODO: also the Async message must be sent when window gets closed
                 dialog.accepted.connect(function() {
                     contentItem.sendAsyncMessage("promptresponse",
-                                                 { "winid": winid, "accepted": true, "promptvalue": dialog.value })
+                                                 { "winId": winId, "accepted": true, "promptvalue": dialog.value })
                 })
                 dialog.rejected.connect(function() {
                     contentItem.sendAsyncMessage("promptresponse",
-                                                 { "winid": winid, "accepted": false })
+                                                 { "winId": winId, "accepted": false })
                 })
             })
             break
@@ -99,7 +99,7 @@ Timer {
             break
         }
         case "embed:auth": {
-            root.openAuthDialog(contentItem, data, winid)
+            root.openAuthDialog(contentItem, data, winId)
             break
         }
         case "embed:permissions": {
@@ -153,22 +153,22 @@ Timer {
         return listeners.indexOf(topic) >= 0
     }
 
-    function openAuthDialog(contentItem, data, winid) {
+    function openAuthDialog(contentItem, data, winId) {
         if (pageStack.busy) {
-            root._delayedOpenAuthDialog(contentItem, data, winid)
+            root._delayedOpenAuthDialog(contentItem, data, winId)
         } else {
-            root._immediateOpenAuthDialog(contentItem, data, winid)
+            root._immediateOpenAuthDialog(contentItem, data, winId)
         }
     }
 
-    function _delayedOpenAuthDialog(contentItem, data, winid) {
+    function _delayedOpenAuthDialog(contentItem, data, winId) {
         authDialogContentItem = contentItem
         authDialogData = data
-        authDialogWinId = winid
+        authDialogWinId = winId
         start()
     }
 
-    function _immediateOpenAuthDialog(contentItem, data, winid) {
+    function _immediateOpenAuthDialog(contentItem, data, winId) {
         var obj = pageStack.animatorPush(Qt.resolvedUrl("AuthDialog.qml"),
                                     {"hostname": data.text, "realm": data.title,
                                      "username": data.storedUsername, "password": data.storedPassword,
@@ -176,13 +176,13 @@ Timer {
         obj.pageCompleted.connect(function(dialog) {
             dialog.accepted.connect(function () {
                 contentItem.sendAsyncMessage("authresponse",
-                                             { "winid": winid, "accepted": true,
+                                             { "winId": winId, "accepted": true,
                                                  "username": dialog.username, "password": dialog.password,
                                                  "dontsave": dialog.dontsave })
             })
             dialog.rejected.connect(function() {
                 contentItem.sendAsyncMessage("authresponse",
-                                             { "winid": winid, "accepted": false})
+                                             { "winId": winId, "accepted": false})
             })
         })
     }
