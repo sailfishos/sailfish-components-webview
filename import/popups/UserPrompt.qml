@@ -15,6 +15,7 @@ import Sailfish.Silica 1.0
 Dialog {
     id: dialog
     property alias acceptText: header.acceptText
+    property alias cancelText: header.cancelText
     property alias title: header.title
 
     property var checkbox
