@@ -14,7 +14,7 @@ import Sailfish.Pickers 1.0
 
 Item {
     id: pickerCreator
-    property int winid
+    property int winId
     property QtObject contentItem
     property string mimeType
     property int mode
@@ -33,7 +33,7 @@ Item {
 
         contentItem.sendAsyncMessage("filepickerresponse",
                                  {
-                                     "winid": winid,
+                                     "winId": winId,
                                      "accepted": filePath ? true : false,
                                                             "items": [filePath]
                                  })
@@ -53,7 +53,7 @@ Item {
 
         contentItem.sendAsyncMessage("filepickerresponse",
                                  {
-                                     "winid": winid,
+                                     "winId": winId,
                                      "accepted": result.length > 0,
                                      "items": result
                                  })
