@@ -34,6 +34,16 @@ Timer {
 
     signal aboutToOpenContextMenu(var data)
 
+    function getCheckbox(data) {
+        var inputs = data.inputs
+        for (var i = 0; inputs && (i < inputs.length); ++i) {
+            if (inputs[i].hint === "preventAddionalDialog") {
+                return inputs[i]
+            }
+        }
+        return null
+    }
+
     // Returns true if message is handled.
     function message(topic, data) {
         if (!handlesMessage(topic)) {
@@ -53,41 +63,71 @@ Timer {
         var winId = data.winId
         switch (topic) {
         case "embed:alert": {
-            var obj = pageStack.animatorPush(Qt.resolvedUrl("AlertDialog.qml"), { "text": data.text })
+            var obj = pageStack.animatorPush(Qt.resolvedUrl("AlertDialog.qml"), {
+                                                 "text": data.text,
+                                                 "checkbox": getCheckbox(data)
+                                             })
             obj.pageCompleted.connect(function(dialog) {
                 // TODO: also the Async message must be sent when window gets closed
                 dialog.done.connect(function() {
-                    contentItem.sendAsyncMessage("alertresponse", {"winId": winId})
+                    contentItem.sendAsyncMessage("alertresponse", {
+                                                     "winId": winId,
+                                                     "checkvalue": dialog.checkboxValue
+                                                 })
                 })
             })
             break
         }
         case "embed:confirm": {
-            var obj = pageStack.animatorPush(Qt.resolvedUrl("ConfirmDialog.qml"), { "text": data.text })
+            var obj = pageStack.animatorPush(Qt.resolvedUrl("ConfirmDialog.qml"), {
+                                                 "text": data.text,
+                                                 "checkbox": getCheckbox(data)
+                                             })
             obj.pageCompleted.connect(function(dialog) {
                 // TODO: also the Async message must be sent when window gets closed
                 dialog.accepted.connect(function() {
                     contentItem.sendAsyncMessage("confirmresponse",
-                                                 { "winId": winId, "accepted": true })
+                                                 {
+                                                     "winId": winId,
+                                                     "accepted": true,
+                                                     "checkvalue": dialog.checkboxValue
+                                                 })
                 })
                 dialog.rejected.connect(function() {
                     contentItem.sendAsyncMessage("confirmresponse",
-                                                 { "winId": winId, "accepted": false })
+                                                 {
+                                                     "winId": winId,
+                                                     "accepted": false,
+                                                     "checkvalue": dialog.checkboxValue
+                                                 })
                 })
             })
             break
         }
         case "embed:prompt": {
-            var obj = pageStack.animatorPush(Qt.resolvedUrl("PromptDialog.qml"), { "text": data.text, "value": data.defaultValue })
+            var obj = pageStack.animatorPush(Qt.resolvedUrl("PromptDialog.qml"), {
+                                                 "text": data.text,
+                                                 "value": data.defaultValue,
+                                                 "checkbox": getCheckbox(data)
+                                             })
             obj.pageCompleted.connect(function(dialog) {
                 // TODO: also the Async message must be sent when window gets closed
                 dialog.accepted.connect(function() {
                     contentItem.sendAsyncMessage("promptresponse",
-                                                 { "winId": winId, "accepted": true, "promptvalue": dialog.value })
+                                                 {
+                                                     "winId": winId,
+                                                     "accepted": true,
+                                                     "promptvalue": dialog.value,
+                                                     "checkvalue": dialog.checkboxValue
+                                                 })
                 })
                 dialog.rejected.connect(function() {
                     contentItem.sendAsyncMessage("promptresponse",
-                                                 { "winId": winId, "accepted": false })
+                                                 {
+                                                     "winId": winId,
+                                                     "accepted": false,
+                                                     "checkvalue": dialog.checkboxValue
+                                                 })
                 })
             })
             break

@@ -18,6 +18,7 @@ BuildRequires:  qt5-qttools-linguist
 Requires: sailfishsilica-qt5 >= 1.1.46
 Requires: sailfish-components-media-qt5
 Requires: sailfish-components-pickers-qt5
+Requires: embedlite-components-qt5 >= 1.21.2
 
 %description
 %{summary}.
