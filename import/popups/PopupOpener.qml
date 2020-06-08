@@ -209,16 +209,33 @@ Timer {
     }
 
     function _immediateOpenAuthDialog(contentItem, data, winId) {
+        var inputs = data.inputs
+        var username
+        var password
+        var remember
+
+        for (var i = 0; i < inputs.length; ++i) {
+            if (inputs[i].hint === "username") {
+                username = inputs[i]
+            } else if (inputs[i].hint === "password") {
+                password = inputs[i]
+            } else if (inputs[i].hint === "remember") {
+                remember = inputs[i]
+            }
+        }
+
+        var passwordOnly = !username
         var obj = pageStack.animatorPush(Qt.resolvedUrl("AuthDialog.qml"),
                                     {"hostname": data.text, "realm": data.title,
-                                     "username": data.storedUsername, "password": data.storedPassword,
-                                     "passwordOnly": data.passwordOnly })
+                                     "username": username, "password": password,
+                                     "remember": remember, "passwordOnly": passwordOnly,
+                                     "privateBrowsing": data.privateBrowsing})
         obj.pageCompleted.connect(function(dialog) {
             dialog.accepted.connect(function () {
                 contentItem.sendAsyncMessage("authresponse",
                                              { "winId": winId, "accepted": true,
-                                                 "username": dialog.username, "password": dialog.password,
-                                                 "dontsave": dialog.dontsave })
+                                                 "username": dialog.usernameValue, "password": dialog.passwordValue,
+                                                 "remember": dialog.rememberValue })
             })
             dialog.rejected.connect(function() {
                 contentItem.sendAsyncMessage("authresponse",
