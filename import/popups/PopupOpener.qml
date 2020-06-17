@@ -269,7 +269,7 @@ Timer {
                                                             {
                                                                 "linkHref": linkHref,
                                                                 "imageSrc": imageSrc,
-                                                                "linkTitle": linkTitle.trim(),
+                                                                "linkTitle": linkTitle && linkTitle.trim() || "",
                                                                 "linkProtocol": data.linkProtocol,
                                                                 "contentType": contentType,
                                                                 "tabModel": root.tabModel,
