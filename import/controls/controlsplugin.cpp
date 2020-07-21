@@ -16,6 +16,16 @@
 #include <QtCore/QString>
 #include <QtCore/QTranslator>
 #include <QCoreApplication>
+#include <qqml.h>
+
+#include "permissionmanager.h"
+#include "permissionmodel.h"
+#include "permissionfilterproxymodel.h"
+
+template <typename T> static QObject *singletonApiFactory(QQmlEngine *engine, QJSEngine *)
+{
+    return new T(engine);
+}
 
 namespace SailfishOS {
 
@@ -50,6 +60,10 @@ public:
     void registerTypes(const char *uri) override
     {
         Q_UNUSED(uri)
+
+        qmlRegisterType<PermissionModel>("Sailfish.WebView.Controls", 1, 0, "PermissionModel");
+        qmlRegisterType<PermissionFilterProxyModel>("Sailfish.WebView.Controls", 1, 0, "PermissionFilterProxyModel");
+        qmlRegisterSingletonType<PermissionManager>("Sailfish.WebView.Controls", 1, 0, "PermissionManager", singletonApiFactory<PermissionManager>);
     }
 
     void initializeEngine(QQmlEngine *engine, const char *uri) override
