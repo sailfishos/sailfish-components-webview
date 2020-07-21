@@ -13,8 +13,20 @@ QT += qml quick
 
 QMAKE_CXXFLAGS += -fPIC
 
+INCLUDEPATH += . src ../../lib
+LIBS += -L../../lib -lsailfishwebengine
+
+HEADERS += \
+    permissionmanager.h \
+    permissionmodel.h \
+    permissionfilterproxymodel.h
+
 SOURCES += \
-    controlsplugin.cpp
+    controlsplugin.cpp \
+    permissionmanager.cpp \
+    permissionmodel.cpp \
+    permissionfilterproxymodel.cpp
+
 OTHER_FILES += \
     qmldir \
     files(*.qml)
