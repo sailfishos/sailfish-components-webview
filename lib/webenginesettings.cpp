@@ -128,6 +128,10 @@ void SailfishOS::WebEngineSettings::initialize()
                                   QVariant::fromValue<QString>(langs));
     engineSettings->setPreference(QStringLiteral("browser.enable_automatic_image_resizing"),
                                   QVariant::fromValue<bool>(true));
+    engineSettings->setPreference(QStringLiteral("apz.content_response_timeout"),
+                                  QVariant::fromValue<int>(600));
+    engineSettings->setPreference(QStringLiteral("layout.css.touch_action.enabled"),
+                                  QVariant::fromValue<bool>(false));
 
     isInitialized = true;
 }
