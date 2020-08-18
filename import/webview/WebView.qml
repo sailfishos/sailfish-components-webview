@@ -167,8 +167,9 @@ RawWebView {
         id: popupOpener
 
         pageStack: pickerOpener.pageStack
-        parentItem: webview
+        parentItem: webview.webViewPage || webview
         contentItem: webview
+        downloadsEnabled: false
 
         onAboutToOpenContextMenu: {
             if (Qt.inputMethod.visible) {
