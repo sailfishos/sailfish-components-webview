@@ -30,6 +30,8 @@ Timer {
     property var authDialogData
     property var authDialogWinId
 
+    property bool downloadsEnabled: true
+
     property Component _contextMenuComponent
 
     signal aboutToOpenContextMenu(var data)
@@ -274,7 +276,8 @@ Timer {
                                                                 "contentType": contentType,
                                                                 "tabModel": root.tabModel,
                                                                 "viewId": contentItem.uniqueID(),
-                                                                "pageStack": pageStack
+                                                                "pageStack": pageStack,
+                                                                "downloadsEnabled": root.downloadsEnabled
                                                             })
                     contextMenu.show()
                 } else {
