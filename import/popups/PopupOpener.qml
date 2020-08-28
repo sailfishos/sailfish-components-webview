@@ -293,7 +293,9 @@ Timer {
         // Warmup location settings.
         Popups.LocationSettings.locationEnabled
         if (contentItem) {
-            contentItem.addMessageListeners(listeners)
+            for (var i = 0; i < listeners.length; ++i) {
+                contentItem.addMessageListener(listeners[i])
+            }
         } else {
             console.log("PopupOpener has no contentItem. Each created WebView/WebPage",
                         "instance can have own PopupOpener. Add missing binding.")

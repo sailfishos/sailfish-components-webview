@@ -74,7 +74,7 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
     });
 
     // subscribe to gecko messages
-    webEngine->addObservers({ QStringLiteral("clipboard:setdata") });
+    webEngine->addObserver(QStringLiteral("clipboard:setdata"));
 }
 
 } // namespace WebView
