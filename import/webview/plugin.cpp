@@ -63,12 +63,12 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
 
     connect(webEngine, &SailfishOS::WebEngine::recvObserve, [](const QString &message, const QVariant &data) {
         const QVariantMap dataMap = data.toMap();
-        if (message == "clipboard:setdata") {
+        if (message == QLatin1String("clipboard:setdata")) {
             QClipboard *clipboard = QGuiApplication::clipboard();
 
             // check if we copied password
-            if (!dataMap.value("private").toBool()) {
-                clipboard->setText(dataMap.value("data").toString());
+            if (!dataMap.value(QStringLiteral("private")).toBool()) {
+                clipboard->setText(dataMap.value(QStringLiteral("data")).toString());
             }
         }
     });
