@@ -1,6 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2015-2016 Jolla Ltd.
+** Copyright (c) 2020 Open Mobile Platform LLC.
 ** Contact: Raine Makelainen <raine.makelainen@jolla.com>
 **
 ****************************************************************************/
@@ -69,16 +70,40 @@ void tst_downloadhelper::uniqueFileName_data()
     QTest::addColumn<QString>("expectedName");
 
     QList<QString> existingFiles;
+
+    existingFiles.clear();
     QTest::newRow("new_file") << "some_picture.jpg" << existingFiles << "some_picture.jpg";
 
+    existingFiles.clear();
     QTest::newRow("new_file_no_ext") << "some_file" << existingFiles << "some_file";
 
+    existingFiles.clear();
+    QTest::newRow("one_symbol_name") << "a" << existingFiles << "a";
+
+    existingFiles.clear();
+    existingFiles << "a";
+    QTest::newRow("file_exists_one_symbol_name") << "a" << existingFiles << "a(2)";
+
+    existingFiles.clear();
+    QTest::newRow("one_dot_name") << "." << existingFiles << "(2).";
+
+    existingFiles.clear();
+    QTest::newRow("two_dots_name") << ".." << existingFiles << "(2)..";
+
+    existingFiles.clear();
     existingFiles << "some_picture.jpg";
     QTest::newRow("file_exists") << "some_picture.jpg" << existingFiles << "some_picture(2).jpg";
 
+    existingFiles.clear();
+    existingFiles << "some_picture.jpg";
     QTest::newRow("new_file_2") << "some_picture.png" << existingFiles << "some_picture.png";
 
-    existingFiles << "some_picture(2).jpg" << "some_picture(3).jpg";
+    existingFiles.clear();
+    existingFiles << "some-picture.jpg";
+    QTest::newRow("new_file_3") << "some-picture.png" << existingFiles << "some-picture.png";
+
+    existingFiles.clear();
+    existingFiles << "some_picture.jpg" << "some_picture(2).jpg" << "some_picture(3).jpg";
     QTest::newRow("many_files_exist") << "some_picture.jpg" << existingFiles << "some_picture(4).jpg";
 
     existingFiles.clear();
@@ -94,11 +119,52 @@ void tst_downloadhelper::uniqueFileName_data()
     QTest::newRow("complicated_case") << "and(2)_some(2).picture.jpg" << existingFiles << "and(2)_some(2)(3).picture.jpg";
 
     existingFiles.clear();
+    existingFiles << "some_file.tar.gz";
+    QTest::newRow("file_exists_complex_ext") << "some_file.tar.gz" << existingFiles << "some_file(2).tar.gz";
+
+    existingFiles.clear();
     existingFiles << "some_file";
     QTest::newRow("file_exists_no_ext") << "some_file" << existingFiles << "some_file(2)";
 
-    existingFiles << "some_file(2)" << "some_file(3)";
+    existingFiles.clear();
+    existingFiles << "some_file" << "some_file(2)" << "some_file(3)";
     QTest::newRow("many_files_exist_no_ext") << "some_file" << existingFiles << "some_file(4)";
+
+    existingFiles.clear();
+    QTest::newRow("illegal_symbols_in_name") << "some\t\n\v\f\r\n\n_/\\?%*:|\"<>file  name.tar.gz" << existingFiles << "some_file_name.tar.gz";
+
+    existingFiles.clear();
+    existingFiles << "some_file_name.tar.gz";
+    QTest::newRow("file_exists_illegal_symbols_in_name") << "some\t\n\v\f\r\n\n_/\\?%*:|\"<>file  name.tar.gz" << existingFiles << "some_file_name(2).tar.gz";
+
+    existingFiles.clear();
+    QTest::newRow("dashes_and_underscores") << "1   2  -  3  _  4--_--5__-__6---7___8__--__9--__--10.tar.gz" << existingFiles << "1_2_3_4_5_6-7_8_9_10.tar.gz";
+
+    const QString prefix = QStringLiteral("some_file.");
+    const QString extension = QStringLiteral(".tar.gz");
+
+    existingFiles.clear();
+    {
+        const QString longName = QString(NAME_MAX + 1, 'z') + extension;
+        const QString expectedName = QString(NAME_MAX - extension.length(), 'z') + extension;
+        QTest::newRow("long_basename") << longName << existingFiles << expectedName;
+    }
+
+    existingFiles.clear();
+    {
+        const QString longName = prefix + QString(NAME_MAX + 1, 'z');
+        const QString expectedName = prefix + QString(NAME_MAX - prefix.length(), 'z');
+        QTest::newRow("long_extension") << longName << existingFiles << expectedName;
+    }
+
+    existingFiles.clear();
+    existingFiles << prefix + QString(NAME_MAX - prefix.length() - extension.length(), 'z') + extension;
+    {
+        const QString longName = prefix + QString(NAME_MAX + 1, 'z') + extension;
+        const QString expectedSuffix = QStringLiteral("(2).tar.gz");
+        const QString expectedName = prefix + QString(NAME_MAX - prefix.length() - expectedSuffix.length(), 'z') + expectedSuffix;
+        QTest::newRow("file_exists_long_name") << longName << existingFiles << expectedName;
+    }
 }
 
 void tst_downloadhelper::uniqueFileName()
