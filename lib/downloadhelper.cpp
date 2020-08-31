@@ -1,6 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2016 Jolla Ltd.
+** Copyright (c) 2020 Open Mobile Platform LLC.
 ** Contact: Raine Makelainen <raine.makelaine@jolla.com>
 ** Contact: Chris Adams <chris.adams@jolla.com>
 **
@@ -19,10 +20,26 @@ SailfishOS::WebEngineUtils::DownloadHelper::DownloadHelper(QObject *parent)
 {
 }
 
-QString SailfishOS::WebEngineUtils::DownloadHelper::createUniqueFileUrl(const QString &fileName, const QString &path) const
+QString SailfishOS::WebEngineUtils::DownloadHelper::createUniqueFileUrl(QString fileName, const QString &path) const
 {
-    if (path.isEmpty() || fileName.isEmpty()) {
+    if (path.isEmpty()) {
         return QString();
+    }
+
+    // Remove illegal characters from filename
+    fileName.replace(QRegExp("[<>:\"|?*%/\\\\]+"), "");
+
+    // Remove trailing dots and whitespaces
+    fileName.replace(QRegExp("[\\.\\s_]+$"), "");
+
+    // Remove leading whitespaces
+    fileName.replace(QRegExp("^[\\s_]+"), "");
+
+    // Replace whitespace characters with underscores
+    fileName.replace(QRegExp("[\\s_]+"), "_");
+
+    if (fileName.isEmpty()) {
+        fileName = QStringLiteral("unnamed_file");
     }
 
     const QFileInfo fileInfo(fileName);

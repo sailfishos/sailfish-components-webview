@@ -1,6 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2016 Jolla Ltd.
+** Copyright (c) 2020 Open Mobile Platform LLC.
 ** Contact: Raine Makelainen <raine.makelaine@jolla.com>
 ** Contact: Chris Adams <chris.adams@jolla.com>
 **
@@ -24,7 +25,7 @@ class DownloadHelper : public QObject
     Q_OBJECT
 public:
     DownloadHelper(QObject *parent = Q_NULLPTR);
-    Q_INVOKABLE QString createUniqueFileUrl(const QString &fileName, const QString &path) const;
+    Q_INVOKABLE QString createUniqueFileUrl(QString fileName, const QString &path) const;
 };
 
 }
