@@ -14,8 +14,6 @@
 #include <QCoreApplication>
 #include <QTimer>
 
-#define SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH QLatin1String("/usr/lib/mozembedlite/")
-
 Q_GLOBAL_STATIC(SailfishOS::WebEngine, webEngineInstance)
 
 void SailfishOS::WebEngine::initialize(const QString &profilePath, const QString &userAgent)
