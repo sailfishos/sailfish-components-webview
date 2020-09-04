@@ -12,7 +12,6 @@
 import QtQuick 2.1
 import Sailfish.Silica 1.0
 import MeeGo.QOfono 0.2
-import org.nemomobile.notifications 1.0
 
 MouseArea {
     id: root
@@ -111,7 +110,10 @@ MouseArea {
     }
 
     function showNotification() {
-        notification.show()
+        if (!notification.published) {
+            notification.show()
+            notification.published = true
+        }
     }
 
     function swap() {
@@ -127,7 +129,7 @@ MouseArea {
                                      "clearSelection": true
                                  })
 
-        notification.hide()
+        notification.published = false
         root.destroy()
     }
 
@@ -186,31 +188,16 @@ MouseArea {
         selectionController: root
     }
 
-    Notification {
+    Notice {
         id: notification
         property bool published
 
-        function show() {
-            if (published) {
-                close()
-            } else {
-                publish()
-                published = true
-            }
-        }
-
-        function hide() {
-            if (published) {
-                close()
-            }
-            published = false
-        }
-
-        expireTimeout: 3000
-        icon: "icon-s-clipboard"
+        duration: 3000
 
         //% "Copied to clipboard"
-        previewSummary: qsTrId("sailfish_components_webview_textselection-la-selection_copied")
+        text: qsTrId("sailfish_components_webview_textselection-la-selection_copied")
+
+        verticalOffset: -Theme.itemSizeMedium
     }
 
     OfonoManager {
