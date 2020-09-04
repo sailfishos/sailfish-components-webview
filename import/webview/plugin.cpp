@@ -22,8 +22,6 @@
 #include <QClipboard>
 #include <QGuiApplication>
 
-#define SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH QLatin1String("/usr/lib/mozembedlite/")
-
 namespace SailfishOS {
 
 namespace WebView {
