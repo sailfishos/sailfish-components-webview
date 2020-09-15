@@ -62,6 +62,11 @@ Timer {
             return false
         }
 
+        if (data.text && data.text.length > 1000) {
+            console.log("Message is too big to show and will be truncated.")
+            data.text  = data.text.substring(0, 1000) + " ..."
+        }
+
         var winId = data.winId
         switch (topic) {
         case "embed:alert": {
