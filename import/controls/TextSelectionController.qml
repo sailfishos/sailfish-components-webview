@@ -86,7 +86,7 @@ MouseArea {
         selectionVisible = true
 
         text = data.text || ""
-        searchUri = data.searchUri
+        searchUri = data.searchUri || ""
 
         _phoneNumberSelected = data.isPhoneNumber
         isPhoneNumber = _canCall && _phoneNumberSelected
