@@ -1,6 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 Jolla Ltd.
+** Copyright (c) 2016 Jolla Ltd.
+** Copyright (c) 2020 Open Mobile Platform LLC.
 ** Contact: Raine Makelainen <raine.makelaine@jolla.com>
 **
 ****************************************************************************/
@@ -20,7 +21,7 @@ namespace SailfishOS {
 class WebEngine : public QMozContext {
     Q_OBJECT
 public:
-    static void initialize(const QString &profilePath, const QString &userAgent = QLatin1String("Mozilla/5.0 (Linux; U; Sailfish 3.0; Mobile; rv:52.0) Gecko/52.0 Firefox/52.0 SailfishBrowser/1.0"));
+    static void initialize(const QString &profilePath, const QString &userAgent = QLatin1String("Mozilla/5.0 (Linux; U; Sailfish 3.0; Mobile; rv:60.9) Gecko/60.9 Firefox/60.9 SailfishBrowser/1.0"));
     static WebEngine *instance();
 
     explicit WebEngine(QObject *parent = 0);
