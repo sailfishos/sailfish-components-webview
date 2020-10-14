@@ -1,6 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 Jolla Ltd.
+** Copyright (c) 2016 - 2017 Jolla Ltd.
+** Copyright (c) 2020 Open Mobile Platform LLC.
 ** Contact: Raine Makelainen <raine.makelainen@jolla.com>
 **
 ****************************************************************************/
@@ -10,8 +11,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import QtQuick 2.2
+import Sailfish.Silica 1.0
 import Sailfish.WebView.Popups 1.0 as Popups
-import "GeolocationHosts.js" as Geolocation
 
 Timer {
     id: root
@@ -33,6 +34,13 @@ Timer {
     property bool downloadsEnabled: true
 
     property Component _contextMenuComponent
+
+    property Notice geolocationDisabledNotice: Notice {
+        duration: 3000
+        //% "Geolocation is disabled"
+        text: qsTrId("sailfish_components_webview_popupopener-la-geolocation_disabled")
+        anchor: Notice.Center
+    }
 
     signal aboutToOpenContextMenu(var data)
 
@@ -150,35 +158,23 @@ Timer {
             break
         }
         case "embed:permissions": {
-            if (data.title === "geolocation"
-                    && Popups.LocationSettings.locationEnabled) {
-                switch (Geolocation.response(data.host)) {
-                    case "accepted": {
-                        contentItem.sendAsyncMessage("embedui:permissions",
-                                                 { "allow": true, "checkedDontAsk": false, "id": data.id })
-                        break
-                    }
-                    case "rejected": {
-                        contentItem.sendAsyncMessage("embedui:permissions",
-                                                 { "allow": false, "checkedDontAsk": false, "id": data.id })
-                        break
-                    }
-                    default: {
-                        var obj = pageStack.animatorPush(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
-                        obj.pageCompleted.connect(function(dialog) {
-                            dialog.accepted.connect(function() {
-                                contentItem.sendAsyncMessage("embedui:permissions",
-                                                             { "allow": true, "checkedDontAsk": false, "id": data.id })
-                                Geolocation.addResponse(data.host, "accepted")
-                            })
-                            dialog.rejected.connect(function() {
-                                contentItem.sendAsyncMessage("embedui:permissions",
-                                                             { "allow": false, "checkedDontAsk": false, "id": data.id })
-                                Geolocation.addResponse(data.host, "rejected")
-                            })
+            if (data.title === "geolocation") {
+                if (Popups.LocationSettings.locationEnabled) {
+                    var obj = pageStack.animatorPush(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
+                    obj.pageCompleted.connect(function(dialog) {
+                        dialog.accepted.connect(function() {
+                            contentItem.sendAsyncMessage("embedui:permissions",
+                                                         { "allow": true, "checkedDontAsk": dialog.rememberValue, "id": data.id })
                         })
-                        break
-                    }
+                        dialog.rejected.connect(function() {
+                            contentItem.sendAsyncMessage("embedui:permissions",
+                                                         { "allow": false, "checkedDontAsk": dialog.rememberValue, "id": data.id })
+                        })
+                    })
+                } else {
+                    geolocationDisabledNotice.show()
+                    sendAsyncMessage("embedui:permissions",
+                                     { "allow": false, "checkedDontAsk": false, "id": data.id })
                 }
             } else {
                 // Currently we don't support other permission requests.

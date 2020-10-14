@@ -107,7 +107,6 @@ Unit tests and functional tests of Sailfish OS WebView / WebEngine
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/libsailfishwebviewpopupsplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/*.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/Popups/*.js
 
 %files pickers
 %defattr(-,root,root,-)
