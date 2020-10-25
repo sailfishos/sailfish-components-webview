@@ -42,6 +42,11 @@ void PermissionManager::requestUriPermissions(const QString &uri, QJSValue callb
     sendRequest(QStringLiteral("get-all-for-uri"), uri);
 }
 
+void PermissionManager::add(const QString &host, const QString &type, int capability)
+{
+    add(Permission(host, type, intToCapability(capability)));
+}
+
 void PermissionManager::sendRequest(const QString &message
                                , const QString &host
                                , const QString &type

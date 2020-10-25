@@ -35,6 +35,10 @@ public:
 
     Q_INVOKABLE void requestUriPermissions(const QString &uri, QJSValue callback);
 
+    /* Add host to exclusion list. The type property can be "geolocation", "cookie",
+     * "desktop-notification", "popup", etc. */
+    Q_INVOKABLE void add(const QString &host, const QString &type, int capability);
+
     static void add(const Permission &permission);
     static void remove(const QString &host, const QString &type);
     static void sendRequest(const QString &message,

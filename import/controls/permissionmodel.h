@@ -46,7 +46,7 @@ public:
     PermissionModel(QObject *parent = nullptr);
 
     /* Add host to exclusion list. The type property can be "geolocation", "cookie",
-     * "desktop-notification, "popup", etc. */
+     * "desktop-notification", "popup", etc. */
     Q_INVOKABLE void add(const QString &host, const QString &type, int capability);
 
     void setCapability(QModelIndex index, int capability);
