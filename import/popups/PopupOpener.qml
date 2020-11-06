@@ -159,23 +159,20 @@ Timer {
         }
         case "embed:permissions": {
             if (data.title === "geolocation") {
-                if (Popups.LocationSettings.locationEnabled) {
-                    var obj = pageStack.animatorPush(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
-                    obj.pageCompleted.connect(function(dialog) {
-                        dialog.accepted.connect(function() {
-                            contentItem.sendAsyncMessage("embedui:permissions",
-                                                         { "allow": true, "checkedDontAsk": dialog.rememberValue, "id": data.id })
-                        })
-                        dialog.rejected.connect(function() {
-                            contentItem.sendAsyncMessage("embedui:permissions",
-                                                         { "allow": false, "checkedDontAsk": dialog.rememberValue, "id": data.id })
-                        })
+                var obj = pageStack.animatorPush(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
+                obj.pageCompleted.connect(function(dialog) {
+                    dialog.accepted.connect(function() {
+                        contentItem.sendAsyncMessage("embedui:permissions",
+                                                     { "allow": true, "checkedDontAsk": dialog.rememberValue, "id": data.id })
+                        if (!Popups.LocationSettings.locationEnabled) {
+                            geolocationDisabledNotice.show()
+                        }
                     })
-                } else {
-                    geolocationDisabledNotice.show()
-                    sendAsyncMessage("embedui:permissions",
-                                     { "allow": false, "checkedDontAsk": false, "id": data.id })
-                }
+                    dialog.rejected.connect(function() {
+                        contentItem.sendAsyncMessage("embedui:permissions",
+                                                     { "allow": false, "checkedDontAsk": dialog.rememberValue, "id": data.id })
+                    })
+                })
             } else {
                 // Currently we don't support other permission requests.
                 sendAsyncMessage("embedui:permissions",
