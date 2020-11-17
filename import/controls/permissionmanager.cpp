@@ -12,16 +12,11 @@
 #include "permissionmodel.h"
 #include "webengine.h"
 
-#include <QJSEngine>
-
-static const auto PERMS_ALL_FOR_URI = QStringLiteral("embed:perms:all-for-uri");
-
-PermissionManager::PermissionManager(QObject *parent)
-    : QObject(parent)
-{
+PermissionManager::PermissionManager(QObject *parent) : QObject(parent) {
     SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
-    connect(webEngine, &SailfishOS::WebEngine::recvObserve, this, &PermissionManager::handleRecvObserve);
-    webEngine->addObserver(PERMS_ALL_FOR_URI);
+
+    webEngine->addObserver(QStringLiteral("embed:perms:all"));
+    webEngine->addObserver(QStringLiteral("embed:perms:all-for-uri"));
 }
 
 void PermissionManager::add(const Permission &permission)
@@ -34,17 +29,9 @@ void PermissionManager::remove(const QString &host, const QString &type)
     sendRequest(QStringLiteral("remove"), host, type);
 }
 
-void PermissionManager::requestUriPermissions(const QString &uri, QJSValue callback)
+void PermissionManager::add(const QString &host, const QString &type, Capability capability)
 {
-    if (!callback.isNull() && !callback.isUndefined() && callback.isCallable()) {
-        m_callback.reset(new QJSValue(callback));
-    }
-    sendRequest(QStringLiteral("get-all-for-uri"), uri);
-}
-
-void PermissionManager::add(const QString &host, const QString &type, int capability)
-{
-    add(Permission(host, type, intToCapability(capability)));
+    add(Permission(host, type, capability));
 }
 
 void PermissionManager::sendRequest(const QString &message
@@ -70,10 +57,12 @@ PermissionManager::Capability PermissionManager::intToCapability(int value)
     return static_cast<Capability>(value);
 }
 
-void PermissionManager::handleRecvObserve(const QString &message, const QVariant &data)
+int PermissionManager::expirationToInt(PermissionManager::Expiration expireType)
 {
-    if (message == PERMS_ALL_FOR_URI) {
-        m_callback->call(QJSValueList() << m_callback->engine()->toScriptValue(data));
-        m_callback.reset();
-    }
+    return static_cast<int>(expireType);
+}
+
+PermissionManager::Expiration PermissionManager::intToExpiration(int value)
+{
+    return static_cast<Expiration>(value);
 }

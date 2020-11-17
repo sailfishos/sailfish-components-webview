@@ -12,14 +12,33 @@
 #include "webengine.h"
 
 static const auto PERMS_ALL = QStringLiteral("embed:perms:all");
+static const auto PERMS_ALL_FOR_URI = QStringLiteral("embed:perms:all-for-uri");
 
+/*
+ * The model stores a list of permissions for the host(m_host).
+ * If host is empty, the model will have all hosts with permissions.
+ * It has no watcher(real-time update), so please,
+ * don't use PermissionManager::add() and PermissionManager::remove()
+ * methods outside for this model.
+*/
 PermissionModel::PermissionModel(QObject *parent) : QAbstractListModel(parent)
 {
     SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
     connect(webEngine, &SailfishOS::WebEngine::recvObserve, this, &PermissionModel::handleRecvObserve);
-    webEngine->addObserver(PERMS_ALL);
 
-    PermissionManager::sendRequest(QStringLiteral("get-all"));
+    connect(this, &PermissionModel::hostChanged, this, &PermissionModel::requestPermissions);
+}
+
+void PermissionModel::classBegin()
+{
+
+}
+
+void PermissionModel::componentComplete()
+{
+    if (host().isEmpty()) {
+        requestPermissions(host());
+    }
 }
 
 void PermissionModel::add(const QString &host, const QString &type, int capability)
@@ -30,8 +49,9 @@ void PermissionModel::add(const QString &host, const QString &type, int capabili
     Permission permission(host, type, PermissionManager::intToCapability(capability));
     PermissionManager::add(permission);
 
-    if (!m_permissionList.contains(permission))
+    if (!m_permissionList.contains(permission)) {
         m_permissionList.append(permission);
+    }
 
     endInsertRows();
 }
@@ -48,6 +68,10 @@ QVariant PermissionModel::data(const QModelIndex &index, int role) const
         return m_permissionList.at(index.row()).m_type;
     case Capability:
         return m_permissionList.at(index.row()).m_capability;
+    case ExpireType:
+        return m_permissionList.at(index.row()).m_expireType;
+    case ExpireTime:
+        return m_permissionList.at(index.row()).m_expireTime;
     default:
         return QVariant();
     }
@@ -65,12 +89,37 @@ QHash<int, QByteArray> PermissionModel::roleNames() const
     roles[Uri] = "uri";
     roles[Type] = "type";
     roles[Capability] = "capability";
+    roles[ExpireType] = "expireType";
+    roles[ExpireTime] = "expireTime";
     return roles;
+}
+
+QString PermissionModel::host() const
+{
+    return m_host;
+}
+
+void PermissionModel::setHost(const QString &host)
+{
+    if (m_host == host) {
+        return;
+    }
+
+    m_host = host;
+    emit hostChanged(m_host);
 }
 
 void PermissionModel::handleRecvObserve(const QString &message, const QVariant &data)
 {
-    if (message == PERMS_ALL) {
+    if (m_host.isEmpty() && message == PERMS_ALL_FOR_URI) {
+        return;
+    }
+
+    if (!m_host.isEmpty() && message == PERMS_ALL) {
+        return;
+    }
+
+    if (message == PERMS_ALL || message == PERMS_ALL_FOR_URI) {
         setPermissionList(qvariant_cast<QVariantList>(data));
     }
 }
@@ -85,9 +134,19 @@ void PermissionModel::setPermissionList(const QVariantList &data)
         QVariantMap varMap = iter.toMap();
         m_permissionList.append(Permission(varMap.value("uri").toString(),
                                            varMap.value("type").toString(),
-                                           PermissionManager::intToCapability(varMap.value("capability").toInt())));
+                                           PermissionManager::intToCapability(varMap.value("capability").toInt()),
+                                           PermissionManager::intToExpiration(varMap.value("expireType").toInt())));
     }
     endResetModel();
+}
+
+void PermissionModel::requestPermissions(const QString &host)
+{
+    if (host.isEmpty()) {
+        PermissionManager::sendRequest(QStringLiteral("get-all"));
+    } else {
+        PermissionManager::sendRequest(QStringLiteral("get-all-for-uri"), host);
+    }
 }
 
 void PermissionModel::remove(int index)
@@ -103,8 +162,9 @@ void PermissionModel::remove(int index)
 
 void PermissionModel::setCapability(QModelIndex index, int capability)
 {
-    if (!index.isValid() || index.row() < 0 || index.row() >= m_permissionList.count())
+    if (!index.isValid() || index.row() < 0 || index.row() >= m_permissionList.count()) {
         return;
+    }
 
     Permission &permission = m_permissionList[index.row()];
     permission.m_capability = PermissionManager::intToCapability(capability);
