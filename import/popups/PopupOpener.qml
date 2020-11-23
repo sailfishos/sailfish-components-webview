@@ -35,10 +35,10 @@ Timer {
 
     property Component _contextMenuComponent
 
-    property Notice geolocationDisabledNotice: Notice {
+    property Notice positioningDisabledNotice: Notice {
         duration: 3000
-        //% "Geolocation is disabled"
-        text: qsTrId("sailfish_components_webview_popupopener-la-geolocation_disabled")
+        //% "Positioning is disabled"
+        text: qsTrId("sailfish_components_webview_popupopener-la-positioning_disabled")
         anchor: Notice.Center
     }
 
@@ -165,7 +165,7 @@ Timer {
                         contentItem.sendAsyncMessage("embedui:permissions",
                                                      { "allow": true, "checkedDontAsk": dialog.rememberValue, "id": data.id })
                         if (!Popups.LocationSettings.locationEnabled) {
-                            geolocationDisabledNotice.show()
+                            positioningDisabledNotice.show()
                         }
                     })
                     dialog.rejected.connect(function() {
