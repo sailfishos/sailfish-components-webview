@@ -14,6 +14,7 @@
 
 PermissionFilterProxyModel::PermissionFilterProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
+    , m_onlyPermanent(false)
 {
 
 }
@@ -24,8 +25,9 @@ void PermissionFilterProxyModel::remove(int currentIndex)
     QModelIndex sourceIndex = mapToSource(proxyIndex);
 
     PermissionModel *permissionModel = qobject_cast<PermissionModel *>(sourceModel());
-    if (!permissionModel)
+    if (!permissionModel) {
         return;
+    }
 
     permissionModel->remove(sourceIndex.row());
 }
@@ -36,8 +38,9 @@ void PermissionFilterProxyModel::setCapability(int currentIndex, int capability)
     QModelIndex sourceIndex = mapToSource(proxyIndex);
 
     PermissionModel *permissionModel = qobject_cast<PermissionModel *>(sourceModel());
-    if (!permissionModel)
+    if (!permissionModel) {
         return;
+    }
 
     permissionModel->setCapability(sourceIndex, capability);
 }
@@ -45,6 +48,17 @@ void PermissionFilterProxyModel::setCapability(int currentIndex, int capability)
 bool PermissionFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
+
+    if (onlyPermanent()) {
+        int expireType = sourceModel()->data(index, PermissionModel::ExpireType).toInt();
+        if (PermissionManager::intToExpiration(expireType) != PermissionManager::Never) {
+            return false;
+        }
+    }
+
+    if (permissionType().isEmpty()) {
+        return true;
+    }
 
     if (sourceModel()->data(index, PermissionModel::Type).toString() == permissionType()) {
         return true;
@@ -59,10 +73,27 @@ QString PermissionFilterProxyModel::permissionType() const
 
 void PermissionFilterProxyModel::setPermissionType(const QString &permissionType)
 {
-    if (m_permissionType == permissionType)
+    if (m_permissionType == permissionType) {
         return;
+    }
 
     m_permissionType = permissionType;
     emit permissionTypeChanged(m_permissionType);
+    invalidate();
+}
+
+bool PermissionFilterProxyModel::onlyPermanent() const
+{
+    return m_onlyPermanent;
+}
+
+void PermissionFilterProxyModel::setOnlyPermanent(bool onlyPermanent)
+{
+    if (m_onlyPermanent == onlyPermanent) {
+        return;
+    }
+
+    m_onlyPermanent = onlyPermanent;
+    emit onlyPermanentChanged(m_onlyPermanent);
     invalidate();
 }

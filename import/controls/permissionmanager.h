@@ -12,8 +12,6 @@
 #define PERMISSIONMANAGER_H
 
 #include <QObject>
-#include <QJSValue>
-#include <QScopedPointer>
 
 class Permission;
 
@@ -33,11 +31,19 @@ public:
     };
     Q_ENUM(Capability)
 
-    Q_INVOKABLE void requestUriPermissions(const QString &uri, QJSValue callback);
+    enum Expiration {
+        Never = 0,
+        Session = 1,
+        Time = 2
+    };
+    Q_ENUM(Expiration)
 
     /* Add host to exclusion list. The type property can be "geolocation", "cookie",
      * "desktop-notification", "popup", etc. */
-    Q_INVOKABLE void add(const QString &host, const QString &type, int capability);
+    Q_INVOKABLE void add(const QString &host, const QString &type, Capability capability);
+
+    // Create a PermissionManager object before using the PermissionModel
+    Q_INVOKABLE void instance() {}
 
     static void add(const Permission &permission);
     static void remove(const QString &host, const QString &type);
@@ -49,11 +55,8 @@ public:
     static int capabilityToInt(Capability capability);
     static Capability intToCapability(int value);
 
-private slots:
-    void handleRecvObserve(const QString &message, const QVariant &data);
-
-private:
-    QScopedPointer<QJSValue> m_callback;
+    static int expirationToInt(Expiration expireType);
+    static Expiration intToExpiration(int value);
 };
 
 #endif // PERMISSIONMANAGER_H
