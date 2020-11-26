@@ -169,6 +169,29 @@ void tst_downloadhelper::uniqueFileName_data()
 
     const QString prefix = QStringLiteral("some_file.");
     const QString extension = QStringLiteral(".tar.gz");
+
+    existingFiles.clear();
+    {
+        const QString longName = QString(NAME_MAX + 1, 'z') + extension;
+        const QString expectedName = QString(NAME_MAX - extension.length(), 'z') + extension;
+        QTest::newRow("long_basename") << longName << existingFiles << expectedName;
+    }
+
+    existingFiles.clear();
+    {
+        const QString longName = prefix + QString(NAME_MAX + 1, 'z');
+        const QString expectedName = prefix + QString(NAME_MAX - prefix.length(), 'z');
+        QTest::newRow("long_extension") << longName << existingFiles << expectedName;
+    }
+
+    existingFiles.clear();
+    existingFiles << prefix + QString(NAME_MAX - prefix.length() - extension.length(), 'z') + extension;
+    {
+        const QString longName = prefix + QString(NAME_MAX + 1, 'z') + extension;
+        const QString expectedSuffix = QStringLiteral("(2).tar.gz");
+        const QString expectedName = prefix + QString(NAME_MAX - prefix.length() - expectedSuffix.length(), 'z') + expectedSuffix;
+        QTest::newRow("file_exists_long_name") << longName << existingFiles << expectedName;
+    }
 }
 
 void tst_downloadhelper::uniqueFileName()
