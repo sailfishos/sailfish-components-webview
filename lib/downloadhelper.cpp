@@ -14,6 +14,8 @@
 #include "downloadhelper.h"
 
 #include <QFileInfo>
+constexpr int FILEEXTENSION_MAX_LENGTH = 32;
+constexpr int FILENAME_MAX_LENGTH = 255;
 
 SailfishOS::WebEngineUtils::DownloadHelper::DownloadHelper(QObject *parent)
     : QObject(parent)
@@ -42,18 +44,25 @@ QString SailfishOS::WebEngineUtils::DownloadHelper::createUniqueFileUrl(QString 
         fileName = QStringLiteral("unnamed_file");
     }
 
-    const QFileInfo fileInfo(fileName);
-    const QString newFile("%1/%2(%3)%4%5");
-    const QString baseName = fileInfo.baseName();
-    const QString suffix = fileInfo.completeSuffix();
-
-    QString result(path + "/" + fileName);
-    int collisionCount(1);
-
-    while (QFileInfo::exists(result)) {
-        collisionCount++;
-        result = newFile.arg(path).arg(baseName).arg(collisionCount).arg(suffix.isEmpty() ? "" : ".").arg(suffix);
+    // Determine start position of file extension
+    int dotPosition = fileName.length() < FILEEXTENSION_MAX_LENGTH ? 0 : fileName.length() - FILEEXTENSION_MAX_LENGTH;
+    while (dotPosition < fileName.length() && fileName[dotPosition] != '.') {
+        dotPosition += 1;
     }
+
+    const QString baseName = fileName.left(dotPosition);
+    const QString extension = fileName.mid(dotPosition);
+
+
+    QString result;
+    QString suffix = extension;
+    int collisionCount = 1;
+
+    do {
+        result = QStringLiteral("%1/%2%4").arg(path).arg(baseName.left(FILENAME_MAX_LENGTH - suffix.length())).arg(suffix);
+        collisionCount++;
+        suffix = QStringLiteral("(%3)%4").arg(collisionCount).arg(extension);
+    } while (QFileInfo::exists(result));
 
     return result;
 }
