@@ -21,7 +21,7 @@ namespace SailfishOS {
 class WebEngine : public QMozContext {
     Q_OBJECT
 public:
-    static void initialize(const QString &profilePath, const QString &userAgent = QLatin1String("Mozilla/5.0 (Linux; U; Sailfish 3.0; Mobile; rv:60.9) Gecko/60.9 Firefox/60.9 SailfishBrowser/1.0"));
+    static void initialize(const QString &profilePath);
     static WebEngine *instance();
 
     explicit WebEngine(QObject *parent = 0);

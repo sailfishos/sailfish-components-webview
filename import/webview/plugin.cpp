@@ -41,8 +41,7 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
     engineeringEnglish->load("sailfish_components_webview_qt5_eng_en", "/usr/share/translations");
     translator->load(QLocale(), "sailfish_components_webview_qt5", "-", "/usr/share/translations");
 
-    SailfishOS::WebEngine::initialize(QStandardPaths::writableLocation(QStandardPaths::CacheLocation),
-                                      QLatin1String("Mozilla/5.0 (Maemo; Linux; U; Sailfish OS 2.0 (like Android 4.4); Mobile; rv:38.0) Gecko/38.0 Firefox/38.0 SailfishBrowser/1.0"));
+    SailfishOS::WebEngine::initialize(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
 
     SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
 
