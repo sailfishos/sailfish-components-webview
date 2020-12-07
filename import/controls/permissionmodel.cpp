@@ -54,6 +54,7 @@ void PermissionModel::add(const QString &host, const QString &type, int capabili
     }
 
     endInsertRows();
+    emit countChanged();
 }
 
 QVariant PermissionModel::data(const QModelIndex &index, int role) const
@@ -109,6 +110,11 @@ void PermissionModel::setHost(const QString &host)
     emit hostChanged(m_host);
 }
 
+int PermissionModel::count() const
+{
+    return rowCount();
+}
+
 void PermissionModel::handleRecvObserve(const QString &message, const QVariant &data)
 {
     if (m_host.isEmpty() && message == PERMS_ALL_FOR_URI) {
@@ -138,6 +144,7 @@ void PermissionModel::setPermissionList(const QVariantList &data)
                                            PermissionManager::intToExpiration(varMap.value("expireType").toInt())));
     }
     endResetModel();
+    emit countChanged();
 }
 
 void PermissionModel::requestPermissions(const QString &host)
@@ -158,6 +165,7 @@ void PermissionModel::remove(int index)
     m_permissionList.removeAt(index);
 
     endRemoveRows();
+    emit countChanged();
 }
 
 void PermissionModel::setCapability(QModelIndex index, int capability)
