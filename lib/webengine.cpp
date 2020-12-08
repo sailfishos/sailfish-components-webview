@@ -16,7 +16,7 @@
 
 Q_GLOBAL_STATIC(SailfishOS::WebEngine, webEngineInstance)
 
-void SailfishOS::WebEngine::initialize(const QString &profilePath, const QString &userAgent)
+void SailfishOS::WebEngine::initialize(const QString &profilePath)
 {
     static bool isInitialized = false;
     if (isInitialized) {
@@ -37,9 +37,6 @@ void SailfishOS::WebEngine::initialize(const QString &profilePath, const QString
     // GRE_HOME must be set before QMozContext is initialized. With invoker PWD is empty.
     QByteArray binaryPath = QCoreApplication::applicationDirPath().toLocal8Bit();
     setenv("GRE_HOME", binaryPath.constData(), 1);
-    if (qgetenv("CUSTOM_UA").isEmpty()) {
-        setenv("CUSTOM_UA", userAgent.toUtf8(), 1);
-    }
 
     SailfishOS::WebEngine *webEngine = instance();
     webEngine->setProfile(profilePath);
