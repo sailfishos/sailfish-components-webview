@@ -40,6 +40,11 @@ struct Permission
                 && m_expireTime == other.m_expireTime);
     }
 
+    bool operator!=(const Permission &other) const
+    {
+        return !(*this == other);
+    }
+
     QString m_host;
     QString m_type;
     PermissionManager::Capability m_capability;
@@ -53,7 +58,7 @@ class PermissionModel : public QAbstractListModel, public QQmlParserStatus
     Q_INTERFACES(QQmlParserStatus)
 
     Q_PROPERTY(QString host READ host WRITE setHost NOTIFY hostChanged)
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
 public:
     enum Roles {
         Uri = Qt::UserRole,
@@ -89,8 +94,6 @@ public:
 
     QString host() const;
     void setHost(const QString &host);
-
-    int count() const;
 
 signals:
     void hostChanged(const QString &host);
