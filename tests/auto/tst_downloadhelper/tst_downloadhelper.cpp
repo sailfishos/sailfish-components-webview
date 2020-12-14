@@ -78,6 +78,12 @@ void tst_downloadhelper::uniqueFileName_data()
     QTest::newRow("new_file_no_ext") << "some_file" << existingFiles << "some_file";
 
     existingFiles.clear();
+    QTest::newRow("empty_name") << "" << existingFiles << "unnamed_file";
+
+    existingFiles.clear();
+    QTest::newRow("empty_base_name") << ".jpg" << existingFiles << "unnamed_file.jpg";
+
+    existingFiles.clear();
     QTest::newRow("one_symbol_name") << "a" << existingFiles << "a";
 
     existingFiles.clear();
@@ -106,7 +112,7 @@ void tst_downloadhelper::uniqueFileName_data()
     QTest::newRow("name_with_trailing_spaces") << "some_file.tar.gz   " << existingFiles << "some_file.tar.gz";
 
     existingFiles.clear();
-    QTest::newRow("name_with_leading_dots") << "...some_file.tar.gz" << existingFiles << "...some_file.tar.gz";
+    QTest::newRow("name_with_leading_dots") << "...some_file.tar.gz" << existingFiles << "unnamed_file...some_file.tar.gz";
 
     existingFiles.clear();
     QTest::newRow("name_with_trailing_dots") << "some_file.tar.gz..." << existingFiles << "some_file.tar.gz";
@@ -161,8 +167,15 @@ void tst_downloadhelper::uniqueFileName_data()
     QTest::newRow("illegal_symbols_in_name") << "some /\\?%*:|\"<> file name.tar.gz" << existingFiles << "some_file_name.tar.gz";
 
     existingFiles.clear();
+    QTest::newRow("illegal_symbols_in_name_2") << "/\\?%*:|\"<>.tar.gz" << existingFiles << "unnamed_file.tar.gz";
+
+    existingFiles.clear();
     existingFiles << "some_file_name.tar.gz";
     QTest::newRow("file_exists_illegal_symbols_in_name") << "some /\\?%*:|\"<> file name.tar.gz" << existingFiles << "some_file_name(2).tar.gz";
+
+    existingFiles.clear();
+    existingFiles << "unnamed_file.tar.gz";
+    QTest::newRow("file_exists_illegal_symbols_in_name_2") << "/\\?%*:|\"<>.tar.gz" << existingFiles << "unnamed_file(2).tar.gz";
 
     existingFiles.clear();
     QTest::newRow("name_with_whitespace_sequences") << "some \t\n\v\f\r file \t \n \v \f \r name.tar.gz" << existingFiles << "some_file_name.tar.gz";

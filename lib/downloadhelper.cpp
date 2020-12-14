@@ -40,19 +40,18 @@ QString SailfishOS::WebEngineUtils::DownloadHelper::createUniqueFileUrl(QString 
     // Replace whitespace characters with underscores
     fileName.replace(QRegExp("[\\s_]+"), "_");
 
-    if (fileName.isEmpty()) {
-        fileName = QStringLiteral("unnamed_file");
-    }
-
     // Determine start position of file extension
     int dotPosition = fileName.length() < FILEEXTENSION_MAX_LENGTH ? 0 : fileName.length() - FILEEXTENSION_MAX_LENGTH;
     while (dotPosition < fileName.length() && fileName[dotPosition] != '.') {
         dotPosition += 1;
     }
 
-    const QString baseName = fileName.left(dotPosition);
-    const QString extension = fileName.mid(dotPosition);
+    QString baseName = fileName.left(dotPosition);
+    if (baseName.isEmpty()) {
+        baseName = QStringLiteral("unnamed_file");
+    }
 
+    const QString extension = fileName.mid(dotPosition);
 
     QString result;
     QString suffix = extension;
