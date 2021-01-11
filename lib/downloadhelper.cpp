@@ -17,6 +17,20 @@
 constexpr int FILEEXTENSION_MAX_LENGTH = 32;
 constexpr int FILENAME_MAX_LENGTH = 255;
 
+static QByteArray cutUtf8String(const QByteArray &str, int maxSize) {
+    int size = str.size();
+    if (str.size() > maxSize) {
+        size = 0;
+        for (int i = maxSize; i > 0; i--) {
+            if ((str[i] & 0xC0) != 0x80) {
+                size = i;
+                break;
+            }
+        }
+    }
+    return QByteArray(str.data(), size);
+}
+
 SailfishOS::WebEngineUtils::DownloadHelper::DownloadHelper(QObject *parent)
     : QObject(parent)
 {
@@ -40,28 +54,32 @@ QString SailfishOS::WebEngineUtils::DownloadHelper::createUniqueFileUrl(QString 
     // Replace whitespace characters with underscores
     fileName.replace(QRegExp("[\\s_]+"), "_");
 
+    // Convert to UTF-8
+    const QByteArray fileNameBuf = fileName.toUtf8();
+
     // Determine start position of file extension
-    int dotPosition = fileName.length() < FILEEXTENSION_MAX_LENGTH ? 0 : fileName.length() - FILEEXTENSION_MAX_LENGTH;
-    while (dotPosition < fileName.length() && fileName[dotPosition] != '.') {
+    int dotPosition = fileNameBuf.size() < FILEEXTENSION_MAX_LENGTH ? 0 : fileNameBuf.size() - FILEEXTENSION_MAX_LENGTH;
+    while (dotPosition < fileNameBuf.size() && fileNameBuf[dotPosition] != '.') {
         dotPosition += 1;
     }
 
-    QString baseName = fileName.left(dotPosition);
+    QByteArray baseName = fileNameBuf.left(dotPosition);
     if (baseName.isEmpty()) {
-        baseName = QStringLiteral("unnamed_file");
+        baseName = QByteArrayLiteral("unnamed_file");
     }
 
-    const QString extension = fileName.mid(dotPosition);
+    const QByteArray extension = fileNameBuf.mid(dotPosition);
+    const QByteArray pathBuf = path.toUtf8() + '/';
 
-    QString result;
-    QString suffix = extension;
+    QByteArray result;
+    QByteArray suffix = extension;
     int collisionCount = 1;
 
     do {
-        result = QStringLiteral("%1/%2%4").arg(path).arg(baseName.left(FILENAME_MAX_LENGTH - suffix.length())).arg(suffix);
+        result = pathBuf + cutUtf8String(baseName, FILENAME_MAX_LENGTH - suffix.size()) + suffix;
         collisionCount++;
-        suffix = QStringLiteral("(%3)%4").arg(collisionCount).arg(extension);
+        suffix = '(' + QByteArray::number(collisionCount) + ')' + extension;
     } while (QFileInfo::exists(result));
 
-    return result;
+    return QString::fromUtf8(result);
 }

@@ -182,6 +182,7 @@ void tst_downloadhelper::uniqueFileName_data()
 
     const QString prefix = QStringLiteral("some_file.");
     const QString extension = QStringLiteral(".tar.gz");
+    const QChar multibyteCharacter(10052); // \u2744, 3 bytes
 
     existingFiles.clear();
     {
@@ -192,9 +193,25 @@ void tst_downloadhelper::uniqueFileName_data()
 
     existingFiles.clear();
     {
+        const QString longName = QString(NAME_MAX + 1, multibyteCharacter) + extension;
+        const int expectedBaseNameSize = (NAME_MAX - extension.toUtf8().length()) / QString(multibyteCharacter).toUtf8().length();
+        const QString expectedName = QString(expectedBaseNameSize, multibyteCharacter) + extension;
+        QTest::newRow("long_basename_with_multibyte_characters") << longName << existingFiles << expectedName;
+    }
+
+    existingFiles.clear();
+    {
         const QString longName = prefix + QString(NAME_MAX + 1, 'z');
         const QString expectedName = prefix + QString(NAME_MAX - prefix.length(), 'z');
         QTest::newRow("long_extension") << longName << existingFiles << expectedName;
+    }
+
+    existingFiles.clear();
+    {
+        const QString longName = prefix + QString(NAME_MAX + 1, multibyteCharacter);
+        const int expectedExtensionSize = (NAME_MAX - prefix.toUtf8().length()) / QString(multibyteCharacter).toUtf8().length();
+        const QString expectedName = prefix + QString(expectedExtensionSize, multibyteCharacter);
+        QTest::newRow("long_extension_with_multibyte_characters") << longName << existingFiles << expectedName;
     }
 
     existingFiles.clear();
