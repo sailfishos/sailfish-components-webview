@@ -21,6 +21,7 @@ class PermissionFilterProxyModel : public QSortFilterProxyModel
 public:
     PermissionFilterProxyModel(QObject *parent = nullptr);
 
+    Q_INVOKABLE void add(const QString &host, const QString &type, int capability);
     Q_INVOKABLE void remove(int currentIndex);
     Q_INVOKABLE void setCapability(int currentIndex, int capability);
 

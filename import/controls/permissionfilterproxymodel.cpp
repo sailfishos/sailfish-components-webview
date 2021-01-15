@@ -19,6 +19,16 @@ PermissionFilterProxyModel::PermissionFilterProxyModel(QObject *parent)
 
 }
 
+void PermissionFilterProxyModel::add(const QString &host, const QString &type, int capability)
+{
+    PermissionModel *permissionModel = qobject_cast<PermissionModel *>(sourceModel());
+    if (!permissionModel) {
+        return;
+    }
+
+    permissionModel->add(host, type, capability);
+}
+
 void PermissionFilterProxyModel::remove(int currentIndex)
 {
     QModelIndex proxyIndex = index(currentIndex, 0);

@@ -43,15 +43,22 @@ void PermissionModel::componentComplete()
 
 void PermissionModel::add(const QString &host, const QString &type, int capability)
 {
+    int it = 0;
+    for (const auto &perm : m_permissionList) {
+        if (perm.m_host == host && perm.m_type == type) {
+            setCapability(index(it), capability);
+            return;
+        }
+        it++;
+    }
+
     int count = m_permissionList.count();
     beginInsertRows(QModelIndex(), count, count);
 
     Permission permission(host, type, PermissionManager::intToCapability(capability));
     PermissionManager::add(permission);
 
-    if (!m_permissionList.contains(permission)) {
-        m_permissionList.append(permission);
-    }
+    m_permissionList.append(permission);
 
     endInsertRows();
     emit countChanged();
