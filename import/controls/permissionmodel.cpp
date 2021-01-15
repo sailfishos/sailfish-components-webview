@@ -175,6 +175,18 @@ void PermissionModel::remove(int index)
     emit countChanged();
 }
 
+void PermissionModel::remove(const Permission &permission)
+{
+    int index = 0;
+    for (const auto &perm : m_permissionList) {
+        if (perm == permission) {
+            remove(index);
+            return;
+        }
+        index++;
+    }
+}
+
 void PermissionModel::setCapability(QModelIndex index, int capability)
 {
     if (!index.isValid() || index.row() < 0 || index.row() >= m_permissionList.count()) {
@@ -186,4 +198,17 @@ void PermissionModel::setCapability(QModelIndex index, int capability)
     PermissionManager::add(permission);
     QVector<int> roles = {Capability};
     dataChanged(index, index, roles);
+}
+
+void PermissionModel::removeAllForPermissionType(const QString &type)
+{
+    QList<Permission> permissions;
+    for (const auto &perm : m_permissionList) {
+        if (perm.m_type == type) {
+            permissions.append(perm);
+        }
+    }
+    for (const auto &perm : permissions) {
+        remove(perm);
+    }
 }

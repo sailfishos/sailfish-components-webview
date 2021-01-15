@@ -29,17 +29,14 @@ void PermissionFilterProxyModel::add(const QString &host, const QString &type, i
     permissionModel->add(host, type, capability);
 }
 
-void PermissionFilterProxyModel::remove(int currentIndex)
+void PermissionFilterProxyModel::remove(const QString &host, const QString &type, int capability)
 {
-    QModelIndex proxyIndex = index(currentIndex, 0);
-    QModelIndex sourceIndex = mapToSource(proxyIndex);
-
     PermissionModel *permissionModel = qobject_cast<PermissionModel *>(sourceModel());
     if (!permissionModel) {
         return;
     }
 
-    permissionModel->remove(sourceIndex.row());
+    permissionModel->remove(Permission(host, type, PermissionManager::intToCapability(capability)));
 }
 
 void PermissionFilterProxyModel::setCapability(int currentIndex, int capability)
