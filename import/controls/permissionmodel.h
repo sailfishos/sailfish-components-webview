@@ -76,8 +76,12 @@ public:
      * "desktop-notification", "popup", etc. */
     Q_INVOKABLE void add(const QString &host, const QString &type, int capability);
     Q_INVOKABLE void setCapability(QModelIndex index, int capability);
+    /* Remove all items from model for permission type.
+     * It can be "geolocation", "cookie", "popup", etc*/
+    Q_INVOKABLE void removeAllForPermissionType(const QString &type);
 
     void remove(int index);
+    void remove(const Permission &permission);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
