@@ -1,7 +1,8 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Jolla Ltd.
+** Copyright (c) 2013 Jolla Ltd.
 ** Contact: Dmitry Rozhkov <dmitry.rozhkov@jollamobile.com>
+** Copyright (c) 2021 Open Mobile Platform LLC.
 **
 ****************************************************************************/
 
@@ -174,8 +175,7 @@ Rectangle {
         }
 
         DownloadMenuItem {
-            visible: root.downloadsEnabled && root.isNavigable && downloadFileTargetUrl
-            //: This menu item saves link to downloads.
+            visible: root.downloadsEnabled && root.isNavigable
             //% "Save link"
             text: qsTrId("sailfish_components_webview_popups-me-save_link")
             targetDirectory: StandardPaths.download
@@ -187,7 +187,6 @@ Rectangle {
 
         MenuItem {
             visible: root.isImage && !!tabModel
-            //: Open image in a new tab from browser context menu
             //% "Open image in a new tab"
             text: qsTrId("sailfish_components_webview_popups-me-open_image_in_new_tab")
             onClicked: {
@@ -197,7 +196,7 @@ Rectangle {
         }
 
         DownloadMenuItem {
-            visible: root.downloadsEnabled && root.isImage && downloadFileTargetUrl
+            visible: root.downloadsEnabled && root.isImage
             //: This menu item saves image to Gallery application
             //% "Save image"
             text: qsTrId("sailfish_components_webview_popups-me-save_image")
