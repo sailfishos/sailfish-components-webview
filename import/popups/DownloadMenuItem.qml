@@ -12,6 +12,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Sailfish.WebEngine 1.0
+import Sailfish.Pickers 1.0
 
 MenuItem {
     id: root
@@ -36,7 +37,7 @@ MenuItem {
         return DownloadHelper.createUniqueFileUrl(leafName, targetDirectory)
     }
 
-    onClicked: {
+    function startDownload() {
         if (downloadFileTargetUrl) {
             WebEngine.notifyObservers("embedui:download",
                                       {
@@ -46,6 +47,29 @@ MenuItem {
                                           "contentType": root.contentType,
                                           "viewId": root.viewId
                                       })
+        }
+    }
+
+    onClicked: {
+        if (WebEngineSettings.useDownloadDir) {
+            startDownload()
+        } else {
+            pageStack.animatorPush(folderPickerPage)
+        }
+    }
+
+    Component {
+        id: folderPickerPage
+
+        FolderPickerPage {
+            showSystemFiles: false
+            //% "Download to"
+            dialogTitle: qsTrId("sailfish_components_webview_popups-ti-download-to")
+
+            onSelectedPathChanged: {
+                root.targetDirectory = selectedPath
+                startDownload()
+            }
         }
     }
 }
