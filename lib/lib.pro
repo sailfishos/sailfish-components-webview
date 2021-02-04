@@ -3,19 +3,33 @@ TARGET = sailfishwebengine
 TARGET = $$qtLibraryTarget($$TARGET)
 TARGETPATH = $$[QT_INSTALL_LIBS]
 
+isEmpty(EMBEDLITE_CONTENT_PATH) {
+  DEFINES += EMBEDLITE_CONTENT_PATH=\"\\\"/usr/lib/mozembedlite/chrome/embedlite/content/\\\"\"
+} else {
+  DEFINES += EMBEDLITE_CONTENT_PATH=\"\\\"$$EMBEDLITE_CONTENT_PATH\\\"\"
+}
+
+isEmpty(USER_OPENSEARCH_PATH) {
+  DEFINES += USER_OPENSEARCH_PATH=\"\\\"/.local/share/org.sailfishos/sailfish-browser/searchEngines/\\\"\"
+} else {
+  DEFINES += USER_OPENSEARCH_PATH=\"\\\"$$USER_OPENSEARCH_PATH\\\"\"
+}
+
 include(../defaults.pri)
 
 CONFIG += qt create_pc create_prl no_install_prl link_pkgconfig
 QT += gui
-PKGCONFIG += qt5embedwidget sailfishsilica
+PKGCONFIG += qt5embedwidget sailfishsilica mlite5
 
 INCLUDEPATH += $$system(pkg-config --cflags sailfishsilica)
 
 SOURCES += downloadhelper.cpp \
+           opensearchconfigs.cpp \
            webengine.cpp \
            webenginesettings.cpp
 
 HEADERS += downloadhelper.h \
+           opensearchconfigs.h \
            webengine.h \
            webengine_p.h \
            webenginesettings.h \

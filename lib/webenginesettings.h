@@ -17,6 +17,7 @@
 
 namespace SailfishOS {
 
+class WebEngineSettingsPrivate;
 class WebEngineSettings : public QMozEngineSettings {
     Q_OBJECT
 public:
@@ -25,6 +26,12 @@ public:
 
     explicit WebEngineSettings(QObject *parent = 0);
     virtual ~WebEngineSettings();
+
+private:
+    QScopedPointer<WebEngineSettingsPrivate> d_ptr;
+
+    inline void setSearchEngine();
+    inline void handleObserve(const QString &message, const QVariant &data);
 };
 }
 
