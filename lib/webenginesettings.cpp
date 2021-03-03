@@ -1,7 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 Jolla Ltd.
-** Contact: Raine Makelainen <raine.makelaine@jolla.com>
+** Copyright (C) 2021 Jolla Ltd.
 **
 ****************************************************************************/
 
@@ -127,6 +126,10 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("intl.accept_languages"),
                                   QVariant::fromValue<QString>(langs));
     engineSettings->setPreference(QStringLiteral("browser.enable_automatic_image_resizing"),
+                                  QVariant::fromValue<bool>(true));
+
+    // Enable user agent overrides
+    engineSettings->setPreference(QStringLiteral("general.useragent.updates.enabled"),
                                   QVariant::fromValue<bool>(true));
 
     isInitialized = true;

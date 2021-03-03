@@ -1,7 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 Jolla Ltd.
-** Contact: Chris Adams <chris.adams@jollamobile.com>
+** Copyright (C) 2021 Jolla Ltd.
 **
 ****************************************************************************/
 
@@ -21,10 +20,18 @@
 #include <QQuickWindow>
 #include <QClipboard>
 #include <QGuiApplication>
+#include <QDir>
+#include <QMap>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 
 namespace SailfishOS {
 
 namespace WebView {
+
+const auto MOZILLA_DATA_UA_UPDATE = QStringLiteral("ua-update.json");
+const auto MOZILLA_DATA_UA_UPDATE_SOURCE = QStringLiteral("/usr/share/sailfish-browser/data/ua-update.json.in");
 
 void SailfishOSWebViewPlugin::registerTypes(const char *uri)
 {
@@ -41,7 +48,9 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
     engineeringEnglish->load("sailfish_components_webview_qt5_eng_en", "/usr/share/translations");
     translator->load(QLocale(), "sailfish_components_webview_qt5", "-", "/usr/share/translations");
 
-    SailfishOS::WebEngine::initialize(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+    QString path = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+    initUserAgentOverrides(path);
+    SailfishOS::WebEngine::initialize(path);
 
     SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
 
@@ -72,6 +81,68 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
 
     // subscribe to gecko messages
     webEngine->addObserver(QStringLiteral("clipboard:setdata"));
+}
+
+void SailfishOSWebViewPlugin::initUserAgentOverrides(const QString &path)
+{
+    // Read source json
+    QJsonDocument sourceDoc;
+    QFile sourceFile(MOZILLA_DATA_UA_UPDATE_SOURCE);
+    if (sourceFile.open(QIODevice::ReadOnly)) {
+        QByteArray line;
+        QByteArray sourceData;
+        while (!sourceFile.atEnd()) {
+            line = sourceFile.readLine();
+            if (!line.trimmed().startsWith("//"))
+                sourceData += line;
+        }
+        sourceFile.close();
+        QJsonParseError e;
+        sourceDoc = QJsonDocument::fromJson(sourceData, &e);
+        if (sourceDoc.isNull()) {
+            qWarning() << sourceFile.fileName() << "parse error" << e.errorString() << "at offset" << e.offset;
+            return;
+        }
+    } else {
+        qWarning() << "Could not open" << sourceFile.fileName();
+    }
+
+    // Make the mozilla dir if not there
+    QString mozillaDir = QString("%1/.mozilla/").arg(path);
+    QDir dir(mozillaDir);
+    if (!dir.exists())
+        dir.mkpath(dir.path());
+
+    // Read destination json
+    QJsonDocument destDoc;
+    QFile destFile(mozillaDir + MOZILLA_DATA_UA_UPDATE);
+    if (destFile.open(QIODevice::ReadWrite)) {
+        QJsonParseError e;
+        destDoc = QJsonDocument::fromJson(destFile.readAll(), &e);
+        if (destDoc.isNull()) {
+            qWarning() << destFile.fileName() << "parse error" << e.errorString() << "at offset" << e.offset;
+            // Not bailing out to get the corrupted file rewritten
+        }
+        QJsonObject source = sourceDoc.object();
+        QJsonObject dest = destDoc.object();
+        QStringList destKeys = dest.keys();
+        bool changed = false;
+        for (const QString &key : source.keys()) {
+            if (!destKeys.contains(key) || (dest.value(key) != source.value(key))) {
+                // Add or change override
+                dest.insert(key, source.value(key));
+                changed = true;
+            }
+        }
+        if (changed) {
+            // Content changed so write it
+            destFile.seek(0);
+            destFile.write(sourceDoc.toJson());
+        }
+        destFile.close();
+    } else {
+        qWarning() << "Could not open" << destFile.fileName();
+    }
 }
 
 } // namespace WebView
