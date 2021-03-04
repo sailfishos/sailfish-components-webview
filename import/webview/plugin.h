@@ -1,7 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 Jolla Ltd.
-** Contact: Chris Adams <chris.adams@jollamobile.com>
+** Copyright (C) 2021 Jolla Ltd.
 **
 ****************************************************************************/
 
@@ -32,6 +31,9 @@ class SailfishOSWebViewPlugin : public QQmlExtensionPlugin
 public:
     void registerTypes(const char *uri);
     void initializeEngine(QQmlEngine *engine, const char *uri);
+
+private:
+    void initUserAgentOverrides(const QString &path);
 };
 
 // using custom translator so it gets properly removed from qApp when engine is deleted
