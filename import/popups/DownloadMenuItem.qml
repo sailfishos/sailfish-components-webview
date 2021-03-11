@@ -27,7 +27,7 @@ MenuItem {
 
         // drop query string from URL and split to sections
         var urlSections = linkUrl.split("?")[0].split("/")
-        var leafName = urlSections[urlSections.length - 1]
+        var leafName = decodeURIComponent(urlSections[urlSections.length - 1])
 
         if (leafName.length === 0) {
             leafName = "unnamed_file"
