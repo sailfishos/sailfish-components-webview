@@ -40,7 +40,10 @@ public:
 
     /* Add host to exclusion list. The type property can be "geolocation", "cookie",
      * "desktop-notification", "popup", etc. */
-    Q_INVOKABLE void add(const QString &host, const QString &type, Capability capability);
+    Q_INVOKABLE void add(const QString &host,
+                         const QString &type,
+                         Capability capability,
+                         Expiration expireType = Never);
 
     // Create a PermissionManager object before using the PermissionModel
     Q_INVOKABLE void instance() {}
@@ -50,7 +53,8 @@ public:
     static void sendRequest(const QString &message,
                             const QString &host = QString(),
                             const QString &type = QString(),
-                            Capability capability = Unknown);
+                            Capability capability = Unknown,
+                            Expiration expireType = Never);
 
     static int capabilityToInt(Capability capability);
     static Capability intToCapability(int value);
