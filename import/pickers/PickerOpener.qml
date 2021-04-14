@@ -1,7 +1,8 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 Jolla Ltd.
+** Copyright (c) 2016 Jolla Ltd.
 ** Contact: Raine Makelainen <raine.makelainen@jolla.com>
+** Copyright (c) 2021 Open Mobile Platform LLC.
 **
 ****************************************************************************/
 
@@ -10,16 +11,18 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import QtQuick 2.2
+import Sailfish.WebEngine 1.0
 
 QtObject {
     property var pageStack
     property QtObject contentItem
-    readonly property var listeners: ["embed:filepicker", "embed:selectasync"]
+    readonly property var listeners: ["embed:filepicker", "embed:selectasync", "embed:downloadpicker"]
 
     // Defer compilation of picker components
     readonly property string _multiSelectComponentUrl: Qt.resolvedUrl("MultiSelectDialog.qml")
     readonly property string _singleSelectComponentUrl: Qt.resolvedUrl("SingleSelectPage.qml")
     readonly property string _filePickerComponentUrl: Qt.resolvedUrl("PickerCreator.qml")
+    readonly property string _downloadPickerComponentUrl: Qt.resolvedUrl("DownloadPicker.qml")
     property Component _filePickerComponent
 
     // Returns true if message is handled.
@@ -61,6 +64,10 @@ QtObject {
                 // Component development time issue, component creation should newer fail.
                 console.warn("PickerOpener failed to create PickerOpener: ", _filePickerComponent.errorString())
             }
+            break
+        }
+        case "embed:downloadpicker": {
+            var page = pageStack.push(_downloadPickerComponentUrl, { "data": data })
             break
         }
         }
