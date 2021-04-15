@@ -145,7 +145,7 @@ BuildRequires:  qt5-tools
 %autosetup -n %{name}-%{version}
 
 %build
-%qmake5 VERSION=`echo %{version} | sed 's/+.*//'`
+%qmake5 VERSION=%{version}
 make %{?_smp_mflags}
 
 %install
