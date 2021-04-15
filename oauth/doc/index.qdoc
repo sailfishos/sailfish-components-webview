@@ -1,0 +1,160 @@
+/****************************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+** All rights reserved.
+**
+****************************************************************************************/
+
+/*!
+\page index.html
+\title Sailfish OS OAuth Framework
+
+Many applications need to interact with remote services to provide their
+functionality to the user.  One industry-standard mechanism by which the
+remote service can delegate authorization for specific actions to the
+application is called OAuth.  The OAuth2 specification, for example,
+describes flows whereby an application can ask a service to allow it to
+perform some specific types of operations (known as the "scope") on behalf
+of the user.  The system browser is then used to provide the user with an
+interactive session with the remote service, whereby the user is asked
+to permit (by logging in) or deny (by cancelling) the request.
+If permitted by the user, the application is returned an "access token"
+which it must use as proof of authorization when performing operations
+(for example, requesting certain data from the remote service).
+
+Note that the application must have been registered with the remote
+service (which is done manually via the service's website) and have a valid
+"consumer_key" (OAuth1.0a) or "client_id" (OAuth2) which identifies it.
+
+The Sailfish OS OAuth Framework provides both C++ and QML API which allows
+application developers to easily integrate OAuth1.0a and OAuth2 flows into
+their application, including a simple TCP server which can listen for
+web-browser redirects.
+
+\section1 Using the Sailfish OS OAuth Framework
+
+Regardless of whether the application is using the QML or C++ API, the
+basic steps for using OAuth in their application is the same:
+
+\list
+\li Construct the redirect listener (to capture a redirect from the browser)
+\li Construct the appropriate (i.e., OAuth1 or OAuth2) helper and set its properties
+\li If using OAuth1.0a, ask the OAuth1 helper to request a temporary token
+\li Ask the OAuth helper to generate an authorization URL
+\li Open the generated URL in the system web browser
+\li Wait for the user to authorize the application
+\li The redirect listener will then capture the redirect, and the OAuth helper will emit a signal containing the access token
+\endlist
+
+After receiving an access token, the application must use this token in
+all subsequent requests to the remote service, by specifying an appropriate
+"Authorization" header in those requests.
+
+For OAuth2 enabled services, this is as simple as setting the "Authorization"
+header value to "Bearer <token>", but for OAuth1 it is more complicated, and
+so some helper API is provided by the Sailfish OS OAuth Framework to generate
+the appropriate authorization header for a specific request, given the OAuth1
+token (and token secret) previously provided to the application.
+See \l{SailfishOS::OAuth::OAuth1::generateAuthorizationHeader()} for more
+information about this.
+
+\section2 C++ API
+
+The C++ API consists of the following classes:
+
+\list
+\li the \l{SailfishOS::OAuth::RedirectListener}{RedirectListener}
+\li the \l{SailfishOS::OAuth::OAuth1}{OAuth1} helper
+\li the \l{SailfishOS::OAuth::OAuth2}{OAuth2} helper
+\li the \l{SailfishOS::OAuth::Error}{Error} type
+\endlist
+
+Note that the OAuth2 specification describes multiple different possible flows
+depending on the type of application.  The \l{OAuth2} helper supports a variety
+of different flows; the application developer must choose the one they want
+to use, and provide values for the appropriate properties as required by that
+flow.  See the \l{SailfishOS::OAuth::OAuth2::FlowType}{FlowType} documentation
+for more information on this topic.
+
+The \l{RedirectListener} is a very simple TCP server which can be used to
+capture redirects from the system browser (which will include the access token
+if the user authorized the application) by listening on a localhost port.
+The client application may use an instance of this type to handle the redirect,
+or alternatively it can implement its own redirect handling (e.g. with custom
+protocol).
+
+To use the C++ API, the client application should use the "sailfishoauth.pc"
+pkgconfig file.
+
+e.g. in a qmake-based project:
+
+\code
+CONFIG += link_pkgconfig
+PKGCONFIG += sailfishoauth
+\endcode
+
+It may then \c{#include <oauth1.h>}, \c{#include <oauth2.h>},
+\c{#include <redirectlistener.h>} as required.
+
+\section2 QML API
+
+The QML API is provided through the Sailfish.OAuth import namespace, and it
+includes the C++ classes, and can be used in the same way.
+In addition, the it also provides some flow-specific helpers which
+expose different properties depending on the requirements of the flow,
+and which automatically instantiate a \l{RedirectListener} by default,
+to simplify usage by client applications.
+
+The QML types exposed in the QML API are as follows:
+
+\list
+\li \l{RedirectListener}
+\li \l{OAuth1}, base OAuth1 helper type
+\li \l{OAuth10a}, for OAuth1.0a flows
+\li \l{OAuth2}, base OAuth2 helper type
+\li \l{OAuth2Ac}, for OAuth2 Authorization Code flows
+\li \l{OAuth2AcPkce}, for OAuth2 Authorization Code With PKCE flows
+\li \l{OAuth2Implicit}, for OAuth2 Implicit flows
+\endlist
+
+Note that the vast majority of client applications should use the OAuth2
+Authorization Code With PKCE flow, i.e. \l{OAuth2AcPkce} type.
+
+\section1 Examples
+
+Please see the \l{sailfishoauthcppexample} and \l{sailfishoauthqmlexample}
+for examples of how to use the APIs.
+
+*/
+
+/*!
+  \example sailfishoauthcppexample
+  \title Sailfish OS OAuth Framework C++ API Example
+  \subtitle
+
+  This example shows how to use the \l{RedirectListener} and \l{OAuth2}
+  helper types to request an access token from Google, and then perform
+  an authorized request for some user information.
+
+  Note that a valid \c{clientId} and \c{clientSecret} must be provided
+  in order for the example to work properly.  These have been deliberately
+  omitted from the code listing in order to allow developers to use their
+  own \c{clientId} and \c{clientSecret}.
+*/
+
+/*!
+  \example sailfishoauthqmlexample
+  \title Sailfish OS OAuth Framework QML API Example
+  \subtitle
+
+  This example shows how to use the \l{OAuth2AcPkce} and \l{OAuth10a}
+  helper types to request access tokens from Google and Twitter respectively,
+  and then perform authorized request for some user information.
+
+  Note that a valid Google \c{clientId} and \c{clientSecret}, and a valid
+  Twitter \c{consumerKey} and \c{consumerSecret} must be provided
+  in order for the example to work properly.  These have been deliberately
+  omitted from the code listing in order to allow developers to use their
+  own Google \c{clientId} and \c{clientSecret} and Twitter \c{consumerKey}
+  and \c{consumerSecret}.
+*/

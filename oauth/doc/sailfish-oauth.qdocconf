@@ -1,0 +1,56 @@
+project         = Sailfish OS OAuth Framework
+description     = Sailfish OS OAuth Framework Reference Documentation
+versionsym      =
+version         = 1.0.0
+url             = https://github.com/sailfishos/sailfish-components-webview/
+
+sourcedirs += $$PWD/../lib $$PWD/../import $$PWD/../doc
+headerdirs += $$PWD/../lib $$PWD/../import
+exampledirs += $$PWD/../examples
+
+outputformats = HTML
+outputdir = $$PWD/../doc/html
+base = file:$$PWD/../doc/html
+tagfile = $$PWD/../doc/html/sailfishos-oauth.tags
+
+outputprefixes = QML
+outputprefixes.QML = qml-sailfishos-oauth-
+
+qhp.projects = SailfishOAuth
+
+qhp.SailfishOAuth.file = sailfish-oauth.qhp
+qhp.SailfishOAuth.namespace = org.sailfishos.oauth.1.0.0
+qhp.SailfishOAuth.virtualFolder = sailfishos-oauth
+qhp.SailfishOAuth.indexTitle = Sailfish OS OAuth Framework
+qhp.SailfishOAuth.indexRoot =
+
+qhp.SailfishOAuth.filterAttributes = sailfishos-oauth 1.0.0
+qhp.SailfishOAuth.customFilters.SailfishOAuth.name = Sailfish OS OAuth 1.0.0
+qhp.SailfishOAuth.customFilters.SailfishOAuth.filterAttributes = sailfishos-oauth 1.0.0
+
+qhp.SailfishOAuth.subprojects        = overview qmltypes classes
+
+qhp.SailfishOAuth.subprojects.overview.title = Sailfish OS OAuth Framework
+qhp.SailfishOAuth.subprojects.overview.indexTitle = Sailfish OS OAuth Framework
+qhp.SailfishOAuth.subprojects.overview.type = manual
+qhp.SailfishOAuth.subprojects.qmltypes.title = QML Types
+qhp.SailfishOAuth.subprojects.qmltypes.indexTitle = Sailfish.OAuth QML Types
+qhp.SailfishOAuth.subprojects.qmltypes.selectors = qmlclass
+qhp.SailfishOAuth.subprojects.qmltypes.sortPages = true
+qhp.SailfishOAuth.subprojects.classes.title = C++ Classes
+qhp.SailfishOAuth.subprojects.classes.indexTitle = Sailfish OAuth C++ Classes
+qhp.SailfishOAuth.subprojects.classes.selectors = class fake:headerfile
+qhp.SailfishOAuth.subprojects.classes.sortPages = true
+
+HTML.footer += \
+    "<div class=\"footer\">\n" \
+    "  <p><acronym title=\"Copyright\">&copy;</acronym> 2021 Open Mobile Platform LLC.</p>\n" \
+    "  <p>All other trademarks are property of their respective owners.</p>\n" \
+    "  <p>\n" \
+    "    This document may be used under the terms of the " \
+    "    <a href=\"http://www.gnu.org/licenses/fdl.html\">GNU Free Documentation License version 1.3</a>" \
+    "    as published by the Free Software Foundation." \
+    "  </p>\n" \
+    "</div>\n"
+
+navigation.homepage = "Sailfish OS OAuth Framework"

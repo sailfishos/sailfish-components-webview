@@ -1,0 +1,238 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype OAuth2AcPkce
+  \inqmlmodule Sailfish.OAuth
+  \ingroup sailfishos-oauth
+  \brief A helper for OAuth2 Authorize Code With PKCE flows
+
+  This helper type provides a simple API to allow the client application
+  to request an access token from the remote OAuth2-enabled service.
+
+  It integrates an \l{OAuth2} helper and a \l{RedirectListener} helper,
+  and exposes the various properties which are required for the
+  OAuth2 Authorize Code With PKCE flow.
+
+  Example of use:
+
+  \code
+  import QtQml 2.0
+  import Sailfish.OAuth 1.0
+
+  OAuth2AcPkce {
+      id: googleOAuth
+
+      property var xhr
+
+      clientId: ""        // use your app's clientId value
+      clientSecret: ""    // use your app's clientSecret value
+      redirectListener.port: 7357 // your app's localhost redirect port.  Not required for Google.
+
+      scopes: ["https://www.googleapis.com/auth/userinfo.email","https://www.googleapis.com/auth/userinfo.profile"]
+      tokenEndpoint: "https://accounts.google.com/o/oauth2/token"
+      authorizationEndpoint: "https://accounts.google.com/o/oauth2/auth"
+      customParameters: ({ "prompt":"consent" })
+
+      onErrorOccurred: console.log("Google OAuth2 Error: " + error.code + " = " + error.message + " : " + error.httpCode)
+
+      onReceivedAuthorizationCode: {
+          console.log("Got auth code, about to request token.")
+          customParameters = {}
+      }
+
+      onReceivedAccessToken: {
+          console.log("Got access token: " + token.access_token)
+          xhr = authenticatedRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo",
+                                     "Bearer " + token.access_token)
+      }
+
+      function authenticatedRequest(method, url, authorization) {
+          var req = new XMLHttpRequest()
+          req.onreadystatechange = function() {
+              if (req.readyState == XMLHttpRequest.DONE) {
+                  var response = req.responseText
+                  console.log(response)
+              }
+          }
+          req.open(method, url)
+          req.setRequestHeader("Authorization", authorization)
+          req.send()
+          return req
+      }
+
+      Component.onCompleted: googleOAuth.authorizeInBrowser()
+  }
+  \endcode
+
+  \sa OAuth2, RedirectListener
+*/
+
+/*!
+  \qmlproperty int OAuth2AcPkce::timeout
+  \brief The \c{timeout} value for the integrated \l{RedirectListener} helper
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::userAgent
+  \brief The \c{userAgent} value for the integrated \l{OAuth2} helper
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::redirectUri
+  \brief The \c{redirectUri} value for the integrated \l{OAuth2} helper
+
+  By default, it is bound to the \c{uri} value of the integrated
+  \l{RedirectListener} helper, but the client application can set it to
+  another URI if it is handling redirects manually.
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::authorizationEndpoint
+  \brief The \c{authorizationEndpoint} value for the integrated \l{OAuth2} helper
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::tokenEndpoint
+  \brief The \c{tokenEndpoint} value for the integrated \l{OAuth2} helper
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::clientId
+  \brief The \c{clientId} value for the integrated \l{OAuth2} helper
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::clientSecret
+  \brief The \c{clientSecret} value for the integrated \l{OAuth2} helper
+
+  It is an optional property, however it is required by some services
+  (e.g. Google).
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::scopes
+  \brief The scopes which the application will request access to.
+
+  The scopes will be joined using the specified \l{scopesSeparator} and the
+  result will be used as the \c{scope} value for the for the integrated
+  \l{OAuth2} helper.
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::scopesSeparator
+  \brief The separator to use when building a valid \c{scope} value.
+
+  This separator value will be used when joining the specified \l{scopes}
+  together into a valid \c{scope} value for the for the integrated
+  \l{OAuth2} helper.
+
+  The default value of this property is a single space (i.e., ' '),
+  but different services may require a different value (e.g., ',').
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::state
+  \brief The \c{state} value for the integrated \l{OAuth2} helper
+
+  The default value is a cryptographically-random value generated automatically
+  by the helper.
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::codeVerifier
+  \brief The \c{codeVerifier} value for the integrated \l{OAuth2} helper
+
+  The default value is a cryptographically-random value generated automatically
+  by the helper.
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::codeChallenge
+  \brief The \c{codeChallenge} value reported by the integrated \l{OAuth2} helper
+
+  It is a read-only property.  Most clients will not need to use this property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::codeChallengeMethod
+  \brief The \c{codeChallengeMethod} value reported by the integrated \l{OAuth2} helper
+
+  It is a read-only property.  Most clients will not need to use this property.
+*/
+
+/*!
+  \qmlproperty string OAuth2AcPkce::customParameters
+  \brief The \c{customParameters} value for the integrated \l{OAuth2} helper
+
+  Some services require some custom parameters to be specified at various
+  stages of the OAuth2 flow, or will return more data if the client specifies
+  particular custom parameters (e.g. returning a "refresh_token" if the
+  custom parameter "access_type"="offline" is specified).
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlsignal OAuth2AcPkce::receivedAuthorizationCode()
+  \brief This signal is emitted after receiving the code, prior to requesting the access token.
+
+  The client application can connect to this signal if it needs to specify
+  different \l{customParameters} for the access token request.
+*/
+
+/*!
+  \qmlsignal OAuth2AcPkce::receivedAccessToken(var token)
+  \brief This signal is emitted after receiving the access token.
+
+  The \a token is a dictionary of key/value pairs, and should include a
+  value for the \c{"access_token"} key.  It may optionally include other
+  values, including \c{"expires_in"} or \c{"refresh_token"}.
+*/
+
+/*!
+  \qmlsignal OAuth2AcPkce::errorOccurred(var code, var message)
+  \brief This signal is emitted if an error occurs during the OAuth2 flow.
+*/
+
+/*!
+  \qmlmethod OAuth2AcPkce::authorizationUrl()
+  \brief Returns a valid authorization URL which can be loaded in the system web browser.
+
+  If the \l{redirectUri} is not manually specified by the client, the helper
+  will automatically use the integrated \l{RedirectListener} helper and ensure
+  that it starts listening.
+*/
+
+/*!
+  \qmlmethod OAuth2AcPkce::authorizeInBrowser()
+  \brief Generates a valid authorization URL and attempts to load it in the system web browser.
+
+  If the \l{redirectUri} is not manually specified by the client, the helper
+  will automatically use the integrated \l{RedirectListener} helper and ensure
+  that it starts listening.
+*/
+

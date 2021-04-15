@@ -85,6 +85,50 @@ BuildRequires:  qt5-tools
 %description doc
 %{summary}.
 
+%package -n libsailfishoauth
+Summary:    Sailfish OS OAuth helpers
+Requires:   %{name} = %{version}-%{release}
+
+%description -n libsailfishoauth
+%{summary}.
+
+%package -n libsailfishoauth-devel
+Summary:    Sailfish OS OAuth helpers development files
+Requires:   %{name} = %{version}-%{release}
+
+%description -n libsailfishoauth-devel
+%{summary}.
+
+%package -n libsailfishoauth-doc
+Summary:    Documentation for Sailfish OS OAuth Framework
+BuildRequires:  mer-qdoc-template
+BuildRequires:  qt5-qttools-qthelp-devel
+BuildRequires:  qt5-tools
+
+%description -n libsailfishoauth-doc
+%{summary}.
+
+%package -n sailfish-components-oauth
+Summary:   QML components to provide common OAuth flows
+Requires:  %{name} = %{version}
+
+%description -n sailfish-components-oauth
+%{summary}.
+
+%package -n sailfish-components-oauth-ts-devel
+Summary:   Translation source for sailfish-components-oauth
+Requires:  %{name} = %{version}
+
+%description -n sailfish-components-oauth-ts-devel
+%{summary}.
+
+%package -n sailfish-components-oauth-examples
+Summary:   Example applications which use the Sailfish.OAuth components
+Requires:  %{name} = %{version}
+
+%description -n sailfish-components-oauth-examples
+%{summary}.
+
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libsailfishwebengine.so.*
@@ -141,6 +185,38 @@ BuildRequires:  qt5-tools
 %dir %{_datadir}/doc/sailfish-components-webview
 %{_datadir}/doc/sailfish-components-webview/*
 
+%files -n libsailfishoauth
+%defattr(-,root,root,-)
+%{_libdir}/libsailfishoauth.so.*
+
+%files -n libsailfishoauth-devel
+%defattr(-,root,root,-)
+%{_libdir}/libsailfishoauth.so
+%{_libdir}/pkgconfig/sailfishoauth.pc
+%{_includedir}/libsailfishoauth/*
+
+%files -n libsailfishoauth-doc
+%defattr(-,root,root,-)
+%dir %{_datadir}/doc/sailfish-oauth
+%{_datadir}/doc/sailfish-oauth/*
+
+%files -n sailfish-components-oauth
+%defattr(-,root,root,-)
+%{_datadir}/translations/sailfish_components_oauth_eng_en.qm
+%{_libdir}/qt5/qml/Sailfish/OAuth/libsailfishoauthplugin.so
+%{_libdir}/qt5/qml/Sailfish/OAuth/qmldir
+%{_libdir}/qt5/qml/Sailfish/OAuth/*.qml
+%{_libdir}/qt5/qml/Sailfish/OAuth/*.js
+
+%files -n sailfish-components-oauth-ts-devel
+%defattr(-,root,root,-)
+%{_datadir}/translations/source/sailfish_components_oauth.ts
+
+%files -n sailfish-components-oauth-examples
+%defattr(-,root,root,-)
+%{_bindir}/sailfishoauthcppexample
+%{_datadir}/sailfishoauthqmlexample/sailfishoauthqmlexample.qml
+
 %prep
 %autosetup -n %{name}-%{version}
 
@@ -167,4 +243,16 @@ make %{?_smp_mflags}
 /sbin/ldconfig
 
 %postun pickers
+/sbin/ldconfig
+
+%post -n libsailfishoauth
+/sbin/ldconfig
+
+%postun -n libsailfishoauth
+/sbin/ldconfig
+
+%post -n sailfish-components-oauth
+/sbin/ldconfig
+
+%postun -n sailfish-components-oauth
 /sbin/ldconfig

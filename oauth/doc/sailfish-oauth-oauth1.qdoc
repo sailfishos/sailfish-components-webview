@@ -1,0 +1,22 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype OAuth1
+  \instantiates OAuth1
+  \inqmlmodule Sailfish.OAuth
+  \ingroup sailfishos-oauth
+  \brief A helper for OAuth1 flows
+
+  The \l{SailfishOS::OAuth::OAuth1} type is exposed to QML as
+  \c{OAuth1} in the \c{Sailfish.OAuth} QML import namespace.
+
+  Clients will most likely want to use the \l{OAuth10a} helper instead of
+  this \l{OAuth1} helper, as it also includes a \l{RedirectListener}.
+
+  \sa OAuth10a
+*/
+

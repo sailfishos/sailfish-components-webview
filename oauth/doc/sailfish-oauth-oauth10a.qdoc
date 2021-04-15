@@ -1,0 +1,186 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype OAuth10a
+  \inqmlmodule Sailfish.OAuth
+  \ingroup sailfishos-oauth
+  \brief A helper for OAuth10a flows
+
+  This helper type provides a simple API to allow the client application
+  to request an access token from the remote OAuth10a-enabled service.
+
+  It integrates an \l{OAuth1} helper and a \l{RedirectListener} helper,
+  and exposes the various properties which are required for the
+  OAuth10a flow.
+
+  Example of use:
+
+  \code
+  import QtQml 2.0
+  import Sailfish.OAuth 1.0
+
+  OAuth10a {
+      id: twitterOAuth
+
+      property var xhr
+
+      consumerKey: ""     // use your app's consumer_key value
+      consumerSecret: ""  // use your app's consumer_secret value
+
+      requestTokenEndpoint: "https://api.twitter.com/oauth/request_token"
+      authorizeTokenEndpoint: "https://api.twitter.com/oauth/authorize"
+      accessTokenEndpoint: "https://api.twitter.com/oauth/access_token"
+
+      onErrorOccurred: console.log("Twitter OAuth1 Error: " + error.code + " = " + error.message + " : " + error.httpCode)
+
+      onReceivedTemporaryToken: {
+          console.log("Got temporary token: " + oauthToken)
+          authorizeInBrowser(oauthToken, oauthTokenSecret)
+      }
+
+      onReceivedAccessToken: {
+          console.log("Got access token: " + oauthToken + "; " + oauthTokenSecret)
+          xhr = authenticatedRequest("GET", "https://api.twitter.com/1.1/account/verify_credentials.json",
+                                     oauth1.generateAuthorizationHeader(
+                                             oauthToken, oauthTokenSecret,
+                                             "GET", "https://api.twitter.com/1.1/account/verify_credentials.json"))
+      }
+
+      function authenticatedRequest(method, url, authorization) {
+          var req = new XMLHttpRequest()
+          req.onreadystatechange = function() {
+              if (req.readyState == XMLHttpRequest.DONE) {
+                  var response = req.responseText
+                  console.log(response)
+              }
+          }
+          req.open(method, url)
+          req.setRequestHeader("Authorization", authorization)
+          req.send()
+          return req
+      }
+
+      Component.onCompleted: twitterOAuth.requestTemporaryToken()
+  }
+  \endcode
+
+  \sa OAuth1, RedirectListener
+*/
+
+/*!
+  \qmlproperty int OAuth10a::timeout
+  \brief The \c{timeout} value for the integrated \l{RedirectListener} helper
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlproperty string OAuth10a::userAgent
+  \brief The \c{userAgent} value for the integrated \l{OAuth1} helper
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlproperty string OAuth10a::redirectUri
+  \brief The \c{redirectUri} value for the integrated \l{OAuth1} helper
+
+  By default, it is bound to the \c{uri} value of the integrated
+  \l{RedirectListener} helper, but the client application can set it to
+  another URI if it is handling redirects manually.
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth10a::requestTokenEndpoint
+  \brief The \c{requestTokenEndpoint} value for the integrated \l{OAuth1} helper
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth10a::authorizeTokenEndpoint
+  \brief The \c{authorizeTokenEndpoint} value for the integrated \l{OAuth1} helper
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth10a::accessTokenEndpoint
+  \brief The \c{accessTokenEndpoint} value for the integrated \l{OAuth1} helper
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth10a::consumerKey
+  \brief The \c{consumerKey} value for the integrated \l{OAuth1} helper
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth10a::consumerSecret
+  \brief The \c{consumerSecret} value for the integrated \l{OAuth1} helper
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth10a::customParameters
+  \brief The \c{customParameters} value for the integrated \l{OAuth1} helper
+
+  Some services require some custom parameters to be specified at various
+  stages of the OAuth1 flow, or will return more data if the client specifies
+  particular custom parameters.
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlsignal OAuth10a::receivedTemporaryToken(string oauthToken, string oauthSecret)
+  \brief This signal is emitted after receiving the temporary token and secret from the server.
+*/
+
+/*!
+  \qmlsignal OAuth10a::receivedAuthorizationCode(string oauthToken, string oauthVerifier)
+  \brief This signal is emitted after receiving the verifier code for the temporary token from the server.
+*/
+
+/*!
+  \qmlsignal OAuth10a::receivedAccessToken(string oauthToken, string oauthSecret)
+  \brief This signal is emitted after receiving the access token and secret from the server.
+*/
+
+/*!
+  \qmlsignal OAuth10a::errorOccurred(var code, var message)
+  \brief This signal is emitted if an error occurs during the OAuth1 flow.
+*/
+
+/*!
+  \qmlmethod OAuth10a::requestTemporaryToken()
+  \brief Requests a temporary token from the remote server.
+*/
+
+/*!
+  \qmlmethod OAuth10a::authorizationUrl(string oauthToken)
+  \brief Returns a valid authorization URL which can be loaded in the system web browser.
+
+  If the \l{redirectUri} is not manually specified by the client, the helper
+  will automatically use the integrated \l{RedirectListener} helper and ensure
+  that it starts listening.
+*/
+
+/*!
+  \qmlmethod OAuth2AcPkce::authorizeInBrowser(string oauthToken, string oauthSecret)
+  \brief Generates a valid authorization URL and attempts to load it in the system web browser.
+
+  If the \l{redirectUri} is not manually specified by the client, the helper
+  will automatically use the integrated \l{RedirectListener} helper and ensure
+  that it starts listening.
+*/

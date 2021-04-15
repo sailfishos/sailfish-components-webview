@@ -1,5 +1,5 @@
 TEMPLATE=subdirs
-SUBDIRS+=lib import tests doc
+SUBDIRS+=lib import tests doc oauth
 OTHER_FILES += $$PWD/rpm/sailfish-components-webview.spec
 
 import.depends = lib

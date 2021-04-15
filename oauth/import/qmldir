@@ -1,0 +1,6 @@
+module Sailfish.OAuth
+plugin sailfishoauthplugin
+OAuth2Ac 1.0 OAuth2Ac.qml
+OAuth2AcPkce 1.0 OAuth2AcPkce.qml
+OAuth2Implicit 1.0 OAuth2Implicit.qml
+OAuth10a 1.0 OAuth10a.qml

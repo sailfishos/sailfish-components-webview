@@ -1,0 +1,158 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype OAuth2Implicit
+  \inqmlmodule Sailfish.OAuth
+  \ingroup sailfishos-oauth
+  \brief A helper for OAuth2 Implicit flows
+
+  This helper type provides a simple API to allow the client application
+  to request an access token from the remote OAuth2-enabled service.
+
+  It integrates an \l{OAuth2} helper and a \l{RedirectListener} helper,
+  and exposes the various properties which are required for the
+  OAuth2 Implicit flow.
+
+  Note: the Implicit flow is not recommended for use by new clients,
+  who should prefer to use the Authorization Code With PKCE flow instead.
+
+  \sa OAuth2, RedirectListener, OAuth2AcPkce
+*/
+
+/*!
+  \qmlproperty int OAuth2Implicit::timeout
+  \brief The \c{timeout} value for the integrated \l{RedirectListener} helper
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlproperty string OAuth2Implicit::userAgent
+  \brief The \c{userAgent} value for the integrated \l{OAuth2} helper
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlproperty string OAuth2Implicit::redirectUri
+  \brief The \c{redirectUri} value for the integrated \l{OAuth2} helper
+
+  By default, it is bound to the \c{uri} value of the integrated
+  \l{RedirectListener} helper, but the client application can set it to
+  another URI if it is handling redirects manually.
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth2Implicit::authorizationEndpoint
+  \brief The \c{authorizationEndpoint} value for the integrated \l{OAuth2} helper
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth2Implicit::tokenEndpoint
+  \brief The \c{tokenEndpoint} value for the integrated \l{OAuth2} helper
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth2Implicit::clientId
+  \brief The \c{clientId} value for the integrated \l{OAuth2} helper
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth2Implicit::clientSecret
+  \brief The \c{clientSecret} value for the integrated \l{OAuth2} helper
+
+  It is an optional property, however it is required by some services
+  (e.g. Google).
+*/
+
+/*!
+  \qmlproperty string OAuth2Implicit::scopes
+  \brief The scopes which the application will request access to.
+
+  The scopes will be joined using the specified \l{scopesSeparator} and the
+  result will be used as the \c{scope} value for the for the integrated
+  \l{OAuth2} helper.
+
+  It is a mandatory property.
+*/
+
+/*!
+  \qmlproperty string OAuth2Implicit::scopesSeparator
+  \brief The separator to use when building a valid \c{scope} value.
+
+  This separator value will be used when joining the specified \l{scopes}
+  together into a valid \c{scope} value for the for the integrated
+  \l{OAuth2} helper.
+
+  The default value of this property is a single space (i.e., ' '),
+  but different services may require a different value (e.g., ',').
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlproperty string OAuth2Implicit::state
+  \brief The \c{state} value for the integrated \l{OAuth2} helper
+
+  The default value is a cryptographically-random value generated automatically
+  by the helper.
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlproperty string OAuth2Implicit::customParameters
+  \brief The \c{customParameters} value for the integrated \l{OAuth2} helper
+
+  Some services require some custom parameters to be specified at various
+  stages of the OAuth2 flow, or will return more data if the client specifies
+  particular custom parameters (e.g. returning a "refresh_token" if the
+  custom parameter "access_type"="offline" is specified).
+
+  It is an optional property.
+*/
+
+/*!
+  \qmlsignal OAuth2Implicit::receivedAccessToken(var token)
+  \brief This signal is emitted after receiving the access token.
+
+  The \a token is a dictionary of key/value pairs, and should include a
+  value for the \c{"access_token"} key.  It may optionally include other
+  values, including \c{"expires_in"} or \c{"refresh_token"}.
+*/
+
+/*!
+  \qmlsignal OAuth2Implicit::errorOccurred(var code, var message)
+  \brief This signal is emitted if an error occurs during the OAuth2 flow.
+*/
+
+/*!
+  \qmlmethod OAuth2Implicit::authorizationUrl()
+  \brief Returns a valid authorization URL which can be loaded in the system web browser.
+
+  If the \l{redirectUri} is not manually specified by the client, the helper
+  will automatically use the integrated \l{RedirectListener} helper and ensure
+  that it starts listening.
+*/
+
+/*!
+  \qmlmethod OAuth2Implicit::authorizeInBrowser()
+  \brief Generates a valid authorization URL and attempts to load it in the system web browser.
+
+  If the \l{redirectUri} is not manually specified by the client, the helper
+  will automatically use the integrated \l{RedirectListener} helper and ensure
+  that it starts listening.
+*/
+

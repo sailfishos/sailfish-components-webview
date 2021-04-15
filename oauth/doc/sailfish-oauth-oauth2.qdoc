@@ -1,0 +1,22 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype OAuth2
+  \instantiates OAuth2
+  \inqmlmodule Sailfish.OAuth
+  \ingroup sailfishos-oauth
+  \brief A helper for OAuth2 flows
+
+  The \l{SailfishOS::OAuth::OAuth2} type is exposed to QML as
+  \c{OAuth2} in the \c{Sailfish.OAuth} QML import namespace.
+
+  Clients will most likely want to use the \l{OAuth2AcPkce} helper instead
+  of this \l{OAuth2} helper, as it also includes a \l{RedirectListener}.
+
+  \sa OAuth2AcPkce, OAuth2Ac, OAuth2Implicit
+*/
+
