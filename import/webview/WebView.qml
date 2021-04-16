@@ -240,7 +240,6 @@ RawWebView {
     }
 
     Component.onCompleted: {
-        webview.loadFrameScript("chrome://embedlite/content/embedhelper.js")
         webview.addMessageListener("embed:linkclicked")
         webview.addMessageListener("Content:ContextMenu")
         webview.addMessageListener("Content:SelectionRange")
