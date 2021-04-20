@@ -1,0 +1,17 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype WebView
+  \inqmlmodule Sailfish.WebView
+  \ingroup sailfishos-webview
+  \brief A component for adding webcontent to a page
+
+  The \c{WebView} QML type is exposed through the \c{Sailfish.WebView} QML
+  import namespace.
+*/
+
+

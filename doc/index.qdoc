@@ -1,0 +1,78 @@
+/****************************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+** All rights reserved.
+**
+****************************************************************************************/
+
+/*!
+\page index.html
+\title Sailfish WebView
+
+The Sailfish WebView provides a straightforward and flexible way for you
+to introduce access to Web pages and websites into your applciation.
+
+The WebView component utilises the Sailfish OS browser engine, built using
+Mozilla gecko.
+
+\section1 Using Sailfish WebView
+
+Currently you have to explicitly link against qtmozembed-qt5 at build time, to
+avoid a symbol issue which leads to a crash:
+
+\code
+CONFIG += link_pkgconfig
+PKGCONFIG += qt5embedwidget
+\endcode
+
+\section2 C++ API
+
+The C++ API consists of the following classes:
+
+\list
+\li the \l{SailfishOS::WebEngine}{WebEngine} class
+\li the \l{SailfishOS::WebEngineSettings}{WebEngineSettings} class
+\endlist
+
+\section2 QML API
+
+The QML API is provided through the Sailfish.WebView import namespace
+
+The QML types exposed in the QML API are as follows:
+
+\list
+\li \l{WebView}
+\li \l{WebViewFlickable}
+\li \l{WebViewPage}
+\li \l{RawWebView}
+\endlist
+
+\section1 Example
+
+The following examples demonstrates how the WebView component can be integrated into an existing application's QML code.
+
+Example:
+
+\code
+import QtQuick 2.0
+import Sailfish.Silica 1.0
+import Sailfish.WebView 1.0
+
+ApplicationWindow {
+    id: root
+    initialPage: Component {
+        Page {
+            id: page
+            WebView {
+                anchors.fill: parent
+                active: true
+                url: "http://www.sailfishos.org"
+            }
+        }
+    }
+}
+\endcode
+
+
+
+*/

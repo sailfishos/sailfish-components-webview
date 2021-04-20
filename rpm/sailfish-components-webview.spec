@@ -82,6 +82,15 @@ Requires:   nemo-test-tools
 %description tests
 Unit tests and functional tests of Sailfish OS WebView / WebEngine
 
+%package doc
+Summary:    Documentation for the Sailfish WebView Component
+BuildRequires:  mer-qdoc-template
+BuildRequires:  qt5-qttools-qthelp-devel
+BuildRequires:  qt5-tools
+
+%description doc
+%{summary}.
+
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libsailfishwebengine.so.*
@@ -132,6 +141,11 @@ Unit tests and functional tests of Sailfish OS WebView / WebEngine
 %files tests
 %defattr(-,root,root,-)
 /opt/tests/sailfish-components-webview/*
+
+%files doc
+%defattr(-,root,root,-)
+%dir %{_datadir}/doc/sailfish-components-webview
+%{_datadir}/doc/sailfish-components-webview/*
 
 %prep
 %setup -q -n %{name}-%{version}

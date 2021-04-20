@@ -1,0 +1,56 @@
+project         = Sailfish WebView
+description     = Sailfish Webview Reference Documentation
+versionsym      =
+version         = 1.0.0
+url             = https://github.com/sailfishos/sailfish-webview/
+
+sourcedirs += $$PWD/../lib $$PWD/../import $$PWD/../doc
+headerdirs += $$PWD/../lib $$PWD/../import
+#exampledirs += $$PWD/../examples
+
+outputformats = HTML
+outputdir = $$PWD/../doc/html
+base = file:$$PWD/../doc/html
+tagfile = $$PWD/../doc/html/sailfishos-webview.tags
+
+outputprefixes = QML
+outputprefixes.QML = qml-sailfishos-webview-
+
+qhp.projects = SailfishWebView
+
+qhp.SailfishWebView.file = sailfish-webview.qhp
+qhp.SailfishWebView.namespace = org.sailfishos.wevview.1.0.0
+qhp.SailfishWebView.virtualFolder = sailfishos-webview
+qhp.SailfishWebView.indexTitle = Sailfish WebView
+qhp.SailfishWebVoew.indexRoot =
+
+qhp.SailfishWebView.filterAttributes = sailfishos-webview 1.0.0
+qhp.SailfishWebView.customFilters.SailfishWebView.name = Sailfish WebView 1.0.0
+qhp.SailfishWebView.customFilters.SailfishWebView.filterAttributes = sailfishos-webview 1.0.0
+
+qhp.SailfishWebView.subprojects        = overview qmltypes classes
+
+qhp.SailfishWebView.subprojects.overview.title = Sailfish WebView
+qhp.SailfishWebView.subprojects.overview.indexTitle = Sailfish WebView
+qhp.SailfishWebView.subprojects.overview.type = manual
+qhp.SailfishWebView.subprojects.qmltypes.title = QML Types
+qhp.SailfishWebView.subprojects.qmltypes.indexTitle = Sailfish.WebView QML Types
+qhp.SailfishWebView.subprojects.qmltypes.selectors = qmlclass
+qhp.SailfishWebView.subprojects.qmltypes.sortPages = true
+qhp.SailfishWebView.subprojects.classes.title = C++ Classes
+qhp.SailfishWebView.subprojects.classes.indexTitle = Sailfish WebView C++ Classes
+qhp.SailfishWebView.subprojects.classes.selectors = class fake:headerfile
+qhp.SailfishWebView.subprojects.classes.sortPages = true
+
+HTML.footer += \
+    "<div class=\"footer\">\n" \
+    "  <p><acronym title=\"Copyright\">&copy;</acronym> 2021 Open Mobile Platform LLC.</p>\n" \
+    "  <p>All other trademarks are property of their respective owners.</p>\n" \
+    "  <p>\n" \
+    "    This document may be used under the terms of the " \
+    "    <a href=\"http://www.gnu.org/licenses/fdl.html\">GNU Free Documentation License version 1.3</a>" \
+    "    as published by the Free Software Foundation." \
+    "  </p>\n" \
+    "</div>\n"
+
+navigation.homepage = "Sailfish WebView"

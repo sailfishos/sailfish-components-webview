@@ -1,0 +1,17 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype WebViewFlickable
+  \inqmlmodule Sailfish.WebView
+  \ingroup sailfishos-webview
+  \brief Provides a flickable WebView component allowing horizontal and vertical panning
+
+  The \c{WebViewFlickable} QML type is exposed through the \c{Sailfish.WebView} QML
+  import namespace.
+*/
+
+
