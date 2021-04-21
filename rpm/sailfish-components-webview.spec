@@ -5,7 +5,6 @@ Version: 1.0.0
 Release: 1
 Source0: %{name}-%{version}.tar.bz2
 Summary: Allows embedding Sailfish OS Browser WebView into applications
-Group:   System/Libraries
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5DBus)
 BuildRequires:  pkgconfig(Qt5Network)
@@ -25,7 +24,6 @@ Requires: embedlite-components-qt5 >= 1.21.2
 
 %package ts-devel
 Summary:   Translation source for sailfish-components-webview-qt5
-Group:     System/Libraries
 Requires:  %{name} = %{version}
 
 %description ts-devel
@@ -33,7 +31,6 @@ Requires:  %{name} = %{version}
 
 %package popups
 Summary:   Popup and alert QML components used by sailfish-components-webview
-Group:     System/Libraries
 Requires:  %{name} = %{version}
 Requires:  declarative-transferengine-qt5 >= 0.3.1
 Requires:  nemo-qml-plugin-systemsettings
@@ -43,7 +40,6 @@ Requires:  nemo-qml-plugin-systemsettings
 
 %package popups-ts-devel
 Summary:   Translation source for sailfish-components-webview-popups-qt5
-Group:     System/Libraries
 Requires:  %{name} = %{version}
 
 %description popups-ts-devel
@@ -51,7 +47,6 @@ Requires:  %{name} = %{version}
 
 %package pickers
 Summary:   Picker and selector QML components used by sailfish-components-webview
-Group:     System/Libraries
 Requires:  %{name} = %{version}
 
 %description pickers
@@ -59,31 +54,30 @@ Requires:  %{name} = %{version}
 
 %package pickers-ts-devel
 Summary:   Translation source for sailfish-components-webview-pickers-qt5
-Group:     System/Libraries
 Requires:  %{name} = %{version}
 
 %description pickers-ts-devel
 %{summary}.
 
 %package devel
-Summary:    Sailfish OS WebEngine development files
+Summary:    Sailfish WebEngine development files
 Requires:   %{name} = %{version}-%{release}
 
 %description devel
 Development package which provides libsailfishwebengine
 
 %package tests
-Summary:    Sailfish OS WebView / WebEngine tests
+Summary:    Sailfish WebView / WebEngine tests
 BuildRequires:  pkgconfig(Qt5Test)
 Requires:   %{name} = %{version}-%{release}
 Requires:   qt5-qtdeclarative-import-qttest
 Requires:   nemo-test-tools
 
 %description tests
-Unit tests and functional tests of Sailfish OS WebView / WebEngine
+Unit tests and functional tests of Sailfish WebView / WebEngine
 
 %package doc
-Summary:    Documentation for the Sailfish WebView Component
+Summary:    Documentation for Sailfish WebView
 BuildRequires:  mer-qdoc-template
 BuildRequires:  qt5-qttools-qthelp-devel
 BuildRequires:  qt5-tools
@@ -148,7 +142,7 @@ BuildRequires:  qt5-tools
 %{_datadir}/doc/sailfish-components-webview/*
 
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup -n %{name}-%{version}
 
 %build
 %qmake5 VERSION=`echo %{version} | sed 's/+.*//'`
