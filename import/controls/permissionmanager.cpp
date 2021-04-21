@@ -21,7 +21,11 @@ PermissionManager::PermissionManager(QObject *parent) : QObject(parent) {
 
 void PermissionManager::add(const Permission &permission)
 {
-    sendRequest(QStringLiteral("add"), permission.m_host, permission.m_type, permission.m_capability);
+    sendRequest(QStringLiteral("add"),
+                permission.m_host,
+                permission.m_type,
+                permission.m_capability,
+                permission.m_expireType);
 }
 
 void PermissionManager::remove(const QString &host, const QString &type)
@@ -29,21 +33,26 @@ void PermissionManager::remove(const QString &host, const QString &type)
     sendRequest(QStringLiteral("remove"), host, type);
 }
 
-void PermissionManager::add(const QString &host, const QString &type, Capability capability)
+void PermissionManager::add(const QString &host,
+                            const QString &type,
+                            Capability capability,
+                            Expiration expireType)
 {
-    add(Permission(host, type, capability));
+    add(Permission(host, type, capability, expireType));
 }
 
-void PermissionManager::sendRequest(const QString &message
-                               , const QString &host
-                               , const QString &type
-                               , Capability capability)
+void PermissionManager::sendRequest(const QString &message,
+                                    const QString &host,
+                                    const QString &type,
+                                    Capability capability,
+                                    Expiration expireType)
 {
     QVariantMap data;
     data.insert(QStringLiteral("msg"), message);
     data.insert(QStringLiteral("uri"), host);
     data.insert(QStringLiteral("type"), type);
     data.insert(QStringLiteral("permission"), QVariant::fromValue(capabilityToInt(capability)));
+    data.insert(QStringLiteral("expireType"), QVariant::fromValue(expirationToInt(expireType)));
     SailfishOS::WebEngine::instance()->notifyObservers("embedui:perms", QVariant(data));
 }
 
