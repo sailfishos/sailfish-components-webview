@@ -13,6 +13,15 @@
 
 #include "downloadhelper.h"
 
+/*!
+  \internal
+  \class SailfishOS::WebEngineUtils::DownloadHelper
+  \brief Utilities to help with file management
+  \inmodule SailfishWebView
+
+  This is an internal helper class used to help with file management.
+*/
+
 #include <QFileInfo>
 constexpr int FILEEXTENSION_MAX_LENGTH = 32;
 constexpr int FILENAME_MAX_LENGTH = 255;

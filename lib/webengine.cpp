@@ -16,7 +16,27 @@
 
 Q_GLOBAL_STATIC(SailfishOS::WebEngine, webEngineInstance)
 
-void SailfishOS::WebEngine::initialize(const QString &profilePath)
+/*!
+  \class SailfishOS::WebEngine
+  \brief Provides access to the Web engine context
+  \inmodule SailfishWebView
+
+  Singleton class which provides access to the Web engine context.
+*/
+
+namespace SailfishOS {
+
+/*!
+  \brief Initialises the WebEngine class.
+
+  Initalises the WebEngine class. The \a profilePath sets the root folder for
+  the mozilla gecko profile. Once set the \a profilePath can't be changed.
+
+  Multiple calls to initialize have no effect.
+
+  \sa initialize
+*/
+void WebEngine::initialize(const QString &profilePath)
 {
     static bool isInitialized = false;
     if (isInitialized) {
@@ -38,7 +58,7 @@ void SailfishOS::WebEngine::initialize(const QString &profilePath)
     QByteArray binaryPath = QCoreApplication::applicationDirPath().toLocal8Bit();
     setenv("GRE_HOME", binaryPath.constData(), 1);
 
-    SailfishOS::WebEngine *webEngine = instance();
+    WebEngine *webEngine = instance();
     webEngine->setProfile(profilePath);
 
     // Set various embedlite components
@@ -52,16 +72,37 @@ void SailfishOS::WebEngine::initialize(const QString &profilePath)
     isInitialized = true;
 }
 
-SailfishOS::WebEngine *SailfishOS::WebEngine::instance()
+/*!
+  \brief Returns the instance of the singleton WebEngine class.
+
+  Returns the instance of the singleton WebEngine class.
+  The returned instance may not be intialised.
+
+  \sa initialize
+*/
+WebEngine *WebEngine::instance()
 {
     return webEngineInstance();
 }
 
-SailfishOS::WebEngine::WebEngine(QObject *parent)
+/*!
+  \brief Constructs a new WebEngine instance, with the specified QObject \a parent.
+
+  In general there should be no need to use the constructor. Call \l instance
+  to return the singleton instance instead.
+
+  \sa instance
+*/
+WebEngine::WebEngine(QObject *parent)
     : QMozContext(parent)
 {
 }
 
-SailfishOS::WebEngine::~WebEngine()
+/*!
+  \brief Destroys the WebEngine instance.
+*/
+WebEngine::~WebEngine()
 {
 }
+
+} // namespace SailfishOS
