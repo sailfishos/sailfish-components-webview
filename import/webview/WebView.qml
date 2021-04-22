@@ -20,6 +20,7 @@ import Sailfish.WebView.Pickers 1.0
 RawWebView {
     id: webview
 
+    property alias downloadsEnabled: popupOpener.downloadsEnabled
     property WebViewPage webViewPage: _findParentWithProperty(webview, '__sailfish_webviewpage')
     property bool canShowSelectionMarkers: true
     property real _indicatorVerticalOffset
