@@ -6,12 +6,120 @@
 
 /*!
   \qmltype WebView
+  \inherits Item
   \inqmlmodule Sailfish.WebView
   \ingroup sailfishos-webview
-  \brief A component for adding webcontent to a page
+  \brief A component for adding web content to a page
+
+  The \c{WebView} component allows you to add web content to a QML page.
 
   The \c{WebView} QML type is exposed through the \c{Sailfish.WebView} QML
   import namespace.
+
+  Exaple of use:
+
+  \code
+  import QtQuick 2.0
+  import Sailfish.Silica 1.0
+  import Sailfish.WebView 1.0
+
+  ApplicationWindow {
+      id: root
+      initialPage: Component {
+          Page {
+              id: page
+              WebView {
+                  anchors.fill: parent
+                  active: true
+                  url: "http://www.sailfishos.org"
+              }
+          }
+      }
+  }
+  \endcode
+
+  \sa WebVewPage
 */
 
+/*!
+  \qmlproperty WebViewPage webViewPage
+  \brief The \l{WebViewPage} the \l{WebView} is embedded in.
+
+  This will be populated automatically unless explicitly set.
+*/
+
+/*!
+  \qmlproperty bool WebView::canShowSelectionMarkers
+  \brief Display markers when the user selects text on a page.
+
+  If \c{true} the user will be able to select text and items on a page,
+  indicated with handles. Set to \c{false} to disable the selection markers.
+
+  The default is \c{true}.
+*/
+
+/*!
+  \qmlproperty bool WebView::textSelectionActive
+  \brief Indicates that text is currently being selected by the user.
+
+  This read only property will be set to \c{true} if the user is currently
+  selecting text on the page, or \c{false} otherwise.
+*/
+
+/*!
+  \qmlproperty string WebView::httpUserAgent
+  \brief The user agent string to be used for http/https requests.
+
+  Set this value to override the user agent string that will be used for http
+  and https requests. This will be sent in the \c{"User-Agent"} header field.
+
+  Setting this value overrides all other user agent configurations.
+
+  If the string is left empty or cleared, it will get set to the actual user
+  agent string used at the start of each request. If there are domain
+  overrides configured the value may be dependent on the domain being accessed
+  and so may change again on future requests.
+
+  Changing the value mid-request will not alter the behaviour for the onging
+  request, but will affect any future requests.
+
+  Defaults to an empty string.
+*/
+
+/*!
+  \qmlsignal WebView::linkClicked(string url)
+  \brief This signal is emitted when the user selects a link on the page.
+
+  When emitted \a url will be set to href selected.
+*/
+
+/*!
+  \qmlmethod WebView::clearSelection()
+  \brief Clears any text currently selected by the user.
+*/
+
+/*!
+  \qmlproperty qreal WebView::virtualKeyboardMargin
+  \brief Set the margin taken by the keyboard at the bottom of the page
+
+  When the keybaord is opened it may overlap web content displayed in a
+  \l{WebView}. Setting this value allows the web content to be arranged to
+  compensate for the overlapped area.
+
+  When using a \l{WebView} this property will be set automatically when the
+  keybaord is opened or closed.
+*/
+
+/*!
+  \qmlsignal WebView::contentOrientationChanged(Qt::ScreenOrientation orientation)
+  \brief This signal is emitted when the screen orientation of the rendered
+         content changes.
+*/
+
+/*!
+  \internal
+
+  \qmlsignal WebView::openUrlInNewWindow()
+  \brief This signal is emitted to indicate a request to open a new window.
+*/
 
