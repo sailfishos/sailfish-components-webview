@@ -1,7 +1,7 @@
 Name: sailfish-components-webview-qt5
 License: MPLv2.0
 Url:     https://github.com/sailfishos/sailfish-components-webview
-Version: 1.0.0
+Version: 1.12.22
 Release: 1
 Source0: %{name}-%{version}.tar.bz2
 Summary: Allows embedding Sailfish OS Browser WebView into applications
@@ -145,7 +145,7 @@ BuildRequires:  qt5-tools
 %autosetup -n %{name}-%{version}
 
 %build
-%qmake5 VERSION=`echo %{version} | sed 's/+.*//'`
+%qmake5 VERSION=%{version}
 make %{?_smp_mflags}
 
 %install

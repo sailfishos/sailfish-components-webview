@@ -259,7 +259,7 @@ Timer {
                 contextMenu.linkProtocol = data.linkProtocol || ""
                 contextMenu.contentType = contentType
                 contextMenu.tabModel = root.tabModel
-                contextMenu.viewId = contentItem.uniqueID()
+                contextMenu.viewId = contentItem.uniqueId
                 contextMenu.pageStack = root.pageStack
                 contextMenu.show()
             } else {
@@ -273,7 +273,7 @@ Timer {
                                                                 "linkProtocol": data.linkProtocol,
                                                                 "contentType": contentType,
                                                                 "tabModel": root.tabModel,
-                                                                "viewId": contentItem.uniqueID(),
+                                                                "viewId": contentItem.uniqueId,
                                                                 "pageStack": pageStack,
                                                                 "downloadsEnabled": root.downloadsEnabled
                                                             })

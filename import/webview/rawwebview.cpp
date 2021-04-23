@@ -57,7 +57,7 @@ ViewCreator::~ViewCreator()
 quint32 ViewCreator::createView(const quint32 &parentId)
 {
     for (RawWebView *view : views) {
-        if (view->uniqueID() == parentId) {
+        if (view->uniqueId() == parentId) {
             view->openUrlInNewWindow();
             break;
         }
