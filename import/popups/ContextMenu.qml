@@ -147,15 +147,12 @@ ContextMenuInterface {
                 //: Share link from browser context menu
                 //% "Share"
                 text: qsTrId("sailfish_components_webview_popups-me-share_link")
-                Component {
-                    id: shareLinkPage
-                    ShareLinkPage {}
-                }
                 onClicked: {
                     root._hide()
-                    if (pageStack != null && pageStack != undefined) {
-                        pageStack.animatorPush(shareLinkPage, {"link" : root.linkHref, "linkTitle": root.linkTitle})
-                    }
+                    webShareAction.shareLink(root.linkHref, root.linkTitle)
+                }
+                WebShareAction {
+                    id: webShareAction
                 }
             }
 
