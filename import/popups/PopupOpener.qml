@@ -1,8 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (c) 2016 - 2017 Jolla Ltd.
-** Copyright (c) 2020 Open Mobile Platform LLC.
-** Contact: Raine Makelainen <raine.makelainen@jolla.com>
+** Copyright (c) 2020 - 2021 Open Mobile Platform LLC.
 **
 ****************************************************************************/
 
@@ -24,8 +23,17 @@ Timer {
     readonly property bool active: contextMenu && contextMenu.active || false
     property Item contextMenu
 
-    readonly property var listeners: ["embed:alert", "embed:confirm", "embed:prompt",
-        "embed:login", "embed:auth", "embed:permissions", "Content:ContextMenu"]
+    property PopupProvider popupProvider: PopupProvider {}
+    readonly property var _messageTopicToPopupProviderPropertyMapping: ({
+        "Content:ContextMenu":  "contextMenu",
+        "embed:alert":          "alertPopup",
+        "embed:confirm":        "confirmPopup",
+        "embed:prompt":         "promptPopup",
+        "embed:login":          "passwordManagerPopup",
+        "embed:auth":           "authPopup",
+        "embed:permissions":  { "geolocation": "locationPermissionPopup" },
+    })
+    readonly property var listeners: Object.keys(_messageTopicToPopupProviderPropertyMapping)
 
     property var authDialogContentItem
     property var authDialogData
@@ -34,6 +42,8 @@ Timer {
     property bool downloadsEnabled: true
 
     property Component _contextMenuComponent
+    property var _popupObject
+    property var _delayedOpenValues
 
     property Notice positioningDisabledNotice: Notice {
         duration: 3000
@@ -42,9 +52,7 @@ Timer {
         anchor: Notice.Center
     }
 
-    property var data
-    property var topic
-
+    signal aboutToOpenPopup(var topic, var data)
     signal aboutToOpenContextMenu(var data)
     signal loginSaved
 
@@ -79,75 +87,28 @@ Timer {
             data.text  = data.text.substring(0, 1000) + " ..."
         }
 
-        var winId = data.winId
+        aboutToOpenPopup(topic, data)
+
+        _delayedOpenValues = null
+        _popupObject = null
         switch (topic) {
-        case "embed:alert": {
-            if (pageStack.busy) {
-                // Wait until pagestack ready
-                root.data = data
-                root.topic = topic;
-                pageStack.busyChanged.connect(busyChanged)
-            } else {
-                alert(data)
-            }
-            break
-        }
-        case "embed:confirm": {
-            if (pageStack.busy) {
-                // Wait until pagestack ready
-                root.data = data
-                root.topic = topic;
-                pageStack.busyChanged.connect(busyChanged)
-            } else {
-                confirm(data)
-            }
-            break
-        }
-        case "embed:prompt": {
-            if (pageStack.busy) {
-                // Wait until pagestack ready
-                root.data = data
-                root.topic = topic;
-                pageStack.busyChanged.connect(busyChanged)
-            } else {
-                prompt(data)
-            }
-            break
-        }
-        case "embed:login": {
-            if (pageStack.busy) {
-                // Wait until pagestack ready
-                root.data = data
-                root.topic = topic;
-                pageStack.busyChanged.connect(busyChanged)
-            } else {
-                login(data)
-            }
-            break
-        }
-        case "embed:auth": {
-            root.openAuthDialog(contentItem, data, winId)
-            break
-        }
+        case "Content:ContextMenu": root._openContextMenu(data); break;
+        case "embed:alert":         alert(data);    break;
+        case "embed:confirm":       confirm(data);  break;
+        case "embed:prompt":        prompt(data);   break;
+        case "embed:login":         login(data);    break;
+        case "embed:auth":          auth(data);     break;
         case "embed:permissions": {
             if (data.title === "geolocation") {
-                if (pageStack.busy) {
-                    // Wait until pagestack ready
-                    root.data = data
-                    root.topic = topic;
-                    pageStack.busyChanged.connect(busyChanged)
-                } else {
-                    permissions(data)
-                }
+                permissions(data)
             } else {
                 // Currently we don't support other permission requests.
-                sendAsyncMessage("embedui:permissions",
-                                 { "allow": false, "checkedDontAsk": false, "id": data.id })
+                sendAsyncMessage("embedui:permissions", {
+                    "allow": false,
+                    "checkedDontAsk": false,
+                    "id": data.id
+                })
             }
-            break
-        }
-        case "Content:ContextMenu": {
-            root._openContextMenu(data)
             break
         }
         }
@@ -157,157 +118,134 @@ Timer {
 
     // Open alert dialog
     function alert(data) {
-        var obj = pageStack.animatorPush(Qt.resolvedUrl("AlertDialog.qml"), {
+        var checkbox = getCheckbox(data)
+        var winId = data.winId
+        var props = {
             "text": data.text,
-            "checkbox": getCheckbox(data)
-        })
-        obj.pageCompleted.connect(function(dialog) {
-            // TODO: also the Async message must be sent when window gets closed
-            dialog.done.connect(function() {
-                contentItem.sendAsyncMessage("alertresponse", {
-                    "winId": data.winId,
-                    "checkvalue": dialog.checkboxValue
-                })
+            "preventDialogsVisible": !(checkbox == null),
+            "preventDialogsPrefillValue": (!(checkbox == null) ? checkbox.value : false)
+        }
+        var acceptFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("alertresponse", {
+                "winId": winId,
+                "checkvalue": popup.preventDialogsValue
             })
-        })
+        }
+        var rejectFn = acceptFn
+
+        var topic = "embed:alert"
+        var subtopic = null
+        var comp =_resolveListenerComponent(topic, subtopic)
+        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
+        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
     }
 
     // Open confirm dialog
     function confirm(data) {
-        var obj = pageStack.animatorPush(Qt.resolvedUrl("ConfirmDialog.qml"), {
+        var checkbox = getCheckbox(data)
+        var winId = data.winId
+        var props = {
             "text": data.text,
-            "checkbox": getCheckbox(data)
-        })
-        obj.pageCompleted.connect(function(dialog) {
-            // TODO: also the Async message must be sent when window gets closed
-            dialog.accepted.connect(function() {
-                contentItem.sendAsyncMessage("confirmresponse", {
-                    "winId": data.winId,
-                    "accepted": true,
-                    "checkvalue": dialog.checkboxValue
-                })
+            "preventDialogsVisible": !(checkbox == null),
+            "preventDialogsPrefillValue": (!(checkbox == null) ? checkbox.value : false)
+        }
+        var acceptFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("confirmresponse", {
+                "winId": winId,
+                "accepted": true,
+                "checkvalue": popup.preventDialogsValue
             })
-            dialog.rejected.connect(function() {
-                contentItem.sendAsyncMessage("confirmresponse", {
-                    "winId": data.winId,
-                    "accepted": false,
-                    "checkvalue": dialog.checkboxValue
-                })
+        }
+        var rejectFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("confirmresponse", {
+                "winId": winId,
+                "accepted": false,
+                "checkvalue": popup.preventDialogsValue
             })
-        })
+        }
+
+        var topic = "embed:confirm"
+        var subtopic = null
+        var comp =_resolveListenerComponent(topic, subtopic)
+        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
+        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
     }
 
     // Open prompt dialog
     function prompt(data) {
-        var obj = pageStack.animatorPush(Qt.resolvedUrl("PromptDialog.qml"), {
+        var checkbox = getCheckbox(data)
+        var winId = data.winId
+        var props = {
             "text": data.text,
             "value": data.defaultValue,
-            "checkbox": getCheckbox(data)
-        })
-        obj.pageCompleted.connect(function(dialog) {
-            // TODO: also the Async message must be sent when window gets closed
-            dialog.accepted.connect(function() {
-                contentItem.sendAsyncMessage("promptresponse", {
-                    "winId": data.winId,
-                    "accepted": true,
-                    "promptvalue": dialog.value,
-                    "checkvalue": dialog.checkboxValue
-                })
+            "preventDialogsVisible": !(checkbox == null),
+            "preventDialogsPrefillValue": (!(checkbox == null) ? checkbox.value : false)
+        }
+        var acceptFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("promptresponse", {
+                "winId": winId,
+                "accepted": true,
+                "promptvalue": popup.value,
+                "checkvalue": popup.preventDialogsValue
             })
-            dialog.rejected.connect(function() {
-                contentItem.sendAsyncMessage("promptresponse", {
-                    "winId": data.winId,
-                    "accepted": false,
-                    "checkvalue": dialog.checkboxValue
-                })
+        }
+        var rejectFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("promptresponse", {
+                "winId": winId,
+                "accepted": false,
+                "checkvalue": popup.preventDialogsValue
             })
-        })
+        }
+
+        var topic = "embed:prompt"
+        var subtopic = null
+        var comp =_resolveListenerComponent(topic, subtopic)
+        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
+        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
     }
 
     // Open login dialog
     function login(data) {
-        var obj = pageStack.animatorPush(Qt.resolvedUrl("PasswordManagerDialog.qml"), {
-            "contentItem": contentItem, "requestId": data.id,
-            "notificationType": data.name, "formData": data.formdata
-        })
-
-        obj.pageCompleted.connect(function(dialog) {
-            dialog.loginSaved.connect(function() {
-                root.loginSaved()
-            })
-        })
-
-    }
-
-    // Open permissions dialog
-    function permissions(data) {
-        var obj = pageStack.animatorPush(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
-        obj.pageCompleted.connect(function(dialog) {
-            dialog.accepted.connect(function() {
-                contentItem.sendAsyncMessage("embedui:permissions", {
-                    "allow": true, "checkedDontAsk": dialog.rememberValue, "id": data.id
-                })
-                if (!Popups.LocationSettings.locationEnabled) {
-                    positioningDisabledNotice.show()
-                }
-            })
-            dialog.rejected.connect(function() {
-                contentItem.sendAsyncMessage("embedui:permissions", {
-                    "allow": false, "checkedDontAsk": dialog.rememberValue, "id": data.id
-                })
-            })
-        })
-    }
-
-    // Handle pagestack busy change
-    function busyChanged() {
-        if (!pageStack.busy && root.data && root.topic) {
-            pageStack.busyChanged.disconnect(busyChanged)
-            switch (root.topic) {
-            case "embed:alert":
-                alert(root.data)
-                break
-            case "embed:confirm":
-                confirm(root.data)
-                break
-            case "embed:prompt":
-                prompt(root.data)
-                break
-            case "embed:login":
-                login(root.data)
-                break
-            case "embed:permissions":
-                permissions(root.data)
-                break
-            }
+        var props = {
+            "notificationType": data.name,
+            "formData": data.formdata,
+            "_internalData": { "contentItem": contentItem, "requestId": data.id }
         }
-    }
-
-    function handlesMessage(topic) {
-        return listeners.indexOf(topic) >= 0
-    }
-
-    function openAuthDialog(contentItem, data, winId) {
-        if (pageStack.busy) {
-            root._delayedOpenAuthDialog(contentItem, data, winId)
-        } else {
-            root._immediateOpenAuthDialog(contentItem, data, winId)
+        var acceptFn = function(popup) {
+            _popupObject = null
+            popup._internalData.contentItem.sendAsyncMessage("embedui:login", {
+                "buttonidx": 0, // "Yes" button
+                "id": popup._internalData.requestId
+            })
+            root.loginSaved()
         }
+        var rejectFn = function(popup) {
+            _popupObject = null
+            popup._internalData.contentItem.sendAsyncMessage("embedui:login", {
+                "buttonidx": 1, // "No" button
+                "id": popup._internalData.requestId
+            })
+        }
+
+        var topic = "embed:login"
+        var subtopic = null
+        var comp =_resolveListenerComponent(topic, subtopic)
+        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
+        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
     }
 
-    function _delayedOpenAuthDialog(contentItem, data, winId) {
-        authDialogContentItem = contentItem
-        authDialogData = data
-        authDialogWinId = winId
-        start()
-    }
-
-    function _immediateOpenAuthDialog(contentItem, data, winId) {
+    // Open password manager dialog
+    function auth(data) {
+        var winId = data.winId
         var inputs = data.inputs
         var username
         var password
         var remember
-
         for (var i = 0; i < inputs.length; ++i) {
             if (inputs[i].hint === "username") {
                 username = inputs[i]
@@ -317,25 +255,129 @@ Timer {
                 remember = inputs[i]
             }
         }
-
         var passwordOnly = !username
-        var obj = pageStack.animatorPush(Qt.resolvedUrl("AuthDialog.qml"),
-                                    {"hostname": data.text, "realm": data.title,
-                                     "username": username, "password": password,
-                                     "remember": remember, "passwordOnly": passwordOnly,
-                                     "privateBrowsing": data.privateBrowsing})
-        obj.pageCompleted.connect(function(dialog) {
-            dialog.accepted.connect(function () {
-                contentItem.sendAsyncMessage("authresponse",
-                                             { "winId": winId, "accepted": true,
-                                                 "username": dialog.usernameValue, "password": dialog.passwordValue,
-                                                 "remember": dialog.rememberValue })
+        var props = {
+            "hostname": data.text,
+            "realm": data.title,
+            "usernameVisible": !(username == null),
+            "usernamePrefillValue": (!(username == null)) ? username.value : "",
+            "usernameAutofocus": (!(username == null)) ? username.autofocus : false,
+            "passwordPrefillValue": (!(password == null)) ? password.value : "",
+            "rememberVisible": !(remember == null),
+            "rememberPrefillValue": (!(remember == null)) ? remember.value : "",
+            "passwordOnly": passwordOnly,
+            "privateBrowsing": data.privateBrowsing
+        }
+        var acceptFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("authresponse", {
+                "winId": winId,
+                "accepted": true,
+                "username": popup.usernameValue,
+                "password": popup.passwordValue,
+                "remember": popup.rememberValue
             })
-            dialog.rejected.connect(function() {
-                contentItem.sendAsyncMessage("authresponse",
-                                             { "winId": winId, "accepted": false})
+        }
+        var rejectFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("authresponse", {
+                "winId": winId,
+                "accepted": false
             })
-        })
+        }
+
+        var topic = "embed:auth"
+        var subtopic = null
+        var comp =_resolveListenerComponent(topic, subtopic)
+        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
+        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
+    }
+
+    // Open permissions dialog
+    function permissions(data) {
+        var props = {
+            "host": data.host
+        }
+        var acceptFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("embedui:permissions", {
+                "allow": true,
+                "checkedDontAsk": popup.rememberValue,
+                "id": data.id
+            })
+            if (!Popups.LocationSettings.locationEnabled) {
+                positioningDisabledNotice.show()
+            }
+        }
+        var rejectFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("embedui:permissions", {
+                "allow": false,
+                "checkedDontAsk": popup.rememberValue,
+                "id": data.id
+            })
+        }
+
+        var topic = "embed:permissions"
+        var subtopic = data.title
+        var comp =_resolveListenerComponent(topic, subtopic)
+        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
+        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
+    }
+
+    // Handle pagestack busy change
+    function busyChanged() {
+        if (!pageStack.busy && root._delayedOpenValues) {
+            pageStack.busyChanged.disconnect(busyChanged)
+            openPopup(root._delayedOpenValues[0],
+                      root._delayedOpenValues[1],
+                      root._delayedOpenValues[2],
+                      root._delayedOpenValues[3],
+                      root._delayedOpenValues[4])
+            root._delayedOpenValues = null
+        }
+    }
+
+    function handlesMessage(topic) {
+        return listeners.indexOf(topic) >= 0
+    }
+
+    function openPopup(comp, properties, isDialog, acceptedFn, rejectedFn) {
+        if (pageStack.busy) {
+            _delayedOpenValues = [comp, properties, isDialog, acceptedFn, rejectedFn]
+            pageStack.busyChanged.connect(busyChanged)
+            return
+        }
+
+        var obj = null
+        if (isDialog) {
+            obj = pageStack.animatorPush(comp, properties)
+            obj.pageCompleted.connect(function(dialog) {
+                // TODO: also the Async message must be sent when window gets closed
+                _popupObject = dialog // prevent gc()
+                dialog.accepted.connect(function() { acceptedFn(dialog) })
+                dialog.rejected.connect(function() { rejectedFn(dialog) })
+            })
+        } else {
+            var component = comp.createObject === undefined
+                          ? Qt.createComponent(comp) // TODO: asynchronous...
+                          : comp
+            if (!component) {
+                console.log("PopupOpener.qml: unable to create component from", comp)
+            } else if (component.status !== Component.Ready) {
+                console.log("PopupOpener.qml: error loading component", comp)
+                if (component.status === Component.Error) {
+                    console.log("PopupOpener.qml: error:", component.errorString())
+                } else if (component.status === Component.Null) {
+                    console.log("PopupOpener.qml: error: component is null")
+                }
+            } else {
+                obj = component.createObject(parentItem, properties)
+                _popupObject = obj // prevent gc()
+                obj.accepted.connect(function() { acceptedFn(obj) })
+                obj.rejected.connect(function() { rejectedFn(obj) })
+            }
+        }
     }
 
     function _openContextMenu(data) {
@@ -357,32 +399,26 @@ Timer {
                 contextMenu.pageStack = root.pageStack
                 contextMenu.show()
             } else {
-                _contextMenuComponent = Qt.createComponent(Qt.resolvedUrl("ContextMenu.qml"))
+                _contextMenuComponent = Qt.createComponent(_resolveListenerComponent("Content:ContextMenu"))
                 if (_contextMenuComponent.status !== Component.Error) {
-                    contextMenu = _contextMenuComponent.createObject(parentItem,
-                                                            {
-                                                                "linkHref": linkHref,
-                                                                "imageSrc": imageSrc,
-                                                                "linkTitle": linkTitle && linkTitle.trim() || "",
-                                                                "linkProtocol": data.linkProtocol,
-                                                                "contentType": contentType,
-                                                                "tabModel": root.tabModel,
-                                                                "viewId": contentItem.uniqueId,
-                                                                "pageStack": pageStack,
-                                                                "downloadsEnabled": root.downloadsEnabled
-                                                            })
+                    contextMenu = _contextMenuComponent.createObject(parentItem, {
+                        "linkHref": linkHref,
+                        "imageSrc": imageSrc,
+                        "linkTitle": linkTitle && linkTitle.trim() || "",
+                        "linkProtocol": data.linkProtocol,
+                        "contentType": contentType,
+                        "tabModel": root.tabModel,
+                        "viewId": contentItem.uniqueId,
+                        "pageStack": pageStack,
+                        "downloadsEnabled": root.downloadsEnabled
+                    })
                     contextMenu.show()
                 } else {
-                    console.log("Can't load ContextMenu.qml")
+                    console.log("Can't load ContextMenu component")
                 }
             }
         }
     }
-
-    repeat: false
-    running: false
-    interval: 600 // page transition delay.
-    onTriggered: openAuthDialog(authDialogContentItem, authDialogData, authDialogWinId)
 
     Component.onCompleted: {
         // Warmup location settings.
@@ -395,5 +431,78 @@ Timer {
             console.log("PopupOpener has no contentItem. Each created WebView/WebPage",
                         "instance can have own PopupOpener. Add missing binding.")
         }
+    }
+
+    function _resolveListenerComponent(topic, subtopic) {
+        var comp = null
+        var providerProperty = _messageTopicToPopupProviderPropertyMapping[topic]
+        if (providerProperty === null || providerProperty === undefined) {
+            console.log("No Popup registered for unknown message type: " + topic)
+        } else if (subtopic !== null && subtopic !== undefined && subtopic.length > 0
+                && providerProperty[subtopic] !== null && providerProperty[subtopic] !== undefined) {
+            providerProperty = providerProperty[subtopic]
+        }
+
+        if (providerProperty !== null && providerProperty !== undefined) {
+            var resolvedProperty = popupProvider[providerProperty]
+            if (resolvedProperty !== null
+                    && resolvedProperty !== undefined) {
+                if (typeof resolvedProperty === 'string'
+                        || resolvedProperty instanceof String) {
+                    // specified as a component URL
+                    comp = resolvedProperty
+                } else if (!resolvedProperty.hasOwnProperty("component")) {
+                    // specified as an inline component
+                    comp = resolvedProperty
+                } else {
+                    // specified as a dictionary with type+component fields
+                    comp = resolvedProperty["component"]
+                }
+            }
+
+            // the default components are specified as URLs
+            // so that they can be compiled lazily.
+            if (typeof comp === 'string' || comp instanceof String) {
+                comp = Qt.resolvedUrl(comp)
+            }
+        }
+
+        return comp
+    }
+
+    function _resolveListenerComponentType(topic, subtopic) {
+        var compType = null
+        var providerProperty = _messageTopicToPopupProviderPropertyMapping[topic]
+        if (providerProperty === null || providerProperty === undefined) {
+            console.log("No Popup registered for unknown message type: " + topic)
+        } else if (subtopic !== null && subtopic !== undefined && subtopic.length > 0
+                && providerProperty[subtopic] !== null && providerProperty[subtopic] !== undefined) {
+            providerProperty = providerProperty[subtopic]
+        }
+
+        if (providerProperty !== null && providerProperty !== undefined) {
+            var resolvedProperty = popupProvider[providerProperty]
+            if (resolvedProperty !== null
+                    && resolvedProperty !== undefined) {
+                if (typeof resolvedProperty === 'string'
+                        || resolvedProperty instanceof String) {
+                    // specified as a component URL, assume item-derived
+                    compType = "item"
+                } else if (!resolvedProperty.hasOwnProperty("component")) {
+                    // specified as an inline component, assume item-derived
+                    compType = "item"
+                } else {
+                    // specified as a dictionary with type+component fields
+                    compType = resolvedProperty["type"]
+                }
+            }
+
+            // if no value, assume normal Item type
+            if (compType === undefined || compType === null) {
+                compType = "item"
+            }
+        }
+
+        return compType
     }
 }

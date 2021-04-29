@@ -1,6 +1,7 @@
 module Sailfish.WebView.Popups
 plugin sailfishwebviewpopupsplugin
 singleton LocationSettings 1.0 LocationSettings.qml
+PopupProvider 1.0 PopupProvider.qml
 UserPromptInterface 1.0 UserPromptInterface.qml
 AlertPopupInterface 1.0 AlertPopupInterface.qml
 AuthPopupInterface 1.0 AuthPopupInterface.qml
