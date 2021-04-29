@@ -1,0 +1,51 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype LocationPopupInterface
+  \inqmlmodule Sailfish.WebView.Popups
+  \ingroup sailfishos-webview-popups
+  \brief A component which defines the interface for the location permission popup
+
+  The \c{LocationPopupInterface} QML type is exposed through the
+  \c{Sailfish.WebView.Popups} QML import namespace.
+
+  Clients who use a \l{WebView} in their application may wish to
+  customize the appearance or behavior of the location permission popup
+  in their application.
+
+  To do so, their implementation must extend the \c{LocationPopupInterface},
+  which itself extends the \l{UserPromptInterface}, and then they must
+  tell the \l{WebView} to use their implementation via the \c{popupComponents}
+  property.
+
+  \sa UserPromptInterface, custompopups
+*/
+
+/*!
+  \qmlproperty string LocationPopupInterface::host
+  \brief The name of the site which is asking for permission to access the
+         user's location
+
+  A custom implementation should bind the \c{text} property
+  of their geolocation permission information text label to the value of this
+  property.
+
+  This label will describe to the user which site is asking them for
+  permission to see their location, allowing the user to make an informed
+  acceptance or rejection decision.
+*/
+
+/*!
+  \qmlproperty bool LocationPopupInterface::rememberValue
+  \brief Whether the acceptance or rejection should be remembered for this
+         site, in case it asks for location permission again in the future
+
+  A custom implementation should bind this property to the \c{checked}
+  property of their "remember for this site" toggle switch.
+
+  It is an output property, whose value is read by the web view.
+*/

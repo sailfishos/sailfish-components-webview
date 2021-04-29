@@ -28,4 +28,11 @@ This module includes the following types:
 \generatelist{qmltypesbymodule Sailfish.WebEngine}
 */
 
+/*!
+\qmlmodule Sailfish.WebView.Popups 1.0
+\title Sailfish.WebView.Popups QML Types
+This module includes the following types:
+\generatelist{qmltypesbymodule Sailfish.WebView.Popups}
+*/
+
 using namespace SailfishOS::WebView;

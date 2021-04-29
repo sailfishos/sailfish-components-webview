@@ -1,0 +1,79 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype ContextMenuInterface
+  \inqmlmodule Sailfish.WebView.Popups
+  \ingroup sailfishos-webview-popups
+  \brief A component which defines the interface for context menu popups
+
+  The \c{ContextMenuInterface} QML type is exposed through the
+  \c{Sailfish.WebView.Popups} QML import namespace.
+
+  Clients who use a \l{WebView} in their application may wish to
+  customize the appearance or behavior of the context menu in their
+  application.
+
+  To do so, their implementation must extend the \c{ContextMenuInterface},
+  and then they must tell the \l{WebView} to use their implementation via
+  the \c{popupComponents} property.
+
+  \sa custompopups
+*/
+
+/*!
+  \qmlproperty string ContextMenuInterface::linkHref
+  \brief The URI of the link which the user long-pressed to trigger the
+         context menu popup
+*/
+
+/*!
+  \qmlproperty string ContextMenuInterface::linkTitle
+  \brief The title of the link which the user long-pressed to trigger the
+         context menu popup
+*/
+
+/*!
+  \qmlproperty string ContextMenuInterface::linkProtocol
+  \brief The protocol of the link which the user long-pressed to trigger the
+         context menu popup
+*/
+
+/*!
+  \qmlproperty string ContextMenuInterface::imageSrc
+  \brief The source URI of the image which the user long-pressed to trigger
+         the context menu popup
+*/
+
+/*!
+  \qmlproperty string ContextMenuInterface::contentType
+  \brief The mime type of the resource which the user long-pressed to trigger
+         the context menu popup
+*/
+
+/*!
+  \qmlproperty bool ContextMenuInterface::downloadsEnabled
+  \brief Whether the user should be given the option to download the resource
+         to their device (e.g. if they long-pressed an image)
+*/
+
+/*!
+  \internal
+  \qmlproperty int ContextMenuInterface::viewId
+  \brief An internal implementation detail
+*/
+
+/*!
+  \internal
+  \qmlproperty PageStack ContextMenuInterface::pageStack
+  \brief An internal implementation detail
+*/
+
+/*!
+  \internal
+  \qmlproperty QtObject ContextMenuInterface::tabModel
+  \brief An internal implementation detail
+*/

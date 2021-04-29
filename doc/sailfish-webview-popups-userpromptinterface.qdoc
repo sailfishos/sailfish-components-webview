@@ -1,0 +1,124 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype UserPromptInterface
+  \inqmlmodule Sailfish.WebView.Popups
+  \ingroup sailfishos-webview-popups
+  \brief A component which defines the base interface for all user interaction popups
+
+  The \c{UserPromptInterface} QML type is exposed through the
+  \c{Sailfish.WebView.Popups} QML import namespace.
+
+  Clients do not need to extend this type directly, but instead should extend
+  one of the interaction-type specific interface types.
+
+  \sa custompopups
+*/
+
+/*!
+  \qmlproperty string UserPromptInterface::title
+  \brief The text to display as the title of the prompt
+
+  A custom implementation should bind the \c{text} property
+  of their header or title label to the value of this property.
+*/
+
+/*!
+  \qmlproperty string UserPromptInterface::acceptText
+  \brief The text to display for the acceptance action, if applicable
+
+  For example, in a confirmation popup with "allow" and "deny" options,
+  the acceptText should be shown as the label on the "allow" button.
+
+  That is, a custom implementation should bind the \c{text} property
+  of their "allow" button to the value of this property.
+
+  If the web view does not provide a value for this property, the custom
+  implementation must provide its own as appropriate (e.g. a translated
+  string such as "OK" or "Allow" or "Accept").
+*/
+
+/*!
+  \qmlproperty string UserPromptInterface::cancelText
+  \brief The text to display for the rejection action, if applicable
+
+  For example, in a confirmation popup with "allow" and "deny" options,
+  the cancelText should be shown as the label on the "deny" button.
+
+  That is, a custom implementation should bind the \c{text} property
+  of their "deny" button to the value of this property.
+
+  If the web view does not provide a value for this property, the custom
+  implementation must provide its own as appropriate (e.g. a translated
+  string such as "Cancel" or "Deny" or "Reject").
+
+  Note that some popup types (e.g. Alert popups) may not have any
+  rejection action, as only the accept action may be necessary, in which
+  case this property may not be required.
+*/
+
+/*!
+  \qmlproperty bool UserPromptInterface::preventDialogsVisible
+  \brief Whether the prompt should include a toggle switch allowing
+         the user to prevent this site from showing popups in future
+
+  A custom implementation should bind the \c{visible} property
+  of their toggle switch to the value of this property.
+*/
+
+/*!
+  \qmlproperty bool UserPromptInterface::preventDialogsPrefillValue
+  \brief Whether the toggle switch shown in the prompt which allows
+         the user to prevent this site from showing popups in future
+         should be prefilled to the value true or false
+
+  A custom implementation should bind the \c{checked} property
+  of their toggle switch to the value of this property.
+*/
+
+/*!
+  \qmlproperty bool UserPromptInterface::preventDialogsValue
+  \brief The output value which is read by the popups opener,
+         telling it whether the user wanted to prevent the site
+         from opening further popups of this type in future
+
+  A custom implementation should bind this property to the
+  \c{checked} property of their toggle switch.
+
+  It is an output property, whose value is read by the web view.
+*/
+
+/*!
+  \qmlsignal UserPromptInterface::accepted()
+  \brief This signal is emitted by the popup if the user accepts the prompt
+
+  If the custom implementation provides an acceptance action (e.g. a button
+  or navigation action which the user can trigger to allow the site to
+  access the data, or confirm the action) it must emit this signal when
+  the user triggers that action.
+
+  After emitting this signal, the popup should perform an appropriate
+  transition to make itself invisible and non-interactable (e.g. for an
+  item-derived popup, an animated opacity transition, and then setting
+  \c{visible} to \c{false} once the animation is complete).
+*/
+
+/*!
+  \qmlsignal UserPromptInterface::rejected()
+  \brief This signal is emitted by the popup if the user rejects the prompt
+
+  If the custom implementation provides a rejection action (e.g. a button
+  or navigation action which the user can trigger to disallow the site to
+  access the data, or deny the action) it must emit this signal when
+  the user triggers that action.
+
+  After emitting this signal, the popup should perform an appropriate
+  transition to make itself invisible and non-interactable (e.g. for an
+  item-derived popup, an animated opacity transition, and then setting
+  \c{visible} to \c{false} once the animation is complete).
+*/
+

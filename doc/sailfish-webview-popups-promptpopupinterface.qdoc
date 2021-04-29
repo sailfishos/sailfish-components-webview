@@ -1,0 +1,52 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype PromptPopupInterface
+  \inqmlmodule Sailfish.WebView.Popups
+  \ingroup sailfishos-webview-popups
+  \brief A component which defines the interface for the input prompt popup
+
+  The \c{PromptPopupInterface} QML type is exposed through the
+  \c{Sailfish.WebView.Popups} QML import namespace.
+
+  Clients who use a \l{WebView} in their application may wish to
+  customize the appearance or behavior of the input prompt popup in their
+  application.
+
+  To do so, their implementation must extend the \c{PromptPopupInterface},
+  which itself extends the \l{UserPromptInterface}, and then they must
+  tell the \l{WebView} to use their implementation via the \c{popupComponents}
+  property.
+
+  \sa UserPromptInterface, custompopups
+*/
+
+/*!
+  \qmlproperty string PromptPopupInterface::text
+  \brief The text to display as the prompt information message
+
+  A custom implementation should bind the \c{text} property
+  of their prompt information text label to the value of this property.
+
+  This label will describe to the user what the site is asking them to
+  enter information for, allowing the user to provide the appropriate
+  information and make an informed acceptance or rejection decision.
+*/
+
+/*!
+  \qmlproperty string PromptPopupInterface::value
+  \brief The text value which the user provided via the prompt popup
+
+  A custom implementation should bind this property to the \c{text}
+  property of their \c{TextField} (or to the appropriate property of
+  whatever input element is being used by the custom implementation to
+  allow the user to provide data).
+
+  It is an output property, whose value is read by the web view.
+*/
+
+

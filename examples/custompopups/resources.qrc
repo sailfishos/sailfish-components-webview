@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>CustomAlertPopup.qml</file>
+        <file>CustomAuthPopup.qml</file>
+        <file>CustomConfirmPopup.qml</file>
+        <file>CustomLocationPopup.qml</file>
+        <file>CustomPasswordManagerPopup.qml</file>
+        <file>CustomPromptPopup.qml</file>
+    </qresource>
+</RCC>
