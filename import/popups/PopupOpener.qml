@@ -42,6 +42,9 @@ Timer {
         anchor: Notice.Center
     }
 
+    property var data
+    property var topic
+
     signal aboutToOpenContextMenu(var data)
 
     function getCheckbox(data) {
@@ -78,79 +81,47 @@ Timer {
         var winId = data.winId
         switch (topic) {
         case "embed:alert": {
-            var obj = pageStack.animatorPush(Qt.resolvedUrl("AlertDialog.qml"), {
-                                                 "text": data.text,
-                                                 "checkbox": getCheckbox(data)
-                                             })
-            obj.pageCompleted.connect(function(dialog) {
-                // TODO: also the Async message must be sent when window gets closed
-                dialog.done.connect(function() {
-                    contentItem.sendAsyncMessage("alertresponse", {
-                                                     "winId": winId,
-                                                     "checkvalue": dialog.checkboxValue
-                                                 })
-                })
-            })
+            if (pageStack.busy) {
+                // Wait until pagestack ready
+                root.data = data
+                root.topic = topic;
+                pageStack.busyChanged.connect(busyChanged)
+            } else {
+                alert(data)
+            }
             break
         }
         case "embed:confirm": {
-            var obj = pageStack.animatorPush(Qt.resolvedUrl("ConfirmDialog.qml"), {
-                                                 "text": data.text,
-                                                 "checkbox": getCheckbox(data)
-                                             })
-            obj.pageCompleted.connect(function(dialog) {
-                // TODO: also the Async message must be sent when window gets closed
-                dialog.accepted.connect(function() {
-                    contentItem.sendAsyncMessage("confirmresponse",
-                                                 {
-                                                     "winId": winId,
-                                                     "accepted": true,
-                                                     "checkvalue": dialog.checkboxValue
-                                                 })
-                })
-                dialog.rejected.connect(function() {
-                    contentItem.sendAsyncMessage("confirmresponse",
-                                                 {
-                                                     "winId": winId,
-                                                     "accepted": false,
-                                                     "checkvalue": dialog.checkboxValue
-                                                 })
-                })
-            })
+            if (pageStack.busy) {
+                // Wait until pagestack ready
+                root.data = data
+                root.topic = topic;
+                pageStack.busyChanged.connect(busyChanged)
+            } else {
+                confirm(data)
+            }
             break
         }
         case "embed:prompt": {
-            var obj = pageStack.animatorPush(Qt.resolvedUrl("PromptDialog.qml"), {
-                                                 "text": data.text,
-                                                 "value": data.defaultValue,
-                                                 "checkbox": getCheckbox(data)
-                                             })
-            obj.pageCompleted.connect(function(dialog) {
-                // TODO: also the Async message must be sent when window gets closed
-                dialog.accepted.connect(function() {
-                    contentItem.sendAsyncMessage("promptresponse",
-                                                 {
-                                                     "winId": winId,
-                                                     "accepted": true,
-                                                     "promptvalue": dialog.value,
-                                                     "checkvalue": dialog.checkboxValue
-                                                 })
-                })
-                dialog.rejected.connect(function() {
-                    contentItem.sendAsyncMessage("promptresponse",
-                                                 {
-                                                     "winId": winId,
-                                                     "accepted": false,
-                                                     "checkvalue": dialog.checkboxValue
-                                                 })
-                })
-            })
+            if (pageStack.busy) {
+                // Wait until pagestack ready
+                root.data = data
+                root.topic = topic;
+                pageStack.busyChanged.connect(busyChanged)
+            } else {
+                prompt(data)
+            }
             break
         }
         case "embed:login": {
-            var obj = pageStack.animatorPush(Qt.resolvedUrl("PasswordManagerDialog.qml"),
-                                    { "contentItem": contentItem, "requestId": data.id,
-                                      "notificationType": data.name, "formData": data.formdata })
+            if (pageStack.busy) {
+                // Wait until pagestack ready
+                root.data = data
+                root.topic = topic;
+                pageStack.busyChanged.connect(busyChanged)
+            } else {
+                login(data)
+            }
             break
         }
         case "embed:auth": {
@@ -159,20 +130,14 @@ Timer {
         }
         case "embed:permissions": {
             if (data.title === "geolocation") {
-                var obj = pageStack.animatorPush(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
-                obj.pageCompleted.connect(function(dialog) {
-                    dialog.accepted.connect(function() {
-                        contentItem.sendAsyncMessage("embedui:permissions",
-                                                     { "allow": true, "checkedDontAsk": dialog.rememberValue, "id": data.id })
-                        if (!Popups.LocationSettings.locationEnabled) {
-                            positioningDisabledNotice.show()
-                        }
-                    })
-                    dialog.rejected.connect(function() {
-                        contentItem.sendAsyncMessage("embedui:permissions",
-                                                     { "allow": false, "checkedDontAsk": dialog.rememberValue, "id": data.id })
-                    })
-                })
+                if (pageStack.busy) {
+                    // Wait until pagestack ready
+                    root.data = data
+                    root.topic = topic;
+                    pageStack.busyChanged.connect(busyChanged)
+                } else {
+                    permissions(data)
+                }
             } else {
                 // Currently we don't support other permission requests.
                 sendAsyncMessage("embedui:permissions",
@@ -187,6 +152,127 @@ Timer {
         }
         // If we end up here, message has been handled.
         return true
+    }
+
+    // Open alert dialog
+    function alert(data) {
+        var obj = pageStack.animatorPush(Qt.resolvedUrl("AlertDialog.qml"), {
+            "text": data.text,
+            "checkbox": getCheckbox(data)
+        })
+        obj.pageCompleted.connect(function(dialog) {
+            // TODO: also the Async message must be sent when window gets closed
+            dialog.done.connect(function() {
+                contentItem.sendAsyncMessage("alertresponse", {
+                    "winId": data.winId,
+                    "checkvalue": dialog.checkboxValue
+                })
+            })
+        })
+    }
+
+    // Open confirm dialog
+    function confirm(data) {
+        var obj = pageStack.animatorPush(Qt.resolvedUrl("ConfirmDialog.qml"), {
+            "text": data.text,
+            "checkbox": getCheckbox(data)
+        })
+        obj.pageCompleted.connect(function(dialog) {
+            // TODO: also the Async message must be sent when window gets closed
+            dialog.accepted.connect(function() {
+                contentItem.sendAsyncMessage("confirmresponse", {
+                    "winId": data.winId,
+                    "accepted": true,
+                    "checkvalue": dialog.checkboxValue
+                })
+            })
+            dialog.rejected.connect(function() {
+                contentItem.sendAsyncMessage("confirmresponse", {
+                    "winId": data.winId,
+                    "accepted": false,
+                    "checkvalue": dialog.checkboxValue
+                })
+            })
+        })
+    }
+
+    // Open prompt dialog
+    function prompt(data) {
+        var obj = pageStack.animatorPush(Qt.resolvedUrl("PromptDialog.qml"), {
+            "text": data.text,
+            "value": data.defaultValue,
+            "checkbox": getCheckbox(data)
+        })
+        obj.pageCompleted.connect(function(dialog) {
+            // TODO: also the Async message must be sent when window gets closed
+            dialog.accepted.connect(function() {
+                contentItem.sendAsyncMessage("promptresponse", {
+                    "winId": data.winId,
+                    "accepted": true,
+                    "promptvalue": dialog.value,
+                    "checkvalue": dialog.checkboxValue
+                })
+            })
+            dialog.rejected.connect(function() {
+                contentItem.sendAsyncMessage("promptresponse", {
+                    "winId": data.winId,
+                    "accepted": false,
+                    "checkvalue": dialog.checkboxValue
+                })
+            })
+        })
+    }
+
+    // Open login dialog
+    function login(data) {
+        pageStack.animatorPush(Qt.resolvedUrl("PasswordManagerDialog.qml"), {
+            "contentItem": contentItem, "requestId": data.id,
+            "notificationType": data.name, "formData": data.formdata
+        })
+    }
+
+    // Open permissions dialog
+    function permissions(data) {
+        var obj = pageStack.animatorPush(Qt.resolvedUrl("LocationDialog.qml"), {"host": data.host })
+        obj.pageCompleted.connect(function(dialog) {
+            dialog.accepted.connect(function() {
+                contentItem.sendAsyncMessage("embedui:permissions", {
+                    "allow": true, "checkedDontAsk": dialog.rememberValue, "id": data.id
+                })
+                if (!Popups.LocationSettings.locationEnabled) {
+                    positioningDisabledNotice.show()
+                }
+            })
+            dialog.rejected.connect(function() {
+                contentItem.sendAsyncMessage("embedui:permissions", {
+                    "allow": false, "checkedDontAsk": dialog.rememberValue, "id": data.id
+                })
+            })
+        })
+    }
+
+    // Handle pagestack busy change
+    function busyChanged() {
+        if (!pageStack.busy && root.data && root.topic) {
+            pageStack.busyChanged.disconnect(busyChanged)
+            switch (root.topic) {
+            case "embed:alert":
+                alert(root.data)
+                break
+            case "embed:confirm":
+                confirm(root.data)
+                break
+            case "embed:prompt":
+                prompt(root.data)
+                break
+            case "embed:login":
+                login(root.data)
+                break
+            case "embed:permissions":
+                permissions(root.data)
+                break
+            }
+        }
     }
 
     function handlesMessage(topic) {
