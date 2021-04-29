@@ -22,4 +22,7 @@ Item {
 
     // output
     property bool preventDialogsValue
+
+    signal accepted
+    signal rejected
 }

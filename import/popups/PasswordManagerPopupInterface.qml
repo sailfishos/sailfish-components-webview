@@ -18,4 +18,8 @@ Item {
 
     // internal, don't touch this.
     property var _internalData // contentItem and requestId
+
+    // outputs
+    signal accepted
+    signal rejected
 }

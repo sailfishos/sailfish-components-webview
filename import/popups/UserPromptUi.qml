@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2013-2016 Jolla Ltd.
-** Contact: Raine Makelainen <raine.makelainen@jollamobile.com>
+** Copyright (c) 2013 - 2020 Jolla Ltd.
+** Copyright (c) 2021 Open Mobile Platform LLC.
 **
 ****************************************************************************/
 
@@ -12,14 +12,12 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-Dialog {
-    id: dialog
-    property alias acceptText: header.acceptText
-    property alias cancelText: header.cancelText
-    property alias title: header.title
+Item {
+    id: root
 
-    property var checkbox
-    property alias checkboxValue: preventDialogs.checked
+    // inputs
+    property Dialog dialog
+    property UserPromptInterface popupInterface
 
     default property alias defaultContent: promptContent.children
 
@@ -35,6 +33,9 @@ Dialog {
                 id: header
                 dialog: dialog
                 _glassOnly: true
+                acceptText: popupInterface.acceptText
+                cancelText: popupInterface.cancelText
+                title: popupInterface.title
             }
 
             Item {
@@ -51,8 +52,9 @@ Dialog {
                 id: preventDialogs
 
                 height: visible ? implicitHeight : 0
-                visible: dialog.checkbox || false
-                checked: dialog.checkbox && dialog.checkbox.checked || false
+                visible: popupInterface.preventDialogsVisible
+                checked: popupInterface.preventDialogsVisible && popupInterface.preventDialogsPrefillValue
+                onCheckedChanged: popupInterface.preventDialogsValue = checked
 
                 //% "Prevent this page to create additional dialogs"
                 text: qsTrId("sailfish_components_webview_popups-prevent_additional_dialogs")

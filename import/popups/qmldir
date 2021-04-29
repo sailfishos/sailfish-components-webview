@@ -9,7 +9,8 @@ LocationPopupInterface 1.0 LocationPopupInterface.qml
 PasswordManagerPopupInterface 1.0 PasswordManagerPopupInterface.qml
 PromptPopupInterface 1.0 PromptPopupInterface.qml
 ContextMenuInterface 1.0 ContextMenuInterface.qml
-UserPrompt 1.0 UserPrompt.qml
+UserPromptUi 1.0 UserPromptUi.qml
+UserPromptDialog 1.0 UserPromptDialog.qml
 AlertDialog 1.0 AlertDialog.qml
 AuthDialog 1.0 AuthDialog.qml
 ConfirmDialog 1.0 ConfirmDialog.qml

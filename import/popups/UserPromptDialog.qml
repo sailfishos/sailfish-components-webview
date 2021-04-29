@@ -15,11 +15,6 @@ import Sailfish.Silica 1.0
 Dialog {
     id: dialog
 
-    canAccept: input.text.length > 0
-
-    property alias text: prompt.text
-    property alias value: prompt.value
-
     property alias acceptText: prompt.acceptText
     property alias cancelText: prompt.cancelText
     property alias title: prompt.title
@@ -27,36 +22,14 @@ Dialog {
     property alias preventDialogsPrefillValue: prompt.preventDialogsPrefillValue
     property alias preventDialogsValue: prompt.preventDialogsValue
 
-    PromptPopupInterface {
+    UserPromptInterface {
         id: prompt
-
         anchors.fill: parent
-        value: input.text
-
-        //: Text on the Accept dialog button that accepts browser's prompt() messages
-        //% "Ok"
-        acceptText: qsTrId("sailfish_components_webview_popups-he-accept_prompt")
-
-        onAccepted: dialog.accept()
 
         UserPromptUi {
             anchors.fill: parent
             dialog: dialog
             popupInterface: prompt
-
-            TextField {
-                id: input
-
-                anchors.centerIn: parent
-                width: parent.width
-                focus: true
-                label: text.length > 0 ? prompt.text : ""
-                placeholderText: prompt.text
-                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
-                EnterKey.enabled: text.length > 0
-                EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                EnterKey.onClicked: prompt.accepted()
-            }
         }
     }
 }
