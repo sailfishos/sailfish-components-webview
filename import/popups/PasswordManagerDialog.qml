@@ -21,12 +21,15 @@ Dialog {
     property string notificationType
     property variant formData
 
+    signal loginSaved
+
     onAccepted: {
         contentItem.sendAsyncMessage("embedui:login",
                                    {
                                        "buttonidx": 0, // "Yes" button
                                        "id": requestId
                                    })
+        loginSaved()
     }
 
     onRejected: {
