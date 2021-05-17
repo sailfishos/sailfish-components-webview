@@ -1,0 +1,324 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+    \qmltype WebEngine
+    \inherits Item
+    \inqmlmodule Sailfish.WebEngine
+    \ingroup sailfishos-webview
+    \brief Provides access to the web engine context.
+
+    The \c{WebEngine} component is a singleton which provides access to the web
+    engine context.
+
+    The \c{WebEngine} QML type is exposed through the \c{Sailfish.WebEngine} QML
+    import namespace.
+
+    Example of use:
+
+    \qml
+        import QtQuick 2.0
+        import Sailfish.Silica 1.0
+        import Sailfish.WebView 1.0
+        import Sailfish.WebEngine 1.0
+
+        ApplicationWindow {
+            id: root
+            initialPage: Component {
+                WebViewPage {
+                    WebView {
+                        anchors.fill: parent
+                        url: "http://www.sailfishos.org"
+                    }
+
+                    Component.onCompleted: {
+                        WebEngine.addObserver("clipboard:setdata")
+                        WebEngine.onRecvObserve.connect(function(message, data) {
+                            if (message == "clipboard:setdata" && !data.private) {
+                                console.log("Clipboard contents: " + data.data);
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    \endqml
+
+    \sa WebView
+*/
+
+/*!
+    \readonly
+    \qmlproperty bool WebEngine::initialized
+    \brief Returns true if the component has been initialized, false otherwise.
+*/
+
+/*!
+    \qmlmethod WebEngine::addComponentManifest(manifestPath)
+    \brief Register JavaScript chrome components to be loaded into the WebEngine.
+
+    The sailfish WebEngine has three main layers. The top layer is exposed as
+    QML components with a developer-facing interface. The lowest level is the
+    native Gecko rendering engine.
+
+    Between the two sits a JavaScript chrome layer that can communicate with
+    either of the other layers using an observer/notification pattern. These
+    JavaScript components are considered privileged code and run with the
+    \l {https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Script_security#security_principals}{system principal}.
+
+    This call allows new JavaScript components to be added and executed as part
+    of this intermediary layer.
+
+    The \a manifestPath should be an absolute path pointing to a manifest file.
+    The manifest file should contain references to components in the same folder,
+    as shown in the following example. The example is comprised of three files:
+    a QML user interface file that calls \c addComponentManifest, the manifest
+    file and a component referenced in the manifest.
+
+    The WebEngine \b page.qml file calls \c addComponentManifest.
+
+    \qml
+        import QtQuick 2.1
+        import Sailfish.Silica 1.0
+        import Sailfish.Browser 1.0
+        import Sailfish.WebEngine 1.0
+
+        ApplicationWindow {
+            id: root
+            initialPage: Component {
+                WebViewPage {
+                    WebView {
+                        anchors.fill: parent
+                        url: "http://www.sailfishos.org"
+                        onLinkClicked: {
+                            WebEngine.notifyObservers("exampleTopic", url)
+                        }
+                    }
+
+                    Component.onCompleted: {
+                        WebEngine.addComponentManifest("/path/file.manifest")
+                    }
+                }
+            }
+        }
+    \endqml
+
+    The \b manifest file at /path/file.manifest
+
+    \code
+        component {20227a22-1722-4753-b8f6-c842b401b4c3} ExampleComponent.js
+        contract @mozilla.org/embedlite-example-component;1 {20227a22-1722-4753-b8f6-c842b401b4c3}
+        category app-startup ExampleComponent service,@mozilla.org/embedlite-example-component;1
+    \endcode
+
+    The JavaScript chrome \b component referenced in the manifest and stored
+    at /path/ExampleComponent.js
+
+    \code
+        const Ci = Components.interfaces;
+        const Cu = Components.utils;
+
+        Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+        Cu.import("resource://gre/modules/Services.jsm");
+
+        XPCOMUtils.defineLazyServiceGetter(Services, "embedlite",
+                                            "@mozilla.org/embedlite-app-service;1",
+                                            "nsIEmbedAppService");
+
+        Services.scriptloader.loadSubScript("chrome://embedlite/content/Logger.js");
+
+        function ExampleComponent() {
+          Logger.debug("JSComp: ExampleComponent.js loaded");
+        }
+
+        ExampleComponent.prototype = {
+          classID: Components.ID("{20227a22-1722-4753-b8f6-c842b401b4c3}"),
+
+          QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver]),
+
+          observe: function(aSubject, aTopic, aData) {
+            switch (aTopic) {
+            case "app-startup":
+              Services.obs.addObserver(this, "exampleTopic", false);
+              break;
+            case "exampleTopic":
+              Logger.debug("ExampleComponent: exapleTopic data: " + aData);
+              break;
+            }
+          },
+        };
+
+        this.NSGetFactory = XPCOMUtils.generateNSGetFactory([ExampleComponent]);
+    \endcode
+*/
+
+/*!
+    \qmlmethod WebEngine::addObserver(aTopic)
+    \brief Registers the WebEngine for receiving notifications on a topic
+
+    The Gecko engine and EmbedLite components use notifications to transfer data
+    and information about events to other components. The \c addObserver method
+    allows the WebEngine to be registered as interested in the particular \a
+    aTopic so that it will start receiving notifications about them.
+
+    When WebEngine receives a notification on a registered \a aTopic it will emit
+    a \c recvObserve signal.
+
+    The Mozilla \l {https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIObserverService}{nsIObserver}
+    documentation provides details about the underlying processes.
+
+    There is also a non-exhaustive list of \l {https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Observer_Notifications}{observer notification topics}
+    that can be subscribed to.
+
+    \sa removeObserver, recvObserve, notifyObservers
+*/
+
+/*!
+    \qmlmethod WebEngine::removeObserver(aTopic)
+    \brief Unregisters the WebEngine from receiving notifications on a topic.
+
+    If a component which previously registered an interest in receiving
+    notifications on \a aTopic by calling \l addObserver is no longer interested
+    in receiving them, it can call \c removeObserver to indicate this.
+
+    Calling \c removeObserver does not guarantee that no more notifications on
+    the topic will be received, since other components may have registered an
+    interest with the \c WebEngine. The \c WebEngine will stop emitting signals
+    on the topic only once all interests have been deregistered.
+
+    \sa addObserver, recvObserve, notifyObservers
+*/
+
+/*!
+    \qmlmethod WebEngine::notifyObservers(topic, value)
+    \brief Sends a broadcast notification that can be observed by other components.
+
+    Sends a notification that will be picked up by any component that has
+    registered an observer for \a topic.
+
+    Additional data can be sent with the notification using the \a value
+    parameter in JSON format.
+
+    \sa addObserver, recvObserve
+*/
+
+/*!
+    \internal
+    \qmlmethod WebEngine::runEmbedding(aDelay)
+    \brief Starts the engine event loop.
+
+    When WebEngine is instantiated as a QML component this is called
+    automatically during initialization.
+
+    The \a aDelay allows for an asynchronous startup. Calling without the
+    \a aDelay parameter specified will cause execution to happen on the nested
+    main loop, which will block until \l stopEmbedding is called.
+
+    Useful when rolling your own initialization, but that can only be done from
+    C++ code.
+
+    \sa stopEmbedding, setProfile
+*/
+
+/*!
+    \internal
+    \qmlmethod WebEngine::stopEmbedding()
+    \brief Stops the engine event loop.
+
+    Causes execution of the WebEngine to halt. If \l runEmbedding was called
+    without an \a aDelay parameter, this will cause the \l runEmbedding call to
+    unblock.
+
+    \sa runEmbedding, setProfile
+*/
+
+/*!
+    \internal
+    \qmlmethod WebEngine::notifyFirstUIInitialized()
+    \brief Sends the "final-ui-startup" notification to observers.
+
+    For internal use? I don't actually see it used anywhere.
+*/
+
+/*!
+    \internal
+    \qmlmethod WebEngine::setProfile(profilePath)
+    \brief Sets the location for the profile directory.
+
+    This is called during the startup process to set the location of profile
+    files storage (inside which the \c{.mozilla} directory will be created). By
+    default this is set to the cache location for the app
+    (\c{~/.cache/orgname/appname}) and should not be changed after
+    initialization.
+
+    Useful when rolling your own initialization, but that can only be done from
+    C++ code.
+
+    \sa runEmbedding, stopEmbedding
+*/
+
+/*!
+    \internal
+    \qmlmethod WebEngine::setViewCreator(viewCreator)
+    \brief Called automatically on WebView creation so that the engine can create views.
+
+    For internal use.
+
+    \sa setViewCreator
+*/
+
+/*!
+    \internal
+    \qmlmethod WebEngine::createView()
+    \brief Opens a new view that can contain web content.
+
+    For internal use.
+
+    \sa setViewCreator
+*/
+
+/*!
+    \qmlsignal WebEngine::recvObserve(message, data)
+    \brief This signal is emitted when a notification on an observed topic is received.
+
+    After an app has registered an interested in a particular topic by calling
+    \l addObserver, it can then connect to this signal to be notified about
+    any component sending a notification on the topic.
+
+    The \a message parameter will be the topic in question, the \a data parameter
+    will contain data sent by the sender in JSON format. The exact JSON structure
+    is at the sender's discretion.
+
+    \sa addObserver, notifyObservers
+*/
+
+
+/*!
+    \qmlsignal WebEngine::contextDestroyed()
+    \brief This signal is emitted after the embedding has been stopped and the
+           context is ready to be deleted.
+
+    This signal is emitted when the embedding has been stopped, just prior to
+    the WebEngine being deleted and the program exiting.
+*/
+
+/*!
+    \internal
+    \qmlsignal WebEngine::lastViewDestroyed()
+    \brief This signal is emitted when when the last view has been destroyed.
+
+    In practice it doesn't seem to be emitted anywhere.
+*/
+
+/*!
+    \internal
+    \qmlsignal WebEngine::lastWindowDestroyed()
+    \brief This signal is emitted when the last registered window has been destroyed.
+
+    This is used to delay execution of \l stopEmbedding until after the last
+    window has closed.
+*/
+

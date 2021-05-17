@@ -40,7 +40,7 @@
   \l{Sailfish WebView Additional Attributes}{additional attributes} or the
   \l{Sailfish WebView Experimental Attributes}{experimental attributes}.
 
-  \sa WebVewPage
+  \sa WebViewPage
 */
 
 /*!
@@ -184,7 +184,7 @@
 
 /*!
   \qmlmethod WebView::runJavaScript(string script, variant callback, variant errorCallback)
-  \brief Runs javascript snippet in the context of the loaded DOM document.
+  \brief Runs JavaScript snippet in the context of the loaded DOM document.
 
   When the \a script returns, \a callback with a single argument that is the return value is called. The
   \a callback argument is optional, if set to \c undefined (the default), the return value will be
