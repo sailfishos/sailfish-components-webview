@@ -99,6 +99,30 @@
 */
 
 /*!
+  \qmlmethod WebView::runJavaScript(string script, variant callback, variant errorCallback)
+  \brief Runs javascript snippet in the context of the loaded DOM document.
+
+  When the \a script returns, \a callback with a single argument that is the return value is called. The
+  \a callback argument is optional, if set to \c undefined (the default), the return value will be
+  discarded.
+  
+  If the function fails \a errorCallback is called with a single argument containing the error 
+  string. The \a errorCallback argument is optional, if set to \c undefined (the default), any 
+  errors are silently ignored.
+
+  \qml
+  runJavaScript("return document.title", function(result) { console.log("Document title is", result); });
+  \endqml
+
+  \note The \a script must have explicit \l {https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return}{return statement}.
+
+  \note Only basic data types are supported as \a script return values and
+  \l {https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function}{async function} or
+  \l {https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise}{Promise} are not supported
+  for the \a script.
+*/
+
+/*!
   \qmlproperty qreal WebView::virtualKeyboardMargin
   \brief Set the margin taken by the keyboard at the bottom of the page
 
@@ -122,4 +146,3 @@
   \qmlsignal WebView::openUrlInNewWindow()
   \brief This signal is emitted to indicate a request to open a new window.
 */
-
