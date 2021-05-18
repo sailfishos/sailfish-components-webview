@@ -12,5 +12,4 @@ OTHER_FILES += \
     $$PWD/sailfish-webview-webview.qdoc \
     $$PWD/sailfish-webview-webviewflickable.qdoc \
     $$PWD/sailfish-webview-webviewpage.qdoc \
-    $$PWD/sailfish-webview-rawwebview.qdoc \
     $$PWD/index.qdoc

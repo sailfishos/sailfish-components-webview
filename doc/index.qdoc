@@ -44,7 +44,6 @@ The QML types exposed in the QML API are as follows:
 \li \l{WebView}
 \li \l{WebViewFlickable}
 \li \l{WebViewPage}
-\li \l{RawWebView}
 \endlist
 
 \section1 Example
