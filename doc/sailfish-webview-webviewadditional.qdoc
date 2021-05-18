@@ -1,0 +1,338 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+\page webview-additional.html
+\title Sailfish WebView Additional Attributes
+
+Each one of the properties, signals, and methods provided by Sailfish WebView
+falls into one of the three following categories:
+\list
+\li Stable attributes, as per the WebView type documentation
+\li \l{Sailfish WebView Additional Attributes}{Additional attributes}
+\li \l{Sailfish WebView Experimental Attributes}{Experimental attributes}
+\endlist
+
+This page documents the additional attributes of the Sailfish WebView.
+These additional attributes are unlikely to be used by the majority of
+application developers, however for some use cases they are likely to be
+useful.
+
+These additional attributes should be largely stable, however we reserve the
+right to modify or remove any of these attributes in future versions of the
+\c{Sailfish.WebView} import if required.
+
+\section1 Properties
+
+\section2 WebView::webViewPage
+
+\l{WebViewPage}-type property.
+
+The \l{WebViewPage} the \l{WebView} is embedded in.
+
+This will be populated automatically unless explicitly set.
+
+\section2 WebView::canShowSelectionMarkers
+
+\c{bool}-type property.
+
+Display markers when the user selects text on a page.
+
+If \c{true} the user will be able to select text and items on a page,
+indicated with handles. Set to \c{false} to disable the selection markers.
+
+The default is \c{true}.
+
+\section2 WebView::textSelectionActive
+
+\c{bool}-type read-only property.
+
+Indicates that text is currently being selected by the user.
+
+This read only property will be set to \c{true} if the user is currently
+selecting text on the page, or \c{false} otherwise.
+
+While text selection is active, the text selection controller will be
+receiving touch events (e.g. allowing the selection markers to be dragged)
+before the web view itself.
+
+\section2 WebView::textSelectionController
+
+\l{Item}-type property.
+
+The item which handles text selection gestures.
+
+If the client application doesn't explicitly provide a text selection
+controller, a default TextSelectionController from Sailfish.WebView.Controls
+will be constructed and used when required.
+
+Any text selection controller provided by the client must conform
+to the required API.  See the documentation for \c{Sailfish.WebView.Controls}
+for more information.
+
+\section2 WebView::downloadsEnabled
+
+\c{bool}-type property.
+
+Whether downloads are enabled within the webview.
+
+If downloads are enabled, long-press context menus will include options to
+save the link or image to the device, when appropriate.
+
+\section2 WebView::virtualKeyboardMargin
+
+\c{real}-type property.
+
+The margin taken by the keyboard at the bottom of the page.
+
+When using a \l{WebView} this property will be set automatically when the
+keyboard is opened or closed, and as such, most developers will never need
+to change the default behavior by setting this property manually.
+
+In some special cases, if the application developer wishes to control
+precisely how web content should be arranged to compensate for the open
+keyboard (e.g. by allowing the keyboard to overlap the web content to some
+extent, for some reason), they can set this value manually.
+
+\section2 WebView::orientation
+
+\c{Qt::ScreenOrientation}-type property.
+
+The orientation of the webview.
+
+Ordinarily, the value of this property will follow the orientation of the
+(Silica) Page in which the web view is shown.
+
+\section2 WebView::viewportWidth
+
+\c{real}-type property.
+
+The width of the webview viewport, in device pixels.
+
+Note that the viewport width will usually be the same as the width of the
+web view, but in some cases clients may wish to set the viewport width
+explicitly (e.g. to show some chrome at one edge or the other, without
+obscuring some content underneath, while keeping the geometry of the web view
+item itself unchanged).
+
+Device orientation should be considered when binding to this property.
+
+See also: \l{WebView::contentRect}, \l{WebView::orientation},
+\l{WebView::viewportHeight}
+
+\section2 WebView::viewportHeight
+
+\c{real}-type property.
+
+The height of the webview viewport, in device pixels, which by default is
+bound to the screen height (in portrait orientation) or width (in landscape
+orientation).
+
+Note that the viewport height will usually be the same as the height of the
+web view, but in some cases clients may wish to set the viewport height
+explicitly (e.g. to show some chrome at one edge or the other, without
+obscuring some content underneath, while keeping the geometry of the web view
+item itself unchanged).
+
+Device orientation should be considered when binding to this property.
+
+See also: \l{WebView::contentRect}, \l{WebView::orientation},
+\l{WebView::viewportWidth}
+
+\section2 WebView::atXBeginning
+
+\c{bool}-type read-only property.
+
+Whether the viewport of the webview is scrolled to the far-left of the content.
+
+Effectively, the value of this property will be true if the
+\l{WebView::scrollableOffset} x-value is approximately zero
+(due to floating-point number comparison semantics).
+
+See also: \l{WebView::atXEnd}, \l{WebView::scrollableOffset}
+
+\section2 WebView::atXEnd
+
+\c{bool}-type read-only property.
+
+Whether the viewport of the webview is scrolled to the far-right of the
+content.
+
+Effectively, the value of this property will be true if the
+\l{WebView::scrollableOffset} x-value plus the (\l{WebView::resolution} scaled)
+\l{WebView::contentRect} width is approximately equal to or greater than the
+\l{WebView::scrollableSize} width.
+
+See also: \l{WebView::atXBeginning}, \l{WebView::scrollableOffset},
+\l{WebView::scrollableSize}, \l{WebView::contentRect}
+
+\section2 WebView::atYBeginning
+
+\c{bool}-type read-only property.
+
+Whether the viewport of the webview is scrolled to the top of the content.
+
+Effectively, the value of this property will be true if the
+\l{WebView::scrollableOffset} y-value is approximately zero
+(due to floating-point number comparison semantics).
+
+See also: \l{WebView::atYEnd}, \l{WebView::scrollableOffset}
+
+\section2 WebView::atYEnd
+
+\c{bool}-type read-only property.
+
+Whether the viewport of the webview is scrolled to the bottom of the
+content.
+
+Effectively, the value of this property will be true if the
+\l{WebView::scrollableOffset} y-value plus the (\l{WebView::resolution} scaled)
+\l{WebView::contentRect} height is approximately equal to or greater than the
+\l{WebView::scrollableSize} height.
+
+See also: \l{WebView::atYBeginning}, \l{WebView::scrollableOffset},
+\l{WebView::scrollableSize}, \l{WebView::contentRect}
+
+\section2 WebView::dragging
+
+\c{bool}-type read-only property.
+
+Whether the user is currently dragging the scrollable area.
+
+Note that if the touch events are being consumed by the content
+(e.g. panning within a maps application, which causes loading
+new tiles), rather than the web view itself, this property will not be set.
+
+\section2 WebView::moving
+
+\c{bool}-type read-only property.
+
+Whether the scrollable area is currently moving due to
+inertia from a previous drag gesture.
+
+\section2 WebView::pinching
+
+\c{bool}-type read-only property.
+
+Whether the user is currently performing a pinch gesture
+in order to zoom the web view.
+
+Note that if the touch events are being consumed by the content
+(e.g. zooming within a maps application, which causes loading new
+higher-resolution tiles), rather than the web view itself,
+this property will not be set.
+
+\section2 WebView::chrome
+
+\c{bool}-type property.
+
+Whether the chrome (i.e. user interface elements for navigation) is visible.
+
+When using the web view component, no navigation chrome is shown.  If you want
+to mimic the behaviour of the chrome toolbar in the browser, then you can
+show or hide your custom navigation chrome elements according to the value of
+this property.
+
+By default, the chrome will be shown or hidden in response to certain
+gestures.  The client can override this behavior by setting the value
+manually.
+
+See also: \l{WebView::chromeGestureEnabled},
+\l{WebView::chromeGestureThreshold}
+
+\section2 WebView::chromeGestureEnabled
+
+\c{bool}-type property.
+
+Whether the gesture to show the navigation chrome is enabled.
+
+If true, chrome is set to false (hiding the navigation chrome) when a pan
+or flick gesture causes movement exceeding the \l{chromeGestureThreshold},
+and automatically set back to true when a similar gesture in the opposite
+direction is detected.
+
+See also: \l{WebView::chrome}, \l{WebView::chromeGestureThreshold}
+
+\section2 WebView::chromeGestureThreshold
+
+\c{real}-type property.
+
+The movement threshold for detecting a chrome gesture.
+
+See also: \l{WebView::chromeGestureEnabled}, \l{WebView::chrome}
+
+\section2 WebView::desktopMode
+
+\c{bool}-type property.
+
+Whether the web view will attempt to load the desktop version of the
+site rather than the mobile version.
+
+It depends on the web service whether the desktop mode can be served or not.
+
+\section2 WebView::backgroundColor
+
+\c{color}-type read-only property.
+
+The background color currently specified by the loaded page.
+
+\section1 Signals
+
+\section2 WebView::recvAsyncMessage(string message, variant data)
+
+Emitted if the async message is not handled by the built-in handler,
+and a message listener has been registered for the specified message.
+
+Clients who have their own handling for async messages can connect
+to this signal in order to implement custom behavior.
+
+\section1 Methods
+
+\section2 WebView::addMessageListener(string name)
+
+Register a listener for asynchronous messages with the
+specified \a name.
+
+The web view will emit recvAsyncMessage() for messages with that name
+which are sent by event handlers etc.
+
+\section2 WebView::sendAsyncMessage(string name, variant data)
+
+Send an asynchronous message with the specified \a name and \a data.
+
+If a message listener is registered for the message, the listener will be
+delivered the message.
+
+\section2 WebView::loadFrameScript(string name)
+
+Loads the specified frame script.
+
+A frame script is JavaScript which is loaded before any content, and has
+the ability to manipulate the content DOM.
+
+A developer could load a custom frame script for their WebView instance
+in order to add an event listener of some kind (via addEventListener()),
+do some custom handling of the event, and then notify the application
+via an async message.
+
+e.g.
+
+\code
+webView.loadFrameScript(Qt.resolvedUrl("customframescript.js"));
+webView.addMessageListener("appMessageHandler")
+\endcode
+
+where the custom frame script has something like:
+
+\code
+document.addEventListener("click", function() {
+    sendAsyncMessage("appMessageHandler", {"click": true})
+    // the web view will emit recvAsyncMessage().
+});
+\endcode
+
+*/
+

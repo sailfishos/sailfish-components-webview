@@ -10,6 +10,8 @@ OTHER_FILES += \
     $$PWD/sailfish-webview.qdocconf \
     $$PWD/sailfish-webview.cpp \
     $$PWD/sailfish-webview-webview.qdoc \
+    $$PWD/sailfish-webview-webviewadditional.qdoc \
+    $$PWD/sailfish-webview-webviewexperimental.qdoc \
     $$PWD/sailfish-webview-webviewflickable.qdoc \
     $$PWD/sailfish-webview-webviewpage.qdoc \
     $$PWD/index.qdoc
