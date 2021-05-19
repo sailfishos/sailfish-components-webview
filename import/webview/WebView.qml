@@ -32,6 +32,7 @@ RawWebView {
     readonly property bool textSelectionActive: textSelectionController && textSelectionController.active
     property Item textSelectionController: null
     readonly property int _pageOrientation: webViewPage ? webViewPage.orientation : Orientation.None
+    readonly property bool _appActive: Qt.application.state === Qt.ApplicationActive
 
     signal linkClicked(string url)
 
@@ -57,8 +58,8 @@ RawWebView {
     }
 
     active: !webViewPage
-            || webViewPage.status === PageStatus.Active
-            || webViewPage.status === PageStatus.Deactivating
+            || _appActive && (webViewPage.status === PageStatus.Active)
+            || _appActive && (webViewPage.status === PageStatus.Deactivating)
     _acceptTouchEvents: !textSelectionActive
 
     viewportHeight: webViewPage
