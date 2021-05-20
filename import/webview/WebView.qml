@@ -21,7 +21,11 @@ RawWebView {
     id: webview
 
     property alias downloadsEnabled: popupOpener.downloadsEnabled
-    property WebViewPage webViewPage: _findParentWithProperty(webview, '__sailfish_webviewpage')
+    property Page webViewPage: {
+        var containerPage = _findParentWithProperty(webview, '__sailfish_webviewpage')
+        if (!containerPage) containerPage = _findParentWithProperty(webview, '__silica_page')
+        return containerPage
+    }
     property bool canShowSelectionMarkers: true
     property real _indicatorVerticalOffset
 
