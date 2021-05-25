@@ -46,6 +46,7 @@ Timer {
     property var topic
 
     signal aboutToOpenContextMenu(var data)
+    signal loginSaved
 
     function getCheckbox(data) {
         var inputs = data.inputs
@@ -225,10 +226,17 @@ Timer {
 
     // Open login dialog
     function login(data) {
-        pageStack.animatorPush(Qt.resolvedUrl("PasswordManagerDialog.qml"), {
+        var obj = pageStack.animatorPush(Qt.resolvedUrl("PasswordManagerDialog.qml"), {
             "contentItem": contentItem, "requestId": data.id,
             "notificationType": data.name, "formData": data.formdata
         })
+
+        obj.pageCompleted.connect(function(dialog) {
+            dialog.loginSaved.connect(function() {
+                root.loginSaved()
+            })
+        })
+
     }
 
     // Open permissions dialog
