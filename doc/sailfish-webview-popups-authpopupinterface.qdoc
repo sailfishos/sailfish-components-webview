@@ -1,0 +1,155 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype AuthPopupInterface
+  \inqmlmodule Sailfish.WebView.Popups
+  \ingroup sailfishos-webview-popups
+  \brief A component which defines the interface for the auth popup
+
+  The \c{AuthPopupInterface} QML type is exposed through the
+  \c{Sailfish.WebView.Popups} QML import namespace.
+
+  Clients who use a \l{WebView} in their application may wish to
+  customize the appearance or behavior of the authorization popup in their
+  application.
+
+  To do so, their implementation must extend the \c{AuthPopupInterface},
+  which itself extends the \l{UserPromptInterface}, and then they must
+  tell the \l{WebView} to use their implementation via the \c{popupComponents}
+  property.
+
+  \sa UserPromptInterface, custompopups
+*/
+
+/*!
+  \qmlproperty string AuthPopupInterface::hostname
+  \brief The hostname of the site which is asking for credentials
+
+  A custom implementation should include this information in the message which
+  it displays to the user, to allow the user to make an informed choice about
+  which credentials to enter, or whether to accept or reject the prompt.
+*/
+
+/*!
+  \qmlproperty string AuthPopupInterface::realm
+  \brief The realm within the site for which the credentials are being
+         requested
+
+  A custom implementation should include this information in the message which
+  it displays to the user, to allow the user to make an informed choice about
+  which credentials to enter, or whether to accept or reject the prompt.
+*/
+
+/*!
+  \qmlproperty bool AuthPopupInterface::passwordOnly
+  \brief Will be true if no username is required from the user
+
+  A custom implementation should use the value of this property to determine
+  whether or not to show an input field for a username as well as an input
+  field for a password.
+
+  If either \c{usernameVisible} is \c{false} or \c{passwordOnly} is \c{true}
+  then the username input field should not be shown to the user.
+*/
+
+/*!
+  \qmlproperty bool AuthPopupInterface::privateBrowsing
+  \brief Will be true if the user is in private browsing mode
+
+  A custom implementation should use the value of this property to determine
+  how to change the look-and-feel of the popup, to ensure that the user is
+  reminded that the web view is currently in private browsing mode.
+
+  Also, if in private browsing mode, the custom implementation should not
+  ask the user if they would like the web view to remember their credentials,
+  and as such it should hide its "remember" toggle switch.
+*/
+
+/*!
+  \qmlproperty bool AuthPopupInterface::usernameVisible
+  \brief Whether the username input field should be visible to the user
+
+  A custom implementation should use the value of this property to determine
+  whether or not to show an input field for a username as well as an input
+  field for a password.
+
+  If either \c{usernameVisible} is \c{false} or \c{passwordOnly} is \c{true}
+  then the username input field should not be shown to the user.
+*/
+
+/*!
+  \qmlproperty bool AuthPopupInterface::usernameAutofocus
+  \brief Whether the username input field should be given focus automatically
+         when the popup is shown to the user
+
+  If the value of this property is true, the custom implementation should give
+  the username input field focus immediately upon being shown, for example by
+  binding the \c{focus} property of the input field to the value of this
+  property (but only if the username input field should be visible).
+*/
+
+/*!
+  \qmlproperty string AuthPopupInterface::usernamePrefillValue
+  \brief The value which should be prefilled into the username input field
+*/
+
+/*!
+  \qmlproperty string AuthPopupInterface::passwordPrefillValue
+  \brief The value which should be prefilled into the password input field
+*/
+
+/*!
+  \qmlproperty bool AuthPopupInterface::rememberVisible
+  \brief Whether the "remember" toggle switch should be shown to the user
+
+  If the value of this property is true and if the value of the
+  \c{privateBrowsing} property is false, the custom implementation should
+  provide a toggle switch which provides the user with an option to allow
+  the web view to remember the credentials in future.
+*/
+
+/*!
+  \qmlproperty bool AuthPopupInterface::rememberPrefillValue
+  \brief The value which should be prefilled into the "remember" toggle switch
+*/
+
+
+/*!
+  \qmlproperty string AuthPopupInterface::usernameValue
+  \brief The username value which the user provided via the username field
+
+  A custom implementation should bind this property to the \c{text}
+  property of their username \c{TextField} (or to the appropriate property of
+  whatever input element is being used by the custom implementation to
+  allow the user to provide username data).
+
+  It is an output property, whose value is read by the web view.
+*/
+
+/*!
+  \qmlproperty string AuthPopupInterface::passwordValue
+  \brief The password value which the user provided via the password field
+
+  A custom implementation should bind this property to the \c{text}
+  property of their password \c{TextField} (or to the appropriate property of
+  whatever input element is being used by the custom implementation to
+  allow the user to provide password data).
+
+  It is an output property, whose value is read by the web view.
+*/
+
+/*!
+  \qmlproperty bool AuthPopupInterface::rememberValue
+  \brief The value of the "remember" toggle switch
+
+  A custom implementation should bind this property to the \c{checked}
+  property of their \c{ToggleSwitch} (or to the appropriate property of
+  whatever input element is being used by the custom implementation to
+  give the user an option to allow the web view to remember the credentials).
+
+  It is an output property, whose value is read by the web view.
+*/

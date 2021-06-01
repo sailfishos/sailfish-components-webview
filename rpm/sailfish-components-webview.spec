@@ -76,6 +76,14 @@ Requires:   nemo-test-tools
 %description tests
 Unit tests and functional tests of Sailfish WebView / WebEngine
 
+%package examples
+Summary:    Sailfish WebView / WebEngine examples
+Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-popups = %{version}-%{release}
+
+%description examples
+Examples using Sailfish WebView and WebEngine
+
 %package doc
 Summary:    Documentation for Sailfish WebView
 BuildRequires:  mer-qdoc-template
@@ -135,6 +143,10 @@ BuildRequires:  qt5-tools
 %files tests
 %defattr(-,root,root,-)
 /opt/tests/sailfish-components-webview/*
+
+%files examples
+%defattr(-,root,root,-)
+%{_bindir}/custompopups
 
 %files doc
 %defattr(-,root,root,-)

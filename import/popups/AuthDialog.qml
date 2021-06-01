@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Jolla Ltd.
-** Contact: Dmitry Rozhkov <dmitry.rozhkov@jollamobile.com>
+** Copyright (c) 2013 - 2020 Jolla Ltd.
+** Copyright (c) 2021 Open Mobile Platform LLC.
 **
 ****************************************************************************/
 
@@ -12,92 +12,121 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-UserPrompt {
-    id: root
+Dialog {
+    id: dialog
 
-    property string hostname
-    property string realm
-    property bool passwordOnly
-    property bool privateBrowsing
+    property alias hostname: auth.hostname
+    property alias realm: auth.realm
+    property alias passwordOnly: auth.passwordOnly
+    property alias privateBrowsing: auth.privateBrowsing
 
-    property var username
-    property var password
-    property var remember
+    property alias usernameVisible: auth.usernameVisible
+    property alias usernameAutofocus: auth.usernameAutofocus
+    property alias usernamePrefillValue: auth.usernamePrefillValue
+    property alias passwordPrefillValue: auth.passwordPrefillValue
+    property alias rememberVisible: auth.rememberVisible
+    property alias rememberPrefillValue: auth.rememberPrefillValue
 
-    property alias usernameValue: username.text
-    property alias passwordValue: password.text
-    property alias rememberValue: remember.checked
+    property alias usernameValue: auth.usernameValue
+    property alias passwordValue: auth.passwordValue
+    property alias rememberValue: auth.rememberValue
 
-    //: Text on the Accept dialog button that accepts browser's auth request
-    //% "Log In"
-    acceptText: qsTrId("sailfish_components_webview_popups-he-accept_login")
+    property alias acceptText: auth.acceptText
+    property alias cancelText: auth.cancelText
+    property alias title: auth.title
+    property alias preventDialogsVisible: auth.preventDialogsVisible
+    property alias preventDialogsPrefillValue: auth.preventDialogsPrefillValue
+    property alias preventDialogsValue: auth.preventDialogsValue
 
-    Column {
-        width: parent.width
+    AuthPopupInterface {
+        id: auth
 
-        Label {
-            x: Theme.paddingLarge
-            width: parent.width - Theme.paddingLarge * 2
-            //: %1 is server URL, %2 is HTTP auth realm
-            //% "The server %1 requires authentication. The server says: %2"
-            text: qsTrId("sailfish_components_webview_popups-la-auth_requested").arg(hostname).arg(realm)
-            wrapMode: Text.Wrap
-            color: Theme.highlightColor
-        }
+        anchors.fill: parent
 
-        TextField {
-            id: username
+        usernameValue: username.text
+        passwordValue: password.text
+        rememberValue: remember.checked
 
-            width: parent.width
-            focus: root.username && root.username.autofocus || false
-            visible: !passwordOnly
-            //% "Enter your user name"
-            placeholderText: qsTrId("sailfish_components_webview_popups-la-enter_username")
-            //% "User name"
-            label: qsTrId("sailfish_components_webview_popups-la-user_name")
+        //: Text on the Accept dialog button that accepts browser's auth request
+        //% "Log In"
+        acceptText: qsTrId("sailfish_components_webview_popups-he-accept_login")
 
-            text: root.username && root.username.value || ""
-            inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
-            EnterKey.iconSource: "image://theme/icon-m-enter-next"
-            EnterKey.onClicked: password.focus = true
-        }
+        onAccepted: dialog.accept()
+        onRejected: dialog.reject()
 
-        PasswordField {
-            id: password
+        UserPromptUi {
+            anchors.fill: parent
+            dialog: dialog
+            popupInterface: auth
 
-            width: parent.width
-            //% "Enter password"
-            placeholderText: qsTrId("sailfish_components_webview_popups-la-enter_password")
-            text: root.password && root.password.value || ""
+            Column {
+                width: parent.width
 
-            EnterKey.iconSource: (username.text.length > 0 && text.length > 0) ? "image://theme/icon-m-enter-accept"
-                                                                               : "image://theme/icon-m-enter-next"
-            EnterKey.onClicked: root.accept()
-        }
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - Theme.horizontalPageMargin * 2
+                    //: %1 is server URL, %2 is HTTP auth realm
+                    //% "The server %1 requires authentication. The server says: %2"
+                    text: qsTrId("sailfish_components_webview_popups-la-auth_requested").arg(auth.hostname).arg(auth.realm)
+                    wrapMode: Text.Wrap
+                    color: Theme.highlightColor
+                }
 
-        TextSwitch {
-            id: remember
+                TextField {
+                    id: username
 
-            // If credentials are already remember removing them via this is not feasibible
-            // Better to hide the whole checkbox.
-            visible: !privateBrowsing && !(root.remember && root.remember.checked)
-            checked: false
+                    width: parent.width
+                    focus: auth.usernameVisible && auth.usernameAutofocus
+                    visible: !auth.passwordOnly && auth.usernameVisible
+                    //% "Enter your user name"
+                    placeholderText: qsTrId("sailfish_components_webview_popups-la-enter_username")
+                    //% "User name"
+                    label: qsTrId("sailfish_components_webview_popups-la-user_name")
 
-            //: Remember entered credentials for later use
-            //% "Remember credentials"
-            text: qsTrId("sailfish_components_webview_popups-remember_credentials")
-        }
+                    text: auth.usernamePrefillValue
+                    inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+                    EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                    EnterKey.onClicked: password.focus = true
+                }
 
-        Label {
-            x: Theme.paddingLarge
-            width: parent.width - Theme.paddingLarge * 2
-            visible: privateBrowsing
-            wrapMode: Text.Wrap
-            color: Theme.highlightColor
+                PasswordField {
+                    id: password
 
-            //: Description label for user when private mode active (entered credentials are not saved)
-            //% "Credential storage is not available in private browsing mode"
-            text: qsTrId("sailfish_components_webview_popups-la-private_browsing_credentials_description")
+                    width: parent.width
+                    //% "Enter password"
+                    placeholderText: qsTrId("sailfish_components_webview_popups-la-enter_password")
+                    text: auth.passwordPrefillValue
+
+                    EnterKey.iconSource: (username.text.length > 0 && text.length > 0) ? "image://theme/icon-m-enter-accept"
+                                                                                       : "image://theme/icon-m-enter-next"
+                    EnterKey.onClicked: auth.accepted()
+                }
+
+                TextSwitch {
+                    id: remember
+
+                    // If credentials are already remembered removing them via this is not feasible
+                    // Better to hide the whole checkbox.
+                    visible: !auth.privateBrowsing && !(auth.rememberVisible && auth.rememberPrefillValue)
+                    checked: auth.rememberPrefillValue // bind the output value for when the prefill value is true.
+
+                    //: Remember entered credentials for later use
+                    //% "Remember credentials"
+                    text: qsTrId("sailfish_components_webview_popups-remember_credentials")
+                }
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - Theme.horizontalPageMargin * 2
+                    visible: auth.privateBrowsing
+                    wrapMode: Text.Wrap
+                    color: Theme.highlightColor
+
+                    //: Description label for user when private mode active (entered credentials are not saved)
+                    //% "Credential storage is not available in private browsing mode"
+                    text: qsTrId("sailfish_components_webview_popups-la-private_browsing_credentials_description")
+                }
+            }
         }
     }
 }

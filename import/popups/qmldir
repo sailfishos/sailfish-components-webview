@@ -1,16 +1,26 @@
 module Sailfish.WebView.Popups
 plugin sailfishwebviewpopupsplugin
 singleton LocationSettings 1.0 LocationSettings.qml
-UserPrompt 1.0 UserPrompt.qml
+PopupProvider 1.0 PopupProvider.qml
+UserPromptInterface 1.0 UserPromptInterface.qml
+AlertPopupInterface 1.0 AlertPopupInterface.qml
+AuthPopupInterface 1.0 AuthPopupInterface.qml
+ConfirmPopupInterface 1.0 ConfirmPopupInterface.qml
+LocationPopupInterface 1.0 LocationPopupInterface.qml
+PasswordManagerPopupInterface 1.0 PasswordManagerPopupInterface.qml
+PromptPopupInterface 1.0 PromptPopupInterface.qml
+ContextMenuInterface 1.0 ContextMenuInterface.qml
+UserPromptUi 1.0 UserPromptUi.qml
+UserPromptDialog 1.0 UserPromptDialog.qml
 AlertDialog 1.0 AlertDialog.qml
 AuthDialog 1.0 AuthDialog.qml
 ConfirmDialog 1.0 ConfirmDialog.qml
 LocationDialog 1.0 LocationDialog.qml
 PasswordManagerDialog 1.0 PasswordManagerDialog.qml
-PopupOpener 1.0 PopupOpener.qml
 PromptDialog 1.0 PromptDialog.qml
-PromptLabel 1.0 PromptLabel.qml
 ContextMenu 1.0 ContextMenu.qml
+PopupOpener 1.0 PopupOpener.qml
+PromptLabel 1.0 PromptLabel.qml
 DownloadMenuItem 1.0 DownloadMenuItem.qml
 ShareLinkPage 1.0 ShareLinkPage.qml
 ShareTextPage 1.0 ShareTextPage.qml

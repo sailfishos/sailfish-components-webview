@@ -1,7 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (c) 2016 - 2020 Jolla Ltd.
-** Copyright (c) 2019 - 2020 Open Mobile Platform LLC.
+** Copyright (c) 2019 - 2021 Open Mobile Platform LLC.
 **
 ****************************************************************************/
 
@@ -34,6 +34,9 @@ RawWebView {
     readonly property int _pageOrientation: webViewPage ? webViewPage.orientation : Orientation.None
     readonly property bool _appActive: Qt.application.state === Qt.ApplicationActive
 
+    property alias popupProvider: popupOpener.popupProvider
+
+    signal aboutToOpenPopup(var topic, var data)
     signal linkClicked(string url)
 
     function _findParentWithProperty(item, propertyName) {
@@ -166,6 +169,7 @@ RawWebView {
         contentItem: webview
         downloadsEnabled: false
 
+        onAboutToOpenPopup: webview.aboutToOpenPopup(topic, data)
         onAboutToOpenContextMenu: {
             if (Qt.inputMethod.visible) {
                 webview.parent.focus = true

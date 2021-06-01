@@ -69,6 +69,36 @@ ApplicationWindow {
 }
 \endcode
 
+\section2 Popup Customization
 
+The appearance and behaviour of some aspects of the WebView (for example,
+popups and other user-interaction dialogs) may be customized via the QML API.
+To do so, clients must implement the appropriate interface type, and register
+their implementations with the WebView via a \l{PopupProvider} which is then
+bound to the WebView's \c{popupProvider} property.
 
+WebView currently supports customization via the following interfaces:
+\list
+\li \l{ContextMenuInterface}
+\li \l{AlertPopupInterface}
+\li \l{ConfirmPopupInterface}
+\li \l{PromptPopupInterface}
+\li \l{AuthPopupInterface}
+\li \l{PasswordManagerPopupInterface}
+\li \l{LocationPopupInterface}
+\endlist
+
+*/
+
+/*!
+  \example custompopups
+  \title Sailfish WebView custom popups example
+  \subtitle
+
+  This example shows how to define custom components which the webview will
+  load and display after receiving the corresponding asynchronous message.
+
+  It allows the client to provide custom chrome for various types of user
+  interaction, including alerts, confirmation requests, permission requests,
+  etc.
 */

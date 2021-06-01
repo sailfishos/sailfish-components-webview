@@ -1,0 +1,108 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype PopupProvider
+  \inqmlmodule Sailfish.WebView.Popups
+  \ingroup sailfishos-webview-popups
+  \brief A component which provides custom popup implementations for use by
+         the web view
+
+  The \c{PopupProvider} QML type is exposed through the
+  \c{Sailfish.WebView.Popups} QML import namespace.
+
+  If a client wishes to customize the look and feel of popups which are
+  displayed by the web view in response to certain conditions (e.g. JavaScript
+  alert popups, etc), they must instantiate a \c{PopupProvider} and bind the
+  \c{popupProvider} property of the \l{WebView} to that instance.
+
+  The \c{PopupProvider} defines a set of properties which each specify a
+  custom popup component.  The web view will inspect the appropriate
+  property of the \c{PopupProvider} and then construct an instance of the
+  component and show it, when required.
+
+  Each property value must be one of the following:
+  \list
+  \li a component URL string, e.g. \c{"qrc:/CustomAlertPopup.qml"}
+  \li a component instance, e.g. \c{Qt.createComponent("qrc:/CustomAlertPopup.qml")}
+  \li a popup component descriptor dictionary, to allow specifying dialog-derived popups
+  \endlist
+
+  A popup component descriptor dictionary has the following fields:
+  \list
+  \li \c{"component"} whose value is a component instance object or URL
+  \li \c{"type"} whose value is either \c{"dialog"} or \c{"item"} (the default)
+  \endlist
+
+  For example, if a client wishes to provide custom implementations for the
+  JavaScript \c{alert()} and JavaScript \c{geolocation permission} popups,
+  they might set the WebView's \c{popupProvider} property as follows:
+
+  \code
+  popupProvider: PopupProvider {
+      alertPopup: "qrc:/CustomAlertPopup.qml"
+      locationPermissionPopup": {"type": "dialog", "component": "qrc:/CustomLocationDialog.qml"}
+  }
+  \endcode
+
+  \sa custompopups
+*/
+
+/*!
+  \qmlproperty var PopupProvider::contextMenu
+  \brief The context menu component descriptor
+
+  The component specified must implement the
+  \l{ContextMenuInterface}{context menu popup} interface.
+*/
+
+/*!
+  \qmlproperty var PopupProvider::alertPopup
+  \brief The alert popup component descriptor
+
+  The component specified must implement the
+  \l{AlertPopupInterface}{alert popup} interface.
+*/
+
+/*!
+  \qmlproperty var PopupProvider::confirmPopup
+  \brief The confirm popup component descriptor
+
+  The component specified must implement the
+  \l{ConfirmPopupInterface}{confirm popup} interface.
+*/
+
+/*!
+  \qmlproperty var PopupProvider::promptPopup
+  \brief The input prompt popup component descriptor
+
+  The component specified must implement the
+  \l{PromptPopupInterface}{input prompt popup} interface.
+*/
+
+/*!
+  \qmlproperty var PopupProvider::authPopup
+  \brief The authorization/login popup component descriptor
+
+  The component specified must implement the
+  \l{AuthPopupInterface}{authorization/login popup} interface.
+*/
+
+/*!
+  \qmlproperty var PopupProvider::passwordManagerPopup
+  \brief The password manager popup component descriptor
+
+  The component specified must implement the
+  \l{PasswordManagerPopupInterface}{password manager popup} interface.
+*/
+
+/*!
+  \qmlproperty var PopupProvider::locationPermissionPopup
+  \brief The geolocation permission popup component descriptor
+
+  The component specified must implement the
+  \l{LocationPopupInterface}{geolocation permission popup} interface.
+*/

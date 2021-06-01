@@ -14,4 +14,13 @@ OTHER_FILES += \
     $$PWD/sailfish-webview-webviewexperimental.qdoc \
     $$PWD/sailfish-webview-webviewflickable.qdoc \
     $$PWD/sailfish-webview-webviewpage.qdoc \
+    $$PWD/sailfish-webview-popups-popupprovider.qdoc \
+    $$PWD/sailfish-webview-popups-alertpopupinterface.qdoc \
+    $$PWD/sailfish-webview-popups-authpopupinterface.qdoc \
+    $$PWD/sailfish-webview-popups-confirmpopupinterface.qdoc \
+    $$PWD/sailfish-webview-popups-contextmenuinterface.qdoc \
+    $$PWD/sailfish-webview-popups-locationpopupinterface.qdoc \
+    $$PWD/sailfish-webview-popups-passwordmanagerpopupinterface.qdoc \
+    $$PWD/sailfish-webview-popups-promptpopupinterface.qdoc \
+    $$PWD/sailfish-webview-popups-userpromptinterface.qdoc \
     $$PWD/index.qdoc

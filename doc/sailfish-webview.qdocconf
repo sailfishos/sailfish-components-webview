@@ -6,7 +6,7 @@ url             = https://github.com/sailfishos/sailfish-webview/
 
 sourcedirs += $$PWD/../lib $$PWD/../import $$PWD/../doc
 headerdirs += $$PWD/../lib $$PWD/../import
-#exampledirs += $$PWD/../examples
+exampledirs += $$PWD/../examples
 
 outputformats = HTML
 outputdir = $$PWD/../doc/html

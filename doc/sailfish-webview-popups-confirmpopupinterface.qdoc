@@ -1,0 +1,40 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype ConfirmPopupInterface
+  \inqmlmodule Sailfish.WebView.Popups
+  \ingroup sailfishos-webview-popups
+  \brief A component which defines the interface for the confirm popup
+
+  The \c{ConfirmPopupInterface} QML type is exposed through the
+  \c{Sailfish.WebView.Popups} QML import namespace.
+
+  Clients who use a \l{WebView} in their application may wish to
+  customize the appearance or behavior of the confirm popup in their
+  application.
+
+  To do so, their implementation must extend the \c{ConfirmPopupInterface},
+  which itself extends the \l{UserPromptInterface}, and then they must
+  tell the \l{WebView} to use their implementation via the \c{popupComponents}
+  property.
+
+  \sa UserPromptInterface, custompopups
+*/
+
+/*!
+  \qmlproperty string ConfirmPopupInterface::text
+  \brief The text to display as the confirmation information message
+
+  A custom implementation should bind the \c{text} property
+  of their confirmation information text label to the value of this property.
+
+  This label will describe to the user what the site is asking them to
+  confirm or deny, allowing the user to make an informed acceptance or
+  rejection decision.
+*/
+
+

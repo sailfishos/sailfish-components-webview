@@ -166,6 +166,23 @@
 */
 
 /*!
+  \qmlproperty PopupProvider WebView::popupProvider
+  \brief A provider of custom user interaction components
+
+  Client applications can define their own custom user interaction components
+  which extend the various interface types defined in the
+  \l{Sailfish.WebView.Popups} namespace.
+
+  In order for those custom components to be used by the WebView, the client
+  must register a PopupProvider instance (which specifies the various
+  custom components which should be used) with the WebView via this property.
+
+  It is an optional property.
+
+  \sa {Popup Customization}, PopupProvider, custompopups
+*/
+
+/*!
   \qmlmethod WebView::runJavaScript(string script, variant callback, variant errorCallback)
   \brief Runs javascript snippet in the context of the loaded DOM document.
 

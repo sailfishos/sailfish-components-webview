@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2013-2016 Jolla Ltd.
-** Contact: Dmitry Rozhkov <dmitry.rozhkov@jollamobile.com>
+** Copyright (c) 2013 - 2020 Jolla Ltd.
+** Copyright (c) 2021 Open Mobile Platform LLC.
 **
 ****************************************************************************/
 
@@ -12,16 +12,37 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-UserPrompt {
-    property alias text: label.text
+Dialog {
+    id: dialog
 
-    //: Text on the Accept dialog button that accepts browser alert messages
-    //% "Ok"
-    acceptText: qsTrId("sailfish_components_webview_popups-he-accept_alert")
-    // Cancel button left blank on the alert() dialog
-    cancelText: ""
+    property alias text: alert.text
 
-    PromptLabel {
-        id: label
+    property alias acceptText: alert.acceptText
+    property alias cancelText: alert.cancelText
+    property alias title: alert.title
+    property alias preventDialogsVisible: alert.preventDialogsVisible
+    property alias preventDialogsPrefillValue: alert.preventDialogsPrefillValue
+    property alias preventDialogsValue: alert.preventDialogsValue
+
+    AlertPopupInterface {
+        id: alert
+
+        anchors.fill: parent
+
+        //: Text on the Accept dialog button that accepts browser alert messages
+        //% "Ok"
+        acceptText: qsTrId("sailfish_components_webview_popups-he-accept_alert")
+        // Cancel button left blank on the alert() dialog
+        cancelText: ""
+
+        UserPromptUi {
+            anchors.fill: parent
+            dialog: dialog
+            popupInterface: alert
+
+            PromptLabel {
+                text: alert.text
+            }
+        }
     }
 }
