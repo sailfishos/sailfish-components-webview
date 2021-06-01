@@ -9,7 +9,7 @@
   \inherits Item
   \inqmlmodule Sailfish.WebView
   \ingroup sailfishos-webview
-  \brief A component for adding web content to a page
+  \brief A component for adding web content to a page.
 
   The \c{WebView} component allows you to add web content to a QML page.
 
@@ -36,11 +36,20 @@
   }
   \endcode
 
+  Advanced users may wish to make use of the
+  \l{Sailfish WebView Additional Attributes}{additional attributes} or the
+  \l{Sailfish WebView Experimental Attributes}{experimental attributes}.
+
   \sa WebVewPage
 */
 
 /*!
-  \qmlproperty bool active
+  \qmlproperty WebViewPage WebView::webViewPage
+  \brief The \l{WebViewPage} the \l{WebView} is embedded in.
+*/
+
+/*!
+  \qmlproperty bool WebView::active
   \brief This property is \c{true} when WebView is actively evaluating or rendering content.
 
   If a webview is not set as active, it will not display any content.
@@ -54,28 +63,86 @@
 */
 
 /*!
-  \qmlproperty WebViewPage webViewPage
-  \brief The \l{WebViewPage} the \l{WebView} is embedded in.
+  \qmlproperty bool WebView::privateMode
+  \brief Whether the webview is in private browsing mode.
 
-  This will be populated automatically unless explicitly set.
+  If private mode is enabled, history will not be stored in the device.
+
+  Note: the value for this property must be set when the webview is
+  initialized.  Any attempt to set the value of this property after the
+  webview has been instantiated will have no effect.
 */
 
 /*!
-  \qmlproperty bool WebView::canShowSelectionMarkers
-  \brief Display markers when the user selects text on a page.
-
-  If \c{true} the user will be able to select text and items on a page,
-  indicated with handles. Set to \c{false} to disable the selection markers.
-
-  The default is \c{true}.
+  \qmlproperty bool WebView::loaded
+  \brief Whether the webview content has finished loading successfully.
+  \sa load()
 */
 
 /*!
-  \qmlproperty bool WebView::textSelectionActive
-  \brief Indicates that text is currently being selected by the user.
+  \qmlproperty QUrl WebView::url
+  \brief The URL being loaded and displayed by the webview.
 
-  This read only property will be set to \c{true} if the user is currently
-  selecting text on the page, or \c{false} otherwise.
+  Clients can set this property to navigate to a new location.
+  If the webview is redirected, the value of this property will automatically
+  be updated.
+  \sa load()
+*/
+
+/*!
+  \qmlproperty QString WebView::title
+  \readonly
+  \brief The page title of the currently loaded location.
+*/
+
+/*!
+  \qmlproperty bool WebView::canGoBack
+  \readonly
+  \brief Whether the "back" navigation action is available.
+
+  If the user has navigated to a different page by clicking a link or by
+  setting the \l{url} property, then back navigation will be available.
+
+  \sa goBack()
+*/
+
+/*!
+  \qmlproperty bool WebView::canGoForward
+  \readonly
+  \brief Whether the "forward" navigation action is available.
+
+  If the user has navigated back (via \l{goBack()}) without later loading a
+  new page by clicking a link or setting the \l{url} property, then forward
+  navigation will be available.
+
+  \sa goForward()
+*/
+
+/*!
+  \qmlproperty int WebView::loadProgress
+  \readonly
+  \brief The load progress (percentage) of the current page.
+
+  When the webview begins loading a new page, this value will be set
+  to 1 (percent) and then updated as more content is loaded.  When loading is
+  complete, this value will be set to 100 (percent).
+*/
+
+/*!
+  \qmlproperty bool WebView::loading
+  \readonly
+  \brief Whether the webview is currently loading page content.
+
+  \sa loadProgress, loaded
+*/
+
+/*!
+  \qmlproperty QMozSecurity WebView::security
+  \readonly
+  \brief Provides the TLS state and security capabilities of the connection
+         with the site.
+
+  The QMozSecurity type is available in the Qt5Mozilla import namespace.
 */
 
 /*!
@@ -99,27 +166,15 @@
 */
 
 /*!
-  \qmlsignal WebView::linkClicked(string url)
-  \brief This signal is emitted when the user selects a link on the page.
-
-  When emitted \a url will be set to href selected.
-*/
-
-/*!
-  \qmlmethod WebView::clearSelection()
-  \brief Clears any text currently selected by the user.
-*/
-
-/*!
   \qmlmethod WebView::runJavaScript(string script, variant callback, variant errorCallback)
   \brief Runs javascript snippet in the context of the loaded DOM document.
 
   When the \a script returns, \a callback with a single argument that is the return value is called. The
   \a callback argument is optional, if set to \c undefined (the default), the return value will be
   discarded.
-  
-  If the function fails \a errorCallback is called with a single argument containing the error 
-  string. The \a errorCallback argument is optional, if set to \c undefined (the default), any 
+
+  If the function fails \a errorCallback is called with a single argument containing the error
+  string. The \a errorCallback argument is optional, if set to \c undefined (the default), any
   errors are silently ignored.
 
   \qml
@@ -135,15 +190,100 @@
 */
 
 /*!
-  \qmlproperty qreal WebView::virtualKeyboardMargin
-  \brief Set the margin taken by the keyboard at the bottom of the page
+  \qmlmethod WebView::loadHtml(string html, url baseUrl)
+  \brief Loads the specified \a html content, performing symbol resolution
+         from the given \a baseUrl.
+*/
 
-  When the keybaord is opened it may overlap web content displayed in a
-  \l{WebView}. Setting this value allows the web content to be arranged to
-  compensate for the overlapped area.
+/*!
+  \qmlmethod WebView::loadText(string text, string mimeType)
+  \brief Loads the specified \a text content, displaying appropriately for
+         the specified \a mimeType.
+*/
 
-  When using a \l{WebView} this property will be set automatically when the
-  keybaord is opened or closed.
+/*!
+  \qmlmethod WebView::goBack()
+  \brief Navigate back to the previous location in history.
+  \sa canGoBack, goForward()
+*/
+
+/*!
+  \qmlmethod WebView::goForward()
+  \brief Navigate forward to the next location in history.
+  \sa canGoForward, goBack()
+*/
+
+/*!
+  \qmlmethod WebView::stop()
+  \brief Stop loading the current URL or content.
+*/
+
+/*!
+  \qmlmethod WebView::reload()
+  \brief Reload the current URL or content.
+*/
+
+/*!
+  \qmlmethod WebView::load(string url)
+  \brief Loads the specified \a url.
+
+  This is identical to setting the \l{url} property to the specified \a url.
+
+  \sa url
+*/
+
+/*!
+  \qmlmethod WebView::clearSelection()
+  \brief Clears any currently active text selection span.
+*/
+
+/*!
+  \internal
+  \qmlmethod WebView::newWindow(string url)
+  \brief Opens the specified \a url in a new web view window (tab).
+
+  The new web view window will have its \l{parentId} set to the \l{uniqueId}
+  of this web view instance.
+*/
+
+/*!
+  \internal
+  \qmlmethod WebView::synthTouchBegin(variant touches)
+  \brief Synthesize a touch-begin event.
+
+  \sa synthTouchMove(), synthTouchEnd()
+*/
+
+/*!
+  \internal
+  \qmlmethod WebView::synthTouchMove(variant touches)
+  \brief Synthesize a touch-move event.
+
+  \sa synthTouchBegin(), synthTouchEnd()
+*/
+
+/*!
+  \internal
+  \qmlmethod WebView::synthTouchEnd(variant touches)
+  \brief Synthesize a touch-end event.
+
+  \sa synthTouchBegin(), synthTouchMove()
+*/
+
+/*!
+  \internal
+  \qmlmethod WebView::suspendView()
+  \brief Suspend rendering of the view.
+
+  \sa resumeView()
+*/
+
+/*!
+  \internal
+  \qmlmethod WebView::resumeView()
+  \brief Resume rendering of the view.
+
+  \sa suspendView()
 */
 
 /*!
@@ -153,8 +293,30 @@
 */
 
 /*!
-  \internal
+  \qmlsignal WebView::linkClicked(string url)
+  \brief This signal is emitted when the user selects a link on the page.
 
+  When emitted \a url will be set to href selected.
+*/
+
+/*!
+  \qmlsignal WebView::loadRedirect()
+  \brief Emitted if load() resulted in a redirect.
+*/
+
+/*!
+  \qmlsignal WebView::viewDestroyed()
+  \brief Emitted when the view is destroyed.
+*/
+
+/*!
+  \internal
+  \qmlsignal WebView::windowCloseRequested()
+  \brief Emitted when the current window should be closed.
+*/
+
+/*!
+  \internal
   \qmlsignal WebView::openUrlInNewWindow()
   \brief This signal is emitted to indicate a request to open a new window.
 */

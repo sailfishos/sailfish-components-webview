@@ -1,0 +1,205 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+\page webview-experimental.html
+\title Sailfish WebView Experimental Attributes
+
+Each one of the properties, signals, and methods provided by Sailfish WebView
+falls into one of the three following categories:
+\list
+\li Stable attributes, as per the WebView type documentation
+\li \l{Sailfish WebView Additional Attributes}{Additional attributes}
+\li \l{Sailfish WebView Experimental Attributes}{Experimental attributes}
+\endlist
+
+This page documents the experimental attributes of the Sailfish WebView.
+These experimental attributes are highly unlikely to be used by vast majority
+of application developers, however they allow developers great control
+over the way content is displayed in their application.
+
+We reserve the right to modify or remove any of these attributes in future
+versions of the \c{Sailfish.WebView} import.
+
+\section1 Properties
+
+\section2 WebView::contentRect
+
+\c{rect}-type read-only property.
+
+The bounding box rectangle defined by the loaded content being displayed in
+the viewport of the web view.
+
+The loaded page content is likely to fill an area much larger than the
+viewport of the webview (thus requiring the user to scroll the viewport in
+order to see content further down the page, etc).
+
+This property provides the bounding box rectangle of the current viewport
+onto the content, in CSS pixels (that is, not yet scaled by the device
+resolution factor).  The x and y position of the content rectangle describes
+the top-left pixel of the content being displayed in the viewport.  The
+width and height of the content rectangle can be combined with the x and y
+positions to determine the top-right, bottom-left, and bottom-right pixels
+of the content being displayed in the viewport.
+
+Note that the \l{WebView::contentWidth}{content width} and
+\l{WebView::contentHeight}{content height} will differ from the
+viewport width and viewport height only if the content is smaller than the
+viewport, or if some zoom-factor is being applied to the viewport due to
+the device screen \l{WebView::resolution}{resolution}.
+
+For more information about these concepts, please see the related Mozilla
+documentation about
+\l{https://developer.mozilla.org/en-US/docs/Glossary/CSS_pixel}{CSS pixels}
+and
+\l{https://developer.mozilla.org/en-US/docs/Web/CSS/Viewport_concepts}{viewports}.
+
+See also: \l{WebView::contentWidth}, \l{WebView::contentHeight},
+\l{WebView::viewportWidth}, \l{WebView::viewportHeight},
+\l{WebView::scrollableSize}, \l{WebView::resolution}
+
+\section2 WebView::contentWidth
+
+\c{real}-type read-only property.
+
+The width (in CSS pixels) of the bounding box rectangle defined by the loaded
+content being displayed by the webview.
+
+See also: \l{WebView::contentRect}
+
+\section2 WebView::contentHeight
+
+\c{real}-type read-only property.
+
+The height (in CSS pixels) of the bounding box rectangle defined by the loaded
+content being displayed by the webview.
+
+See also: \l{WebView::contentRect}
+
+\section2 WebView::scrollableSize
+
+\c{size}-type read-only property.
+
+The geometric size of the content being displayed by the webview,
+in device pixels.
+
+The loaded page content is likely to fill an area much larger than the
+viewport of the webview (thus requiring the user to scroll the viewport in
+order to see content further down the page, etc).
+
+This property contains the total size of the content, in device pixels.
+
+See also: \l{WebView::contentRect}, \l{WebView::scrollableOffset}
+
+\section2 WebView::scrollableOffset
+
+\c{point}-type read-only property.
+
+The (x and y pixel) offset into the scrollable size which describes
+the top-left pixel of the content being displayed by the viewport.
+
+The value of this property is effectively equal to the value of the
+x and y values of the \l{WebView::contentRect} after applying the appropriate
+\l{WebView::resolution}{resolution} scale factor (to map from CSS pixel
+coordinates to device-resolution pixel coordinates).
+
+See also: \l{WebView::contentRect}, \l{WebView::scrollableSize},
+\l{WebView::resolution}
+
+\section2 WebView::resolution
+
+\c{float}-type read-only property
+
+The scaling factor which is applied to the (CSS-pixel) contentRect
+values to map to the appropriate device-resolution pixel coordinates,
+taking into account the web engine's \c{pixelRatio} setting.
+
+The value of this property is equal to the width of the device's screen
+divided by the width of the \l{WebView::contentRect}{contentRect}.
+As such, it will update when the user zooms in or out (thus changing the
+width, in CSS pixels, of the contentRect), or if the page orientation changes
+(resulting in a change to landscape orientation from portrait orientation,
+or vice-versa).
+
+Note that no change signal for this property is currently emitted.
+
+See also: \l{WebView::contentRect}, \l{WebEngineSettings::pixelRatio}
+
+\section2 WebView::horizontalScrollDecorator
+
+\l{QmlMozScrollDecorator}-type read-only property.
+
+The horizontal scroll bar.
+
+The QmlMozScrollDecorator type is available from the
+Qt5Mozilla import namespace.
+
+\section2 WebView::verticalScrollDecorator
+
+\l{QmlMozScrollDecorator}-type read-only property.
+
+The vertical scroll bar.
+
+The QmlMozScrollDecorator type is available from the
+Qt5Mozilla import namespace.
+
+\section2 WebView::painted
+
+\c{bool}-type read-only property.
+
+Whether the first paint has completed.
+
+\section2 WebView::parentId
+
+\c{int}-type read-only property.
+
+The uniqueId of the parent window (web view instance) which requested
+opening this location.
+
+\section2 WebView::uniqueId
+
+\c{int}-type read-only property.
+
+The unique identifier of this web view instance.
+
+\section1 Signals
+
+\section2 WebView::imeNotification(int state, bool open, int cause, int focusChange, string type)
+
+Emitted when an input method notification is received by the view.
+
+For example, if the user gives focus to an input field, or closes the
+virtual keboard and removes focus from an input field, then input method
+notifications will be emitted.
+
+The \a state parameter will be \c{2} if the field input should be hidden
+(e.g. password entry).
+
+The \a open parameter will be true if the virtual keyboard is already open.
+
+The \a cause parameter will be set according to why the IME notification was
+emitted.  Possible causes are: focus change, selection change, composition
+update, text change, mouse button event, or position change.
+
+The \a focusChange parameter will be set if the notification was emitted
+due to focus change between one input field and another.
+
+The \a type parameter is a string which describes the type of input data
+expected (e.g. "number", "tel", "email", "url", "date", "datetime", etc).
+
+\section1 Methods
+
+\section2 WebView::setInputMethodHints(Qt.InputMethodHints hints)
+
+Set the input method hints for the web view.
+
+This affects the way the web view interprets input method events
+(for example, enforcing formatted-numbers-only or dialable-characters-only
+requirements as specified by the hints).
+
+See also: \l{https://doc.qt.io/qt-5/qt.html#InputMethodHint-enum}{InputMethodHints}
+
+*/
