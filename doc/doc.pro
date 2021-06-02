@@ -14,6 +14,9 @@ OTHER_FILES += \
     $$PWD/sailfish-webview-webviewexperimental.qdoc \
     $$PWD/sailfish-webview-webviewflickable.qdoc \
     $$PWD/sailfish-webview-webviewpage.qdoc \
+    $$PWD/sailfish-webview-webenginesettings.qdoc \
+    $$PWD/sailfish-webview-webenginesettings.cpp \
+    $$PWD/sailfish-webview-webenginesettings.h \
     $$PWD/sailfish-webview-popups-popupprovider.qdoc \
     $$PWD/sailfish-webview-popups-alertpopupinterface.qdoc \
     $$PWD/sailfish-webview-popups-authpopupinterface.qdoc \

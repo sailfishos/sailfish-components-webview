@@ -18,7 +18,7 @@
 
   Exaple of use:
 
-  \code
+  \qml
   import QtQuick 2.0
   import Sailfish.Silica 1.0
   import Sailfish.WebView 1.0
@@ -34,7 +34,7 @@
           }
       }
   }
-  \endcode
+  \endqml
 
   Advanced users may wish to make use of the
   \l{Sailfish WebView Additional Attributes}{additional attributes} or the
@@ -194,9 +194,9 @@
   string. The \a errorCallback argument is optional, if set to \c undefined (the default), any
   errors are silently ignored.
 
-  \qml
+  \badcode
   runJavaScript("return document.title", function(result) { console.log("Document title is", result); });
-  \endqml
+  \endcode
 
   \note The \a script must have explicit \l {https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return}{return statement}.
 

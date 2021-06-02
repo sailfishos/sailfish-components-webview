@@ -1,6 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2021 Jolla Ltd.
+** Copyright (c) 2021 Open Mobile Platform LLC
 **
 ****************************************************************************/
 
@@ -24,6 +25,15 @@ Q_GLOBAL_STATIC(SailfishOS::WebEngineSettings, webEngineSettingsInstance)
 
 #define SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO 1.5
 
+/*!
+    \class SailfishOS::WebEngineSettings
+    \brief Provides access to the global web engine settings.
+    \inmodule SailfishWebView
+    \inherits QMozEngineSettings
+
+    Singleton class which provides access to the global Web engine settings.
+*/
+
 static bool testScreenDimensions(qreal pixelRatio)
 {
     QScreen *screen = QGuiApplication::primaryScreen();
@@ -45,6 +55,29 @@ int getPressAndHoldDelay()
 
 const int PressAndHoldDelay(getPressAndHoldDelay());
 
+/*!
+    \brief Initialises the WebEngineSettings class.
+
+    The \c initialize method sets up default gecko preferences needed in order
+    for the WebView to work correctly.
+
+    If you need to set specific settings which differ from the default, it's
+    recommended that you do so after this initialisation has been called, to
+    avoid your settings being overwritten by it.
+
+    This will be called automatically during QML initialisation, but it can
+    also be called manually in your code in order to control the order of
+    initialisation. Calling this method after intialialisation has already
+    been performed has no effect.
+
+    Hence the following is safe:
+
+    \code
+        SailfishOS::WebEngine::instance() *engineSettings = SailfishOS::WebEngineSettings::instance();
+        engineSettings->initialize();
+        engineSettings->setPreference(QStringLiteral("ui.textSelectBackground"), QLatin1String("#55ff55"));
+    \endcode
+*/
 void SailfishOS::WebEngineSettings::initialize()
 {
     static bool isInitialized = false;
@@ -135,17 +168,38 @@ void SailfishOS::WebEngineSettings::initialize()
     isInitialized = true;
 }
 
+/*!
+    \brief Returns the instance of the singleton WebEngineSettings class.
+
+    The returned instance may not be intialised.
+
+    \sa initialize
+*/
 SailfishOS::WebEngineSettings *SailfishOS::WebEngineSettings::instance()
 {
     return webEngineSettingsInstance();
 }
 
+/*!
+    \internal
+    \brief Constructs a new WebEngineSettings instance, with the specified QObject \a parent.
+
+    In general there should be no need to use the constructor. Call \l instance
+    to return the singleton instance instead.
+
+    \sa instance
+*/
 SailfishOS::WebEngineSettings::WebEngineSettings(QObject *parent)
     : QMozEngineSettings(parent)
 {
 }
 
+/*!
+    \internal
+    \brief Destroys the WebEngineSettings instance.
+
+    WebEngineSettings is a singleton, so should never be deleted.
+*/
 SailfishOS::WebEngineSettings::~WebEngineSettings()
 {
-
 }

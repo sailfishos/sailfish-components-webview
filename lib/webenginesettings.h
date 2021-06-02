@@ -15,6 +15,8 @@
 #include <QString>
 #include <qmozenginesettings.h>
 
+#ifndef Q_QDOC
+
 namespace SailfishOS {
 
 class WebEngineSettings : public QMozEngineSettings {
@@ -28,4 +30,5 @@ public:
 };
 }
 
+#endif // !Q_QDOC
 #endif // SAILFISHOS_WEBENGINE_SETTINGS_H
