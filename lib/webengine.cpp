@@ -17,26 +17,60 @@
 Q_GLOBAL_STATIC(SailfishOS::WebEngine, webEngineInstance)
 
 /*!
-  \class SailfishOS::WebEngine
-  \brief Provides access to the Web engine context
-  \inmodule SailfishWebView
+    \class SailfishOS::WebEngine
+    \brief Provides access to the web engine context.
+    \inmodule SailfishWebView
+    \inherits QMozContext
 
-  Singleton class which provides access to the Web engine context.
+    Singleton class which provides access to the web engine context.
 */
 
 namespace SailfishOS {
 
 /*!
-  \brief Initialises the WebEngine class.
+    \brief Initialises the WebEngine class.
 
-  Initalises the WebEngine class. The \a profilePath sets the root folder for
-  the mozilla gecko profile. Once set the \a profilePath can't be changed.
+    Initalizes the WebEngine class. The \a profilePath sets the root folder for
+    the mozilla gecko profile. Once set the \a profilePath can't be changed.
+    Set \a runEmbedding to \c false (defaults to true) in order to handle steps
+    that are needed before \l{runEmbedding}{engine startup}.
 
-  Multiple calls to initialize have no effect.
+    Multiple calls to initialize have no effect.
 
-  \sa initialize
+    This method will be called automatically during QML initialisation of the
+    WebView. However under some circumstances it may be useful to perform a
+    custom initalization. In this case \c initialize can be called manually as
+    long as this id done before the QML engine initialization.
+
+    One reason for custom initialization would be to proivde additional
+    component manifests.
+
+    \code
+        SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
+        QString profilePath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+        webEngine->initialize(profilePath, false);
+        webEngine->addComponentManifest(QLatin1String("/path/file.manifest"));
+
+        [...]
+
+        QTimer::singleShot(0, webEngine, SLOT(runEmbedding()));
+    \endcode
+
+    \note Using component manifests in this way should be avoided in favour of
+    frame scripts where possible. Frame scritps are likely to cover the
+    majority of cases.
+
+    \note By default When instantiated from QML \a profilePath is set to
+    \c QStandardPaths::writableLocation(QStandardPaths::CacheLocation), which
+    is by default \c{~/.cache/<organisation name>/<application name>}. If using
+    a different location care is needed to select a path that's acceptable from
+    an application sandboxing point of view. The
+    \l{https://doc.qt.io/archives/qt-5.6/qstandardpaths.html}{standard application paths}
+    are safe for profile paths.
+
+    \sa setProfile, addComponentManifest, runEmbedding
 */
-void WebEngine::initialize(const QString &profilePath)
+void WebEngine::initialize(const QString &profilePath, bool runEmbedding)
 {
     static bool isInitialized = false;
     if (isInitialized) {
@@ -67,18 +101,19 @@ void WebEngine::initialize(const QString &profilePath)
     webEngine->addComponentManifest(SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH + QString("/chrome/EmbedLiteJSScripts.manifest"));
     webEngine->addComponentManifest(SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH + QString("/chrome/EmbedLiteOverrides.manifest"));
 
-    QTimer::singleShot(0, webEngine, SLOT(runEmbedding()));
+    if (runEmbedding) {
+        QTimer::singleShot(0, webEngine, SLOT(runEmbedding()));
+    }
 
     isInitialized = true;
 }
 
 /*!
-  \brief Returns the instance of the singleton WebEngine class.
+    \brief Returns the instance of the singleton WebEngine class.
 
-  Returns the instance of the singleton WebEngine class.
-  The returned instance may not be intialised.
+    The returned instance may not be initialized.
 
-  \sa initialize
+    \sa initialize
 */
 WebEngine *WebEngine::instance()
 {
@@ -86,12 +121,13 @@ WebEngine *WebEngine::instance()
 }
 
 /*!
-  \brief Constructs a new WebEngine instance, with the specified QObject \a parent.
+    \internal
+    \brief Constructs a new WebEngine instance, with the specified QObject \a parent.
 
-  In general there should be no need to use the constructor. Call \l instance
-  to return the singleton instance instead.
+    In general there should be no need to use the constructor. Call \l instance
+    to return the singleton instance instead.
 
-  \sa instance
+    \sa instance
 */
 WebEngine::WebEngine(QObject *parent)
     : QMozContext(parent)
@@ -99,7 +135,11 @@ WebEngine::WebEngine(QObject *parent)
 }
 
 /*!
-  \brief Destroys the WebEngine instance.
+    \internal
+    \brief Destroys the WebEngine instance.
+
+    WebEngine is a singleton, so should never be deleted by the client. It will
+    be automatically deleted at application shutdown.
 */
 WebEngine::~WebEngine()
 {

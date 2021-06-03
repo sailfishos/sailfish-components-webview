@@ -18,10 +18,8 @@ ApplicationWindow {
     id: root
     initialPage: Component {
         Page {
-            id: page
             WebView {
                 anchors.fill: parent
-                active: true
                 url: "http://www.sailfishos.org"
             }
         }

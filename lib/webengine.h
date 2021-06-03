@@ -16,12 +16,14 @@
 #include <QString>
 #include <qmozcontext.h>
 
+#ifndef Q_QDOC
+
 namespace SailfishOS {
 
 class WebEngine : public QMozContext {
     Q_OBJECT
 public:
-    static void initialize(const QString &profilePath);
+    static void initialize(const QString &profilePath, bool runEmbedding = true);
     static WebEngine *instance();
 
     explicit WebEngine(QObject *parent = 0);
@@ -29,4 +31,5 @@ public:
 };
 }
 
+#endif // !Q_QDOC
 #endif // SAILFISHOS_WEBENGINE_H
