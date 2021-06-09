@@ -32,6 +32,7 @@ Timer {
         "embed:login":          "passwordManagerPopup",
         "embed:auth":           "authPopup",
         "embed:permissions":  { "geolocation": "locationPermissionPopup" },
+        "embed:webrtcrequest":  "webrtcPermissionPopup"
     })
     readonly property var listeners: Object.keys(_messageTopicToPopupProviderPropertyMapping)
 
@@ -111,6 +112,7 @@ Timer {
             }
             break
         }
+        case "embed:webrtcrequest": webrtc(data);   break;
         }
         // If we end up here, message has been handled.
         return true
@@ -134,11 +136,7 @@ Timer {
         }
         var rejectFn = acceptFn
 
-        var topic = "embed:alert"
-        var subtopic = null
-        var comp =_resolveListenerComponent(topic, subtopic)
-        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
-        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
+        openPopupByTopic("embed:alert", null, props, acceptFn, rejectFn)
     }
 
     // Open confirm dialog
@@ -167,11 +165,7 @@ Timer {
             })
         }
 
-        var topic = "embed:confirm"
-        var subtopic = null
-        var comp =_resolveListenerComponent(topic, subtopic)
-        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
-        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
+        openPopupByTopic("embed:confirm", null, props, acceptFn, rejectFn)
     }
 
     // Open prompt dialog
@@ -202,11 +196,7 @@ Timer {
             })
         }
 
-        var topic = "embed:prompt"
-        var subtopic = null
-        var comp =_resolveListenerComponent(topic, subtopic)
-        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
-        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
+        openPopupByTopic("embed:prompt", null, props, acceptFn, rejectFn)
     }
 
     // Open login dialog
@@ -232,11 +222,7 @@ Timer {
             })
         }
 
-        var topic = "embed:login"
-        var subtopic = null
-        var comp =_resolveListenerComponent(topic, subtopic)
-        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
-        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
+        openPopupByTopic("embed:login", null, props, acceptFn, rejectFn)
     }
 
     // Open password manager dialog
@@ -286,11 +272,7 @@ Timer {
             })
         }
 
-        var topic = "embed:auth"
-        var subtopic = null
-        var comp =_resolveListenerComponent(topic, subtopic)
-        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
-        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
+        openPopupByTopic("embed:auth", null, props, acceptFn, rejectFn)
     }
 
     // Open permissions dialog
@@ -318,11 +300,44 @@ Timer {
             })
         }
 
-        var topic = "embed:permissions"
-        var subtopic = data.title
-        var comp =_resolveListenerComponent(topic, subtopic)
-        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
-        openPopup(comp, props, compIsDialog, acceptFn, rejectFn)
+        openPopupByTopic("embed:permissions", data.title, props, acceptFn, rejectFn)
+    }
+
+    function webrtc(data) {
+        // Promote only supported requests and only from an observable origin
+        if (data.origin && ("camera" in data.devices ||
+                            "microphone" in data.devices)) {
+            openPopupByTopic("embed:webrtcrequest", null, {
+                    "origin": data.origin,
+                    "devices": data.devices
+                },
+                // accept
+                function(popup) {
+                    contentItem.sendAsyncMessage("embedui:webrtcresponse", {
+                        "allow": true,
+                        "checkedDontAsk": popup.rememberValue,
+                        "choices": popup.choices,
+                        "id": data.id
+                    })
+                },
+                // reject
+                function(popup) {
+                    contentItem.sendAsyncMessage("embedui:webrtcresponse", {
+                        "allow": false,
+                        "checkedDontAsk": popup.rememberValue,
+                        "choices": popup.choices,
+                        "id": data.id
+                    })
+                }
+            )
+        } else {
+            contentItem.sendAsyncMessage("embedui:webrtcresponse", {
+                "allow": false,
+                "checkedDontAsk": false,
+                "choices": {},
+                "id": data.id
+            })
+        }
     }
 
     // Handle pagestack busy change
@@ -378,6 +393,12 @@ Timer {
                 obj.rejected.connect(function() { rejectedFn(obj) })
             }
         }
+    }
+
+    function openPopupByTopic(topic, subtopic, properties, acceptedFn, rejectedFn) {
+        var comp =_resolveListenerComponent(topic, subtopic)
+        var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
+        openPopup(comp, properties, compIsDialog, acceptedFn, rejectedFn)
     }
 
     function _openContextMenu(data) {

@@ -10,6 +10,7 @@ LocationPopupInterface 1.0 LocationPopupInterface.qml
 PasswordManagerPopupInterface 1.0 PasswordManagerPopupInterface.qml
 PromptPopupInterface 1.0 PromptPopupInterface.qml
 ContextMenuInterface 1.0 ContextMenuInterface.qml
+WebrtcPermissionInterface 1.0 WebrtcPermissionInterface.qml
 UserPromptUi 1.0 UserPromptUi.qml
 UserPromptDialog 1.0 UserPromptDialog.qml
 AlertDialog 1.0 AlertDialog.qml
@@ -18,6 +19,7 @@ ConfirmDialog 1.0 ConfirmDialog.qml
 LocationDialog 1.0 LocationDialog.qml
 PasswordManagerDialog 1.0 PasswordManagerDialog.qml
 PromptDialog 1.0 PromptDialog.qml
+WebrtcPermissionDialog 1.0 WebrtcPermissionDialog.qml
 ContextMenu 1.0 ContextMenu.qml
 PopupOpener 1.0 PopupOpener.qml
 PromptLabel 1.0 PromptLabel.qml
