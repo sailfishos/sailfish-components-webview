@@ -34,60 +34,75 @@ Dialog {
                 _glassOnly: true
             }
 
-            Label {
-                id: label
-
+            Column {
                 anchors.centerIn: parent
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                wrapMode: Text.Wrap
-                horizontalAlignment: Text.AlignHCenter
-                font {
-                    family: Theme.fontFamilyHeading
-                    pixelSize: Theme.fontSizeExtraLarge
-                }
-                color: Theme.highlightColor
-                opacity: Theme.opacityHigh
+                width: parent.width
+                spacing: Theme.paddingMedium
 
-                text: {
-                    switch (passwordManager.notificationType) {
-                        case "password-save": {
-                            if (passwordManager.formData["displayUser"]) {
-                                //% "Would you like to save password for user %1 on %2?"
-                                return qsTrId("sailfish_components_webview_popups-la-save_password")
-                                        .arg(passwordManager.formData["displayUser"])
-                                        .arg(passwordManager.formData["displayHost"])
-                            } else {
-                                //% "Would you like to save password on %1?"
-                                return qsTrId("sailfish_components_webview_popups-ls-save_password_no_user")
-                                        .arg(passwordManager.formData["displayHost"])
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    wrapMode: Text.Wrap
+                    horizontalAlignment: Text.AlignHCenter
+                    font {
+                        family: Theme.fontFamilyHeading
+                        pixelSize: Theme.fontSizeExtraLarge
+                    }
+                    color: Theme.highlightColor
+                    opacity: Theme.opacityHigh
+
+                    text: {
+                        switch (passwordManager.notificationType) {
+                            case "password-save": {
+                                if (passwordManager.formData["displayUser"]) {
+                                    //% "Would you like to save login and password for %1?"
+                                    return qsTrId("sailfish_components_webview_popups-la-save_password")
+                                            .arg(passwordManager.formData["displayHost"])
+                                } else {
+                                    //% "Would you like to save password for %1?"
+                                    return qsTrId("sailfish_components_webview_popups-ls-save_password_no_user")
+                                            .arg(passwordManager.formData["displayHost"])
+                                }
                             }
-                        }
-                        case "password-change": {
-                            if (passwordManager.formData["displayUser"]) {
-                                //% "Would you like to update password for user %1?"
-                                return qsTrId("sailfish_components_webview_popups-la-update_password")
-                                        .arg(passwordManager.formData["displayUser"])
-                            } else {
-                                //% "Would you like to update password?"
-                                return qsTrId("sailfish_components_webview_popups-la-update_password_no_user")
+                            case "password-change": {
+                                if (passwordManager.formData["displayUser"]) {
+                                    //% "Would you like to update password for user %1?"
+                                    return qsTrId("sailfish_components_webview_popups-la-update_password")
+                                            .arg(passwordManager.formData["displayUser"])
+                                } else {
+                                    //% "Would you like to update password?"
+                                    return qsTrId("sailfish_components_webview_popups-la-update_password_no_user")
+                                }
                             }
-                        }
-                        case "password-update-multiuser": {
-                            // TODO: currently embedlite component for login manager promter heavily relies
-                            //       on gecko's localization service for UI strings.
-                            //       See LoginManagerPrompter.promtToChangePasswordWithUsernames() for details.
-                            //       We need to reimplement it in order to use Qt l10n for password updates where
-                            //       we don't know which existing login is being updated.
-                            //       Though this task is quite a corner case and thus of very low priority.
-                            console.log("TODO: password-update-multiuser notification type hasn't been implemented yet")
-                            break
-                        }
-                        default: {
-                            console.log("Unhandled password manager notification type: "
-                                        + passwordManager.notificationType)
-                            break
+                            case "password-update-multiuser": {
+                                // TODO: currently embedlite component for login manager promter heavily relies
+                                //       on gecko's localization service for UI strings.
+                                //       See LoginManagerPrompter.promtToChangePasswordWithUsernames() for details.
+                                //       We need to reimplement it in order to use Qt l10n for password updates where
+                                //       we don't know which existing login is being updated.
+                                //       Though this task is quite a corner case and thus of very low priority.
+                                console.log("TODO: password-update-multiuser notification type hasn't been implemented yet")
+                                break
+                            }
+                            default: {
+                                console.log("Unhandled password manager notification type: "
+                                            + passwordManager.notificationType)
+                                break
+                            }
                         }
                     }
+                }
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    wrapMode: Text.Wrap
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.fontSizeMedium
+                    color: Theme.highlightColor
+                    opacity: Theme.opacityHigh
+                    //% "Logins and passwords can be managed from the Settings page"
+                    text: qsTrId("sailfish_components_webview_popups-la-manage_paswords_hint")
                 }
             }
         }
