@@ -24,5 +24,4 @@ ContextMenu 1.0 ContextMenu.qml
 PopupOpener 1.0 PopupOpener.qml
 PromptLabel 1.0 PromptLabel.qml
 DownloadMenuItem 1.0 DownloadMenuItem.qml
-ShareLinkPage 1.0 ShareLinkPage.qml
-ShareTextPage 1.0 ShareTextPage.qml
+WebShareAction 1.0 WebShareAction.qml
