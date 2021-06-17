@@ -19,7 +19,7 @@
 
   To do so, their implementation must extend the \c{AlertPopupInterface},
   which itself extends the \l{UserPromptInterface}, and then they must
-  tell the \l{WebView} to use their implementation via the \c{popupComponents}
+  tell the \l{WebView} to use their implementation via the \c{popupProvider}
   property.
 
   Note that a custom implementation of an \c{AlertPopupInterface} need not
