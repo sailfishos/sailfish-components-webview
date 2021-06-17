@@ -29,4 +29,5 @@ OTHER_FILES += \
     $$PWD/sailfish-webview-popups-passwordmanagerpopupinterface.qdoc \
     $$PWD/sailfish-webview-popups-promptpopupinterface.qdoc \
     $$PWD/sailfish-webview-popups-userpromptinterface.qdoc \
+    $$PWD/sailfish-webview-popups-blockedpopupinterface.qdoc \
     $$PWD/index.qdoc

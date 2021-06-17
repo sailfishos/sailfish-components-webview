@@ -106,3 +106,19 @@
   The component specified must implement the
   \l{LocationPopupInterface}{geolocation permission popup} interface.
 */
+
+/*!
+  \qmlproperty var PopupProvider::webrtcPermissionPopup
+  \brief The webrtc popup component descriptor
+
+  The component specified must implement the
+  \l{WebrtcPermissionInterface}{alert popup} interface.
+*/
+
+/*!
+  \qmlproperty var PopupProvider::blockedTabPopup
+  \brief The blocked tab popup component descriptor
+
+  The component specified must implement the
+  \l{BlockedTabPopupInterface}{blocked tab popup} interface.
+*/

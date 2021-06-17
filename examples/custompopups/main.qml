@@ -25,8 +25,9 @@ ApplicationWindow {
                     locationPermissionPopup: customLocationPermissionPopup
 
                     // or by dictionary with "type" and "component" fields
-                    alertPopup: ({"type": "item", "component": "qrc:/CustomAlertPopup.qml"})
                     confirmPopup: ({"type": "item", "component": Qt.createComponent("qrc:/CustomConfirmPopup.qml")})
+                    alertPopup: ({"type": "item", "component": "qrc:/CustomAlertPopup.qml"})
+                    blockedTabPopup: ({"type": "item", "component": "qrc:/CustomBlockedTabPopup.qml"})
 
                     // if a custom implementation is not provided for some popup type,
                     // the default implementation will be used by the webview.

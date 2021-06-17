@@ -7,5 +7,6 @@
         <file>CustomLocationPopup.qml</file>
         <file>CustomPasswordManagerPopup.qml</file>
         <file>CustomPromptPopup.qml</file>
+        <file>CustomBlockedTabPopup.qml</file>
     </qresource>
 </RCC>
