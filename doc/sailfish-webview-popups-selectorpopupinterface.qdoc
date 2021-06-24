@@ -1,0 +1,67 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype SelectorPopupInterface
+  \inqmlmodule Sailfish.WebView.Popups
+  \ingroup sailfishos-webview-popups
+  \brief A component which defines the interface for the item selector popup
+
+  The \c{SelectorPopupInterface} QML type is exposed through the
+  \c{Sailfish.WebView.Popups} QML import namespace.
+
+  The item selector presents a dialog containing a description and a list of
+  items that can be selected by the user.
+
+  Clients who use a \l{WebView} in their application may wish to
+  customize the appearance or behavior of the item selector popup in their
+  application.
+
+  To do so, their implementation must extend the \c{SelectorPopupInterface},
+  which itself extends the \l{UserPromptInterface}, and then they must
+  tell the \l{WebView} to use their implementation via the \c{popupComponents}
+  property.
+
+  \sa UserPromptInterface, custompopups
+*/
+
+/*!
+  \qmlproperty string SelectorPopupInterface::title
+  \brief The text to display in the dialog header
+
+  A custom implementation should bind the \c{title} property of their
+  \c{DialogHeader} to the value of this property.
+*/
+
+/*!
+  \qmlproperty string SelectorPopupInterface::text
+  \brief The text to display as the alert message
+
+  A custom implementation should bind their selector text label to the value
+  of this property (for example bind it to \c{ComboBox.label} if the values are
+  being presented in the form of a \c{ComboBox}).
+*/
+
+/*!
+  \qmlproperty var SelectorPopupInterface::values
+  \brief An array of string values for the user to select from
+
+  These items should be presented to the user, for example if the values are
+  being presented in the form of a \c{ComboBox} then \c{ComboBox.model} can
+  be bound to this value.
+*/
+
+/*!
+  \qmlproperty int SelectorPopupInterface::selectedIndex
+  \brief The index of the item selected by the user
+
+  A custom implementation should bind this property to the \c{currentIndex}
+  property of their selector \c{ComboBox} (or to the appropriate property of
+  whatever selector element is being used by the custom implementation to
+  allow the user to select one of the values).
+
+  It is an output property, whose value is read by the web view.
+*/

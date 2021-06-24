@@ -90,6 +90,7 @@ WebView currently supports customization via the following interfaces:
 \li \l{LocationPopupInterface}
 \li \l{WebrtcPermissionInterface}
 \li \l{BlockedTabPopupInterface}
+\li \l{SelectorPopupInterface}
 \endlist
 
 */
