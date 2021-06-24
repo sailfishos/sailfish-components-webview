@@ -15,6 +15,7 @@ import Sailfish.Pickers 1.0
 FolderPickerPage {
     property var data
 
+    headerSpacing: 0
     showSystemFiles: false
 
     //% "Download to"

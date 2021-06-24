@@ -61,6 +61,7 @@ MenuItem {
         id: folderPickerPage
 
         FolderPickerPage {
+            headerSpacing: 0
             showSystemFiles: false
             //% "Download to"
             dialogTitle: qsTrId("sailfish_components_webview_popups-ti-download-to")
