@@ -12,6 +12,7 @@ PasswordManagerPopupInterface 1.0 PasswordManagerPopupInterface.qml
 PromptPopupInterface 1.0 PromptPopupInterface.qml
 BlockedTabPopupInterface 1.0 BlockedTabPopupInterface.qml
 ContextMenuInterface 1.0 ContextMenuInterface.qml
+SelectorPopupInterface 1.0 SelectorPopupInterface.qml
 UserPromptUi 1.0 UserPromptUi.qml
 UserPromptDialog 1.0 UserPromptDialog.qml
 AlertDialog 1.0 AlertDialog.qml
@@ -23,6 +24,7 @@ PasswordManagerDialog 1.0 PasswordManagerDialog.qml
 PromptDialog 1.0 PromptDialog.qml
 BlockedTabPopupDialog 1.0 BlockedTabPopupDialog.qml
 ContextMenu 1.0 ContextMenu.qml
+SelectorDialog 1.0 SelectorDialog.qml
 PopupOpener 1.0 PopupOpener.qml
 PromptLabel 1.0 PromptLabel.qml
 DownloadMenuItem 1.0 DownloadMenuItem.qml

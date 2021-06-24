@@ -13,6 +13,7 @@ import Sailfish.Silica 1.0
 
 UserPromptInterface {
     // inputs
+    property var messageBundle
     property string hostname
     property string realm
     property bool passwordOnly
@@ -24,6 +25,7 @@ UserPromptInterface {
     property string passwordPrefillValue
     property bool rememberVisible // should only be shown if rememberVisible && !privateBrowsing
     property bool rememberPrefillValue
+    property var rememberMessageBundle
 
     // outputs
     property string usernameValue

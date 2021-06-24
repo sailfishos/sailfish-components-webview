@@ -11,17 +11,12 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-Item {
+UserPromptInterface {
     // inputs
-    property string notificationType
-    property var messageBundle
-    property var formData
-
-    // internal, don't touch this.
-    property var _internalData // contentItem and requestId
+    property string title
+    property string text
+    property var values
 
     // outputs
-    signal accepted
-    signal rejected
-    property string selectedIndex
+    property int selectedIndex
 }
