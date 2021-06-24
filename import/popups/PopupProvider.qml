@@ -10,4 +10,5 @@ QtObject {
     property var locationPermissionPopup: ({"type": "dialog", "component": "LocationDialog.qml" })
     property var webrtcPermissionPopup: ({"type": "dialog", "component": "WebrtcPermissionDialog.qml"})
     property var blockedTabPopup: ({"type": "dialog", "component": "BlockedTabPopupDialog.qml"})
+    property var selectorPopup: ({"type": "dialog", "component": "SelectorDialog.qml"})
 }

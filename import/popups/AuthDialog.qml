@@ -11,10 +11,12 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "StringUtils.js" as StringUtils
 
 Dialog {
     id: dialog
 
+    property alias messageBundle: auth.messageBundle
     property alias hostname: auth.hostname
     property alias realm: auth.realm
     property alias passwordOnly: auth.passwordOnly
@@ -26,6 +28,7 @@ Dialog {
     property alias passwordPrefillValue: auth.passwordPrefillValue
     property alias rememberVisible: auth.rememberVisible
     property alias rememberPrefillValue: auth.rememberPrefillValue
+    property alias rememberMessageBundle: auth.rememberMessageBundle
 
     property alias usernameValue: auth.usernameValue
     property alias passwordValue: auth.passwordValue
@@ -65,9 +68,8 @@ Dialog {
                 Label {
                     x: Theme.horizontalPageMargin
                     width: parent.width - Theme.horizontalPageMargin * 2
-                    //: %1 is server URL, %2 is HTTP auth realm
-                    //% "The server %1 requires authentication. The server says: %2"
-                    text: qsTrId("sailfish_components_webview_popups-la-auth_requested").arg(auth.hostname).arg(auth.realm)
+                    bottomPadding: Theme.paddingLarge
+                    text: StringUtils.geckoKeyToString(auth.messageBundle)
                     wrapMode: Text.Wrap
                     color: Theme.highlightColor
                 }
@@ -109,10 +111,7 @@ Dialog {
                     // Better to hide the whole checkbox.
                     visible: !auth.privateBrowsing && !(auth.rememberVisible && auth.rememberPrefillValue)
                     checked: auth.rememberPrefillValue // bind the output value for when the prefill value is true.
-
-                    //: Remember entered credentials for later use
-                    //% "Remember credentials"
-                    text: qsTrId("sailfish_components_webview_popups-remember_credentials")
+                    text: StringUtils.geckoKeyToString(auth.rememberMessageBundle)
                 }
 
                 Label {
