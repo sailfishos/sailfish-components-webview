@@ -1,0 +1,80 @@
+/****************************************************************************
+**
+** Copyright (c) 2021 Open Mobile Platform LLC
+**
+****************************************************************************/
+
+/*!
+  \qmltype BlockedTabPopupInterface
+  \inqmlmodule Sailfish.WebView.Popups
+  \ingroup sailfishos-webview-popups
+  \brief A component which defines the interface for the blocked popup
+
+  The \c{BlockedTabPopupInterface} QML type is exposed through the
+  \c{Sailfish.WebView.Popups} QML import namespace.
+
+  Clients who use a \l{WebView} in their application may wish to
+  customize the appearance or behavior of the blocked popup prompt
+  in their application.
+
+  To do so, their implementation must extend the \c{BlockedTabPopupInterface},
+  and then they must tell the \l{WebView} to use their implementation via
+  the \c{popupProvider} property.
+
+  This popup is shown to the user when the site they are accessing attempts
+  to open a new tab, and this is blocked by the web browser.  The
+  blocked tab popup is then shown to the user, to ask them whether they
+  would like to continue to block, or alternatively allow, the site to
+  open new tabs in future.
+
+  \sa UserPromptInterface, custompopups
+*/
+
+/*!
+  \qmlproperty string BlockedTabPopupInterface::host
+  \brief The url of the page which is attempting to open a new tab
+
+  A custom implementation should include the \c{host} property value
+  in the string label which describes to the user that the site is
+  attempting to open a popup.
+
+  This label will describe to the user which site is attempting to
+  open a popup, allowing the user to make an informed acceptance or
+  rejection decision.
+*/
+
+/*!
+  \qmlproperty string BlockedTabPopupInterface::rememberValue
+  \brief Whether the user wishes the browser to remember their decision for this site
+
+  A custom implementation should bind the \c{checked} value of their
+  toggle switch or checkbox, to the \c{rememberValue}.
+
+  After the \c{accepted} or \c{rejected} signal is emitted, the value of
+  this property will be used to determine whether to save the decision
+  in the permission manager.
+*/
+
+/*!
+  \qmlsignal BlockedTabPopupInterface::accepted()
+  \brief This signal is emitted by the popup if the user wishes to allow
+         the site to open new tabs in future.
+
+  After emitting this signal, the popup should perform an appropriate
+  transition to make itself invisible and non-interactable (e.g. for an
+  item-derived popup, an animated opacity transition, and then setting
+  \c{visible} to \c{false} once the animation is complete).
+*/
+
+/*!
+  \qmlsignal BlockedTabPopupInterface::rejected()
+  \brief This signal is emitted by the popup if the user wishes to disallow
+         the site from opening new tabs for this session.
+
+  After emitting this signal, the popup should perform an appropriate
+  transition to make itself invisible and non-interactable (e.g. for an
+  item-derived popup, an animated opacity transition, and then setting
+  \c{visible} to \c{false} once the animation is complete).
+*/
+
+

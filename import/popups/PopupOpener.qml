@@ -12,6 +12,7 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Sailfish.WebView.Popups 1.0 as Popups
+import Sailfish.WebView.Controls 1.0 as Controls
 
 Timer {
     id: root
@@ -32,7 +33,8 @@ Timer {
         "embed:login":          "passwordManagerPopup",
         "embed:auth":           "authPopup",
         "embed:permissions":  { "geolocation": "locationPermissionPopup" },
-        "embed:webrtcrequest":  "webrtcPermissionPopup"
+        "embed:webrtcrequest":  "webrtcPermissionPopup",
+        "embed:popupblocked":   "blockedTabPopup"
     })
     readonly property var listeners: Object.keys(_messageTopicToPopupProviderPropertyMapping)
 
@@ -113,6 +115,7 @@ Timer {
             break
         }
         case "embed:webrtcrequest": webrtc(data);   break;
+        case "embed:popupblocked":  blocked(data);  break;
         }
         // If we end up here, message has been handled.
         return true
@@ -340,6 +343,33 @@ Timer {
         }
     }
 
+    function blocked(data) {
+        openPopupByTopic("embed:popupblocked", null,
+            // properties
+            { "host": data.host },
+            // accept
+            function(popup) {
+                Controls.PermissionManager.add(
+                        popup.host,
+                        "popup",
+                        Controls.PermissionManager.Allow,
+                        popup.rememberValue // rule expiry
+                            ? Controls.PermissionManager.Never
+                            : Controls.PermissionManager.Session)
+            },
+            // reject
+            function(popup) {
+                if (popup.rememberValue) {
+                    Controls.PermissionManager.add(
+                            popup.host,
+                            "popup",
+                            Controls.PermissionManager.Deny,
+                            Controls.PermissionManager.Never) // expiry
+                }
+            }
+        )
+    }
+
     // Handle pagestack busy change
     function busyChanged() {
         if (!pageStack.busy && root._delayedOpenValues) {
@@ -398,7 +428,11 @@ Timer {
     function openPopupByTopic(topic, subtopic, properties, acceptedFn, rejectedFn) {
         var comp =_resolveListenerComponent(topic, subtopic)
         var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
-        openPopup(comp, properties, compIsDialog, acceptedFn, rejectedFn)
+        if (comp === null || comp === undefined) {
+            console.log("PopupOpener.qml: invalid component specified for: " + topic + " " + subtopic)
+        } else {
+            openPopup(comp, properties, compIsDialog, acceptedFn, rejectedFn)
+        }
     }
 
     function _openContextMenu(data) {
@@ -444,6 +478,7 @@ Timer {
     Component.onCompleted: {
         // Warmup location settings.
         Popups.LocationSettings.locationEnabled
+        Controls.PermissionManager.instance()
         if (contentItem) {
             for (var i = 0; i < listeners.length; ++i) {
                 contentItem.addMessageListener(listeners[i])

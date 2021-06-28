@@ -19,7 +19,7 @@
 
   To do so, their implementation must extend the \c{LocationPopupInterface},
   which itself extends the \l{UserPromptInterface}, and then they must
-  tell the \l{WebView} to use their implementation via the \c{popupComponents}
+  tell the \l{WebView} to use their implementation via the \c{popupProvider}
   property.
 
   \sa UserPromptInterface, custompopups
