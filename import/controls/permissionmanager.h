@@ -12,6 +12,7 @@
 #define PERMISSIONMANAGER_H
 
 #include <QObject>
+#include <QMap>
 
 class Permission;
 
@@ -47,6 +48,7 @@ public:
 
     // Create a PermissionManager object before using the PermissionModel
     Q_INVOKABLE void instance() {}
+    Q_INVOKABLE int popupCapability(const QString &uri);
 
     static void add(const Permission &permission);
     static void remove(const QString &host, const QString &type);
@@ -61,6 +63,12 @@ public:
 
     static int expirationToInt(Expiration expireType);
     static Expiration intToExpiration(int value);
+
+private slots:
+    void handleRecvObserve(const QString &message, const QVariant &data);
+
+private:
+    QMap<QString, int> m_popupPermissions;
 };
 
 #endif // PERMISSIONMANAGER_H

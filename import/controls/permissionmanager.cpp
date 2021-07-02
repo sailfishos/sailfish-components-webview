@@ -14,9 +14,12 @@
 
 PermissionManager::PermissionManager(QObject *parent) : QObject(parent) {
     SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
+    connect(webEngine, &SailfishOS::WebEngine::recvObserve, this, &PermissionManager::handleRecvObserve);
 
     webEngine->addObserver(QStringLiteral("embed:perms:all"));
     webEngine->addObserver(QStringLiteral("embed:perms:all-for-uri"));
+
+    sendRequest(QStringLiteral("get-all"));
 }
 
 void PermissionManager::add(const Permission &permission)
@@ -26,11 +29,13 @@ void PermissionManager::add(const Permission &permission)
                 permission.m_type,
                 permission.m_capability,
                 permission.m_expireType);
+    sendRequest(QStringLiteral("get-all"));
 }
 
 void PermissionManager::remove(const QString &host, const QString &type)
 {
     sendRequest(QStringLiteral("remove"), host, type);
+    sendRequest(QStringLiteral("get-all"));
 }
 
 void PermissionManager::add(const QString &host,
@@ -74,4 +79,24 @@ int PermissionManager::expirationToInt(PermissionManager::Expiration expireType)
 PermissionManager::Expiration PermissionManager::intToExpiration(int value)
 {
     return static_cast<Expiration>(value);
+}
+
+int PermissionManager::popupCapability(const QString &uri)
+{
+    for (const auto &host : m_popupPermissions.keys())
+        if (uri.startsWith(host))
+            return m_popupPermissions.value(host);
+    return PermissionManager::Unknown;
+}
+
+void PermissionManager::handleRecvObserve(const QString &message, const QVariant &data)
+{
+    if (message == "embed:perms:all") {
+        m_popupPermissions.clear();
+        for (const auto &iter : qvariant_cast<QVariantList>(data)) {
+            QVariantMap varMap = iter.toMap();
+            if (varMap.value("type") == "popup")
+                m_popupPermissions.insert(varMap.value("uri").toString(), varMap.value("capability").toInt());
+        }
+    }
 }

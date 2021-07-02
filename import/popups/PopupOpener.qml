@@ -344,6 +344,22 @@ Timer {
     }
 
     function blocked(data) {
+        switch (Controls.PermissionManager.popupCapability(data.host)) {
+            case Controls.PermissionManager.Unknown:
+            case Controls.PermissionManager.Prompt:
+                askPopup(data)
+                break
+            case Controls.PermissionManager.Allow:
+                //TODO: no confirmation?
+                askPopup(data)
+                break
+            case Controls.PermissionManager.Deny:
+            default:
+                // Ignore
+        }
+    }
+
+    function askPopup(data) {
         openPopupByTopic("embed:popupblocked", null,
             // properties
             { "host": data.host },
