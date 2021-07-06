@@ -22,37 +22,41 @@ BlockedTabPopupInterface {
     Rectangle {
         anchors.fill: parent
         color: "chartreuse"
+        clip: flickable.contentHeight > height
 
-        Text {
-            id: message
-            anchors.centerIn: parent
-            width: parent.width
-            wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
-            text: "Site " + popup.host + " wants to open a popup.  Allow?"
-        }
-        TextSwitch {
-            id: toggle
-            anchors.horizontalCenter: message.horizontalCenter
-            anchors.top: message.bottom
-            anchors.topMargin: Theme.paddingLarge
-            text: "Remember decision for this site"
-        }
-        Button {
-            id: acceptBtn
-            anchors.horizontalCenter: message.horizontalCenter
-            anchors.top: toggle.bottom
-            anchors.topMargin: Theme.paddingLarge
-            text: popup.acceptText
-            onClicked: { popup.accepted(); popup.visible = false }
-        }
-        Button {
-            id: rejectBtn
-            anchors.horizontalCenter: message.horizontalCenter
-            anchors.top: acceptBtn.bottom
-            anchors.topMargin: Theme.paddingLarge
-            text: popup.cancelText
-            onClicked: { popup.rejected(); popup.visible = false }
+        SilicaFlickable {
+            id: flickable
+            anchors.fill: parent
+            contentHeight: content.height + Theme.paddingLarge
+
+            Column {
+                id: content
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                anchors.centerIn: parent
+                spacing: Theme.paddingLarge
+
+                Text {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "Site " + popup.host + " wants to open a popup.  Allow?"
+                }
+                TextSwitch {
+                    id: toggle
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Remember decision for this site"
+                }
+                Button {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: popup.acceptText
+                    onClicked: { popup.accepted(); popup.visible = false }
+                }
+                Button {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: popup.cancelText
+                    onClicked: { popup.rejected(); popup.visible = false }
+                }
+            }
         }
     }
 }

@@ -53,57 +53,56 @@ ApplicationWindow {
             Rectangle {
                 anchors.fill: parent
                 color: "blanchedalmond"
+                clip: flickable.contentHeight > height
 
-                Text {
-                    id: title
-                    anchors.bottom: message.top
-                    anchors.bottomMargin: Theme.paddingLarge
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignHCenter
-                    font.bold: true
-                    text: popup.title
-                }
-                Text {
-                    id: message
-                    anchors.centerIn: parent
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignHCenter
-                    text: "Allow " + popup.host + " to see your location?"
-                }
-                TextSwitch {
-                    id: remember
-                    anchors.horizontalCenter: message.horizontalCenter
-                    anchors.top: message.bottom
-                    anchors.topMargin: Theme.paddingLarge
-                    text: "Remember for this site"
-                }
-                TextSwitch {
-                    id: toggle
-                    anchors.horizontalCenter: message.horizontalCenter
-                    anchors.top: remember.bottom
-                    anchors.topMargin: Theme.paddingLarge
-                    height: visible ? implicitHeight : 0
-                    visible: popup.preventDialogsVisible
-                    checked: popup.preventDialogsVisible && popup.preventDialogsPrefillValue
-                    text: "Don't show this again"
-                }
-                Button {
-                    id: acceptBtn
-                    anchors.horizontalCenter: message.horizontalCenter
-                    anchors.top: toggle.bottom
-                    anchors.topMargin: Theme.paddingLarge
-                    text: popup.acceptText
-                    onClicked: { popup.accepted(); popup.visible = false }
-                }
-                Button {
-                    id: rejectBtn
-                    anchors.horizontalCenter: message.horizontalCenter
-                    anchors.top: acceptBtn.bottom
-                    anchors.topMargin: Theme.paddingLarge
-                    text: popup.cancelText
-                    onClicked: { popup.rejected(); popup.visible = false }
+                SilicaFlickable {
+                    id: flickable
+                    anchors.fill: parent
+                    contentHeight: content.height + Theme.paddingLarge
+
+                    Column {
+                        id: content
+                        width: parent.width - 2 * Theme.horizontalPageMargin
+                        anchors.centerIn: parent
+                        spacing: Theme.paddingLarge
+
+                        Text {
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            horizontalAlignment: Text.AlignHCenter
+                            font.bold: true
+                            text: popup.title
+                        }
+                        Text {
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            horizontalAlignment: Text.AlignHCenter
+                            text: "Allow " + popup.host + " to see your location?"
+                        }
+                        TextSwitch {
+                            id: remember
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: "Remember for this site"
+                        }
+                        TextSwitch {
+                            id: toggle
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            height: visible ? implicitHeight : 0
+                            visible: popup.preventDialogsVisible
+                            checked: popup.preventDialogsVisible && popup.preventDialogsPrefillValue
+                            text: "Don't show this again"
+                        }
+                        Button {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: popup.acceptText
+                            onClicked: { popup.accepted(); popup.visible = false }
+                        }
+                        Button {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: popup.cancelText
+                            onClicked: { popup.rejected(); popup.visible = false }
+                        }
+                    }
                 }
             }
         }
