@@ -50,9 +50,10 @@ Dialog {
         passwordValue: password.text
         rememberValue: remember.checked
 
+        // This key isn't provided by gecko, so we define it explicitly
         //: Text on the Accept dialog button that accepts browser's auth request
         //% "Log In"
-        acceptText: qsTrId("sailfish_components_webview_popups-he-accept_login")
+        acceptText: qsTrId("sailfish_components_webview_popups-la-accept_login")
 
         onAccepted: dialog.accept()
         onRejected: dialog.reject()

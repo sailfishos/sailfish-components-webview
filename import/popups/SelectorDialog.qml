@@ -28,13 +28,6 @@ Dialog {
         anchors.fill: parent
         selectedIndex: selector.currentIndex
 
-        //: Accept button text on the select dialog for selecting items from a list
-        //% "Ok"
-        acceptText: qsTrId("sailfish_components_webview_popups-he-accept_select")
-        //: Reject button text on the select dialog for selecting items from a list
-        //% "Cancel"
-        cancelText: qsTrId("sailfish_components_webview_popups-he-reject_select")
-
         onAccepted: dialog.accept()
         onRejected: dialog.reject()
 

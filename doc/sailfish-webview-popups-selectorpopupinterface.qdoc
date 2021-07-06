@@ -9,6 +9,7 @@
   \inqmlmodule Sailfish.WebView.Popups
   \ingroup sailfishos-webview-popups
   \brief A component which defines the interface for the item selector popup
+  \inherits UserPromptInterface
 
   The \c{SelectorPopupInterface} QML type is exposed through the
   \c{Sailfish.WebView.Popups} QML import namespace.
@@ -24,6 +25,11 @@
   which itself extends the \l{UserPromptInterface}, and then they must
   tell the \l{WebView} to use their implementation via the \c{popupComponents}
   property.
+
+  The key assigned to \l{Sailfish.WebView.Popups::UserPromptInterface::acceptText}
+  {acceptText} will always be "OK" while
+  \l{Sailfish.WebView.Popups::UserPromptInterface::cancelText}{cancelText}
+  will always be assigned the empty string.
 
   \sa UserPromptInterface, custompopups
 */

@@ -29,10 +29,6 @@ Dialog {
 
         anchors.fill: parent
 
-        //: Text on the Accept dialog button that accepts browser's confirm() messages
-        //% "Ok"
-        acceptText: qsTrId("sailfish_components_webview_popups-he-accept_confirm")
-
         UserPromptUi {
             anchors.fill: parent
             dialog: dialog
