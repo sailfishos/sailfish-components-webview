@@ -10,6 +10,9 @@ import Sailfish.WebView.Popups 1.0
 
 PromptPopupInterface {
     id: popup
+
+    property bool canAccept: input.text.length > 0
+
     width: (parent.width/5)*4
     height: (parent.height/5)*4
     anchors.centerIn: parent
@@ -17,10 +20,9 @@ PromptPopupInterface {
     acceptText: "Ok"
     cancelText: "Cancel"
 
-    value: input.text
     preventDialogsValue: toggle.checked
 
-    property bool canAccept: input.text.length > 0
+    onAccepted: value = input.text
 
     Rectangle {
         anchors.fill: parent

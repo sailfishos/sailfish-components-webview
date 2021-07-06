@@ -18,7 +18,7 @@ Dialog {
     canAccept: input.text.length > 0
 
     property alias text: prompt.text
-    property alias value: prompt.value
+    property alias value: input.text
 
     property alias acceptText: prompt.acceptText
     property alias cancelText: prompt.cancelText
