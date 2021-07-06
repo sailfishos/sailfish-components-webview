@@ -11,6 +11,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "StringUtils.js" as StringUtils
 
 Item {
     id: root
@@ -34,8 +35,8 @@ Item {
                 id: header
                 dialog: dialog
                 _glassOnly: true
-                acceptText: popupInterface.acceptText
-                cancelText: popupInterface.cancelText
+                acceptText: StringUtils.geckoKeyToString(popupInterface.acceptText)
+                cancelText: StringUtils.geckoKeyToString(popupInterface.cancelText)
                 title: popupInterface.title
             }
 

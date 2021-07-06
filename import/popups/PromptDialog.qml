@@ -34,10 +34,6 @@ Dialog {
         anchors.fill: parent
         value: input.text
 
-        //: Text on the Accept dialog button that accepts browser's prompt() messages
-        //% "Ok"
-        acceptText: qsTrId("sailfish_components_webview_popups-he-accept_prompt")
-
         onAccepted: dialog.accept()
 
         UserPromptUi {

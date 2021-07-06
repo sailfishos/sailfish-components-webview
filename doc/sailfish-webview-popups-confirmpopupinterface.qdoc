@@ -9,6 +9,7 @@
   \inqmlmodule Sailfish.WebView.Popups
   \ingroup sailfishos-webview-popups
   \brief A component which defines the interface for the confirm popup
+  \inherits UserPromptInterface
 
   The \c{ConfirmPopupInterface} QML type is exposed through the
   \c{Sailfish.WebView.Popups} QML import namespace.
@@ -21,6 +22,16 @@
   which itself extends the \l{UserPromptInterface}, and then they must
   tell the \l{WebView} to use their implementation via the \c{popupProvider}
   property.
+
+  The keys assigned to \l{Sailfish.WebView.Popups::UserPromptInterface::acceptText}
+  {acceptText} and \l{Sailfish.WebView.Popups::UserPromptInterface::cancelText}
+  {cancelText} will always be one of "OK", "Cancel", "Yes", "No", "Save",
+  "DontSave", "Revert" or the empty string. If only DOM javascript is
+  being used, only "OK" and "Cancel" will ever be sent. A custom
+  implementation using privileged code to call functions from the
+  \l{https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPromptService}{nsIPromptService}
+  or \l{https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrompt}{nsIPrompt}
+  interfaces has more flexibility to trigger popups which use the other keys.
 
   \sa UserPromptInterface, custompopups
 */

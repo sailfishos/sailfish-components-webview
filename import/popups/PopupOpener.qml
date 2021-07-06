@@ -92,6 +92,14 @@ Timer {
         return null
     }
 
+    function getButtonStringKeys(data, defaultButtons) {
+        var buttons = data.buttons || defaultButtons;
+        while (buttons.length < defaultButtons.length) {
+            buttons.push("")
+        }
+        return buttons
+    }
+
     // Returns true if message is handled.
     function message(topic, data) {
         if (!handlesMessage(topic)) {
@@ -150,8 +158,11 @@ Timer {
         var checkbox = getCheckbox(data)
         var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
+        var buttons = getButtonStringKeys(data, ["OK", ""])
         var props = {
             "text": data.text,
+            "acceptText": buttons[0],
+            "cancelText": buttons[1],
             "preventDialogsVisible": !(checkbox == null),
             "preventDialogsPrefillValue": checkboxPrefill
         }
@@ -172,8 +183,14 @@ Timer {
         var checkbox = getCheckbox(data)
         var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
+        var buttons = getButtonStringKeys(data, ["OK", "Cancel"])
+        if (buttons.length > 2) {
+            console.log("Requesting " + buttons.length + " buttons, but only two are supported.")
+        }
         var props = {
             "text": data.text,
+            "acceptText": buttons[0],
+            "cancelText": buttons[1],
             "preventDialogsVisible": !(checkbox == null),
             "preventDialogsPrefillValue": checkboxPrefill
         }
@@ -208,9 +225,12 @@ Timer {
         var checkbox = getCheckbox(data)
         var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
+        var buttons = getButtonStringKeys(data, ["OK", "Cancel"])
         var props = {
             "text": data.text,
             "defaultValue": defaultValue,
+            "acceptText": buttons[0],
+            "cancelText": buttons[1],
             "preventDialogsVisible": !(checkbox == null),
             "preventDialogsPrefillValue": checkboxPrefill
         }
@@ -280,9 +300,12 @@ Timer {
             }
         }
         var passwordOnly = !username
+        var buttons = getButtonStringKeys(data, ["AcceptLogin", ""])
 
         var props = {
             "messageBundle": data.text,
+            "acceptText": buttons[0],
+            "cancelText": buttons[1],
             "hostname": data.hostname || "",
             "realm": data.realm || "",
             "usernameVisible": !(username == null),
@@ -410,9 +433,12 @@ Timer {
 
     function selector(data) {
         var winId = data.winId
+        var buttons = getButtonStringKeys(data, ["OK", ""])
         var props = {
             "title": data.title,
             "text": data.text,
+            "acceptText": buttons[0],
+            "cancelText": buttons[1],
             "values": getMenuList(data)
         }
 

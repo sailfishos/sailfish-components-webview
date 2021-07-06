@@ -29,36 +29,67 @@
 
 /*!
   \qmlproperty string UserPromptInterface::acceptText
-  \brief The text to display for the acceptance action, if applicable
+  \brief The key of the text to display for the acceptance action, if applicable
 
-  For example, in a confirmation popup with "allow" and "deny" options,
-  the acceptText should be shown as the label on the "allow" button.
+  The possible keys that may be provided are as follows:
 
-  That is, a custom implementation should bind the \c{text} property
-  of their "allow" button to the value of this property.
+  \list
+    \li "OK"
+    \li "Cancel"
+    \li "Yes"
+    \li "No"
+    \li "Save"
+    \li "DontSave"
+    \li "Revert"
+    \li "AcceptLogin"
+    \li "" (empty string)
+  \endlist
 
-  If the web view does not provide a value for this property, the custom
-  implementation must provide its own as appropriate (e.g. a translated
-  string such as "OK" or "Allow" or "Accept").
+  For example, in a confirmation popup with "OK" and "Cancel" options,
+  an acceptText of "OK" will be passed. The label on the accept button
+  should be a suitable translation for this.
+
+  Apart from "AcceptLogin", these keys are from the commonDialogs.properties
+  gecko localization file. You can search the \l{https://pontoon.mozilla.org/en-GB/firefox/}
+  {Firefox Pontoon localization database} for this file, followed by the
+  appropriate key for appropriate translations.
+
+  It is up to the implementation to provide suitable translations; the
+  gecko translation keys should not be used directly.
+
+  The possible keys may change with future engine updates.
 */
 
 /*!
   \qmlproperty string UserPromptInterface::cancelText
-  \brief The text to display for the rejection action, if applicable
+  \brief The key of the text to display for the rejection action, if applicable
 
-  For example, in a confirmation popup with "allow" and "deny" options,
-  the cancelText should be shown as the label on the "deny" button.
+  The possible keys that may be provided are as follows:
 
-  That is, a custom implementation should bind the \c{text} property
-  of their "deny" button to the value of this property.
+  \list
+    \li "OK"
+    \li "Cancel"
+    \li "Yes"
+    \li "No"
+    \li "Save"
+    \li "DontSave"
+    \li "Revert"
+    \li "" (empty string)
+  \endlist
 
-  If the web view does not provide a value for this property, the custom
-  implementation must provide its own as appropriate (e.g. a translated
-  string such as "Cancel" or "Deny" or "Reject").
+  For example, in a confirmation popup with "OK" and "Cancel" options,
+  a cancelText of "Cancel" will be passed. The label on the cancel button
+  should be a suitable translation for this.
 
-  Note that some popup types (e.g. Alert popups) may not have any
-  rejection action, as only the accept action may be necessary, in which
-  case this property may not be required.
+  These keys are from the commonDialogs.properties gecko localization file.
+  You can search the \l{https://pontoon.mozilla.org/en-GB/firefox/}
+  {Firefox Pontoon localization database} for this file, followed by the
+  appropriate key for appropriate translations.
+
+  It is up to the implementation to provide suitable translations; the
+  gecko translation keys should not be used directly.
+
+  The possible keys may change with future engine updates.
 */
 
 /*!
