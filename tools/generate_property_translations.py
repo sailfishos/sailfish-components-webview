@@ -9,7 +9,7 @@ DEFAULT_PREFIX = "sailfish_components_webview_popups-la"
 
 class Generator:
     TRANSLATION = re.compile(r"(?P<name>[\w-]+)\s*=\s*(?P<text>.*)\s*")
-    SPLITTER = re.compile(r"([A-Za-z0-9][a-z0-9]*)")
+    SPLITTER = re.compile(r"([a-z\d]+)([A-Z])")
     PLACEHOLDER = re.compile(r"%(?:([0-9]+)\$)?S")
 
     def __init__(self, file, source):
@@ -19,7 +19,7 @@ class Generator:
     @staticmethod
     def _convert_key(name):
         """Convert from camelCase to snake_case"""
-        return "_".join(Generator.SPLITTER.findall(name)).lower()
+        return re.sub(Generator.SPLITTER, r'\1_\2', name).lower()
 
     @staticmethod
     def _convert_text(text):
