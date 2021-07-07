@@ -24,72 +24,81 @@ AuthPopupInterface {
     Rectangle {
         anchors.fill: parent
         color: "cyan"
+        clip: flickable.contentHeight > height
 
-        Column {
-            width: parent.width
-            spacing: Theme.paddingLarge
+        SilicaFlickable {
+            id: flickable
+            anchors.fill: parent
+            contentHeight: content.height + Theme.paddingLarge
 
-            Text {
-                width: parent.width
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignHCenter
-                font.bold: true
-                text: popup.title
-            }
+            Column {
+                id: content
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                anchors.centerIn: parent
+                spacing: Theme.paddingLarge
 
-            Text {
-                width: parent.width
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignHCenter
-                text: "" + popup.hostname + " requires authentication: " + popup.realm
-            }
+                Text {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    font.bold: true
+                    text: popup.title
+                }
 
-            TextField {
-                id: username
+                Text {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "" + popup.hostname + " requires authentication: " + popup.realm
+                }
 
-                width: parent.width
-                focus: popup.usernameVisible && popup.usernameAutofocus
-                visible: !popup.passwordOnly && popup.usernameVisible
-                placeholderText: "Enter your user name"
-                label: "User name"
+                TextField {
+                    id: username
 
-                text: popup.usernamePrefillValue
-                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
-                EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: password.focus = true
-            }
+                    width: parent.width
+                    focus: popup.usernameVisible && popup.usernameAutofocus
+                    visible: !popup.passwordOnly && popup.usernameVisible
+                    placeholderText: "Enter your user name"
+                    label: "User name"
 
-            PasswordField {
-                id: password
+                    text: popup.usernamePrefillValue
+                    inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+                    EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                    EnterKey.onClicked: password.focus = true
+                }
 
-                width: parent.width
-                placeholderText: "Enter password"
-                text: popup.passwordPrefillValue
+                PasswordField {
+                    id: password
 
-                EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                EnterKey.onClicked: { popup.accepted(); popup.visible = false }
-            }
+                    width: parent.width
+                    placeholderText: "Enter password"
+                    text: popup.passwordPrefillValue
 
-            TextSwitch {
-                id: remember
+                    EnterKey.iconSource: "image://theme/icon-m-enter-accept"
+                    EnterKey.onClicked: { popup.accepted(); popup.visible = false }
+                }
 
-                visible: !popup.privateBrowsing && !(popup.rememberVisible && popup.rememberPrefillValue)
-                checked: popup.rememberPrefillValue // bind the output value for when the prefill value is true.
-                text: "Remember these details?"
-            }
+                TextSwitch {
+                    id: remember
 
-            Button {
-                id: acceptBtn
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: popup.acceptText
-                onClicked: { popup.accepted(); popup.visible = false }
-            }
+                    visible: !popup.privateBrowsing && !(popup.rememberVisible && popup.rememberPrefillValue)
+                    checked: popup.rememberPrefillValue // bind the output value for when the prefill value is true.
+                    text: "Remember these details?"
+                }
 
-            Button {
-                id: rejectBtn
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: popup.cancelText
-                onClicked: { popup.rejected(); popup.visible = false }
+                Button {
+                    id: acceptBtn
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: popup.acceptText
+                    onClicked: { popup.accepted(); popup.visible = false }
+                }
+
+                Button {
+                    id: rejectBtn
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: popup.cancelText
+                    onClicked: { popup.rejected(); popup.visible = false }
+                }
             }
         }
     }
