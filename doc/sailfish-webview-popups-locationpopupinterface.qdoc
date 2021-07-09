@@ -9,6 +9,7 @@
   \inqmlmodule Sailfish.WebView.Popups
   \ingroup sailfishos-webview-popups
   \brief A component which defines the interface for the location permission popup
+  \inherits UserPromptInterface
 
   The \c{LocationPopupInterface} QML type is exposed through the
   \c{Sailfish.WebView.Popups} QML import namespace.

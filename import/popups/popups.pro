@@ -19,7 +19,7 @@ OTHER_FILES += qmldir *.qml
 
 include(popupstranslations.pri)
 
-import.files = qmldir *.qml
+import.files = qmldir *.qml *.js
 import.path = $$TARGETPATH
 target.path = $$TARGETPATH
 

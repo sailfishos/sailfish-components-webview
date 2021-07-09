@@ -81,15 +81,17 @@ bound to the WebView's \c{popupProvider} property.
 
 WebView currently supports customization via the following interfaces:
 \list
+\li \l{UserPromptInterface}
+\li \l{PromptPopupInterface}
 \li \l{ContextMenuInterface}
 \li \l{AlertPopupInterface}
 \li \l{ConfirmPopupInterface}
-\li \l{PromptPopupInterface}
 \li \l{AuthPopupInterface}
 \li \l{PasswordManagerPopupInterface}
 \li \l{LocationPopupInterface}
 \li \l{WebrtcPermissionInterface}
 \li \l{BlockedTabPopupInterface}
+\li \l{SelectorPopupInterface}
 \endlist
 
 */

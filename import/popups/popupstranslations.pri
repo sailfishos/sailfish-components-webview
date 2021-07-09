@@ -1,8 +1,8 @@
 TS_FILE = $$OUT_PWD/sailfish_components_webview_popups_qt5.ts
 EE_QM = $$OUT_PWD/sailfish_components_webview_popups_qt5_eng_en.qm
 
-translations.commands += lupdate $$PWD -ts $$TS_FILE
-translations.depends = $$PWD/*.qml
+translations.commands += lupdate $$PWD $$PWD/generated -ts $$TS_FILE
+translations.depends = $$PWD/*.qml $$PWD/generated/*.cpp
 translations.CONFIG += no_check_exist no_link
 translations.output = $$TS_FILE
 translations.input = .
@@ -25,3 +25,5 @@ engineering_english_install.CONFIG += no_check_exist
 QMAKE_EXTRA_TARGETS += translations engineering_english
 
 PRE_TARGETDEPS += translations engineering_english
+
+OTHER_FILES += generated/*.cpp

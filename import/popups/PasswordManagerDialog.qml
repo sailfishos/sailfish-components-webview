@@ -11,23 +11,28 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "StringUtils.js" as StringUtils
 
 Dialog {
     id: dialog
 
     property alias notificationType: passwordManager.notificationType
+    property alias messageBundle: passwordManager.messageBundle
     property alias formData: passwordManager.formData
+    property alias selectedIndex: passwordManager.selectedIndex
     property alias _internalData: passwordManager._internalData
 
     PasswordManagerPopupInterface {
         id: passwordManager
 
         anchors.fill: parent
+        selectedIndex: selector.currentIndex
 
         Item {
             anchors.fill: parent
 
             DialogHeader {
+                id: header
                 //: Accept browser's request to save entered password
                 //% "Save"
                 acceptText: qsTrId("sailfish_components_webview_popups-he-accept_password_mgr_request")
@@ -35,7 +40,9 @@ Dialog {
             }
 
             Column {
-                anchors.centerIn: parent
+                property bool _verticalCenter: passwordManager.notificationType !== "password-update-multiuser"
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: _verticalCenter ? Math.round(parent.height - height) / 2.0 : header.height
                 width: parent.width
                 spacing: Theme.paddingMedium
 
@@ -51,46 +58,7 @@ Dialog {
                     color: Theme.highlightColor
                     opacity: Theme.opacityHigh
 
-                    text: {
-                        switch (passwordManager.notificationType) {
-                            case "password-save": {
-                                if (passwordManager.formData["displayUser"]) {
-                                    //% "Would you like to save login and password for %1?"
-                                    return qsTrId("sailfish_components_webview_popups-la-save_password")
-                                            .arg(passwordManager.formData["displayHost"])
-                                } else {
-                                    //% "Would you like to save password for %1?"
-                                    return qsTrId("sailfish_components_webview_popups-ls-save_password_no_user")
-                                            .arg(passwordManager.formData["displayHost"])
-                                }
-                            }
-                            case "password-change": {
-                                if (passwordManager.formData["displayUser"]) {
-                                    //% "Would you like to update password for user %1?"
-                                    return qsTrId("sailfish_components_webview_popups-la-update_password")
-                                            .arg(passwordManager.formData["displayUser"])
-                                } else {
-                                    //% "Would you like to update password?"
-                                    return qsTrId("sailfish_components_webview_popups-la-update_password_no_user")
-                                }
-                            }
-                            case "password-update-multiuser": {
-                                // TODO: currently embedlite component for login manager promter heavily relies
-                                //       on gecko's localization service for UI strings.
-                                //       See LoginManagerPrompter.promtToChangePasswordWithUsernames() for details.
-                                //       We need to reimplement it in order to use Qt l10n for password updates where
-                                //       we don't know which existing login is being updated.
-                                //       Though this task is quite a corner case and thus of very low priority.
-                                console.log("TODO: password-update-multiuser notification type hasn't been implemented yet")
-                                break
-                            }
-                            default: {
-                                console.log("Unhandled password manager notification type: "
-                                            + passwordManager.notificationType)
-                                break
-                            }
-                        }
-                    }
+                    text: StringUtils.geckoKeyToString(passwordManager.messageBundle)
                 }
 
                 Label {
@@ -103,6 +71,21 @@ Dialog {
                     opacity: Theme.opacityHigh
                     //% "Logins and passwords can be managed from the Settings page"
                     text: qsTrId("sailfish_components_webview_popups-la-manage_paswords_hint")
+                }
+
+                ComboBox {
+                    id: selector
+                    visible: passwordManager.notificationType === "password-update-multiuser"
+                    label: StringUtils.geckoKeyToString(passwordManager.formData["textBundle"] || "")
+
+                    menu: ContextMenu {
+                        Repeater {
+                            model: passwordManager.formData["usernames"]
+                            delegate: MenuItem {
+                                text: model.modelData
+                            }
+                        }
+                    }
                 }
             }
         }

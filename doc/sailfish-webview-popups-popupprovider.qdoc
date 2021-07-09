@@ -122,3 +122,11 @@
   The component specified must implement the
   \l{BlockedTabPopupInterface}{blocked tab popup} interface.
 */
+
+/*!
+  \qmlproperty var PopupProvider::selectorPopup
+  \brief The selector popup component descriptor
+
+  The component specified must implement the
+  \l{SelectorPopupInterface}{selector popup} interface.
+*/
