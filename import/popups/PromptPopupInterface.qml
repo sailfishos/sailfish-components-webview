@@ -14,6 +14,7 @@ import Sailfish.Silica 1.0
 UserPromptInterface {
     // inputs
     property string text
+    property string defaultValue
 
     // outputs
     property string value

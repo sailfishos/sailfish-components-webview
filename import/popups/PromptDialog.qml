@@ -18,7 +18,8 @@ Dialog {
     canAccept: input.text.length > 0
 
     property alias text: prompt.text
-    property alias value: input.text
+    property alias value: prompt.value
+    property alias defaultValue: prompt.defaultValue
 
     property alias acceptText: prompt.acceptText
     property alias cancelText: prompt.cancelText
@@ -51,6 +52,7 @@ Dialog {
                 width: parent.width
                 focus: true
                 label: text.length > 0 ? prompt.text : ""
+                text: prompt.defaultValue
                 placeholderText: prompt.text
                 inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                 EnterKey.enabled: text.length > 0

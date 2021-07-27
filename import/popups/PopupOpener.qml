@@ -173,11 +173,17 @@ Timer {
 
     // Open prompt dialog
     function prompt(data) {
+        var defaultValue = !!data.defaultValue
+                         ? data.defaultValue
+                         : (!!data.inputs[0].value
+                            ? data.inputs[0].value
+                            : "")
+
         var checkbox = getCheckbox(data)
         var winId = data.winId
         var props = {
             "text": data.text,
-            "value": data.defaultValue,
+            "defaultValue": defaultValue,
             "preventDialogsVisible": !(checkbox == null),
             "preventDialogsPrefillValue": (!(checkbox == null) ? checkbox.value : false)
         }
