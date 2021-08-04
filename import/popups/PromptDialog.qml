@@ -47,8 +47,7 @@ Dialog {
 
             TextField {
                 id: input
-
-                anchors.centerIn: parent
+                height: implicitHeight
                 width: parent.width
                 focus: true
                 label: text.length > 0 ? prompt.text : ""
