@@ -21,8 +21,7 @@ PromptPopupInterface {
     cancelText: "Cancel"
 
     preventDialogsValue: toggle.checked
-
-    onAccepted: value = input.text
+    value: input.text
 
     Rectangle {
         anchors.fill: parent
@@ -52,6 +51,7 @@ PromptPopupInterface {
                     width: parent.width
                     focus: true
                     label: text.length > 0 ? popup.text : ""
+                    text: popup.defaultValue
                     placeholderText: popup.text
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                     EnterKey.enabled: text.length > 0
