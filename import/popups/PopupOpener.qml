@@ -69,6 +69,18 @@ Timer {
         return null
     }
 
+    function getCheckboxValue(checkbox) {
+        if (checkbox) {
+            // Check for undefined / null
+            if (checkbox.checked !== null && checkbox.checked !== undefined) {
+                return checkbox.checked
+            } else if (checkbox.value !== null && checkbox.value !== undefined) {
+                return checkbox.value
+            }
+        }
+        return false
+    }
+
     // Returns true if message is handled.
     function message(topic, data) {
         if (!handlesMessage(topic)) {
@@ -124,11 +136,12 @@ Timer {
     // Open alert dialog
     function alert(data) {
         var checkbox = getCheckbox(data)
+        var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
         var props = {
             "text": data.text,
             "preventDialogsVisible": !(checkbox == null),
-            "preventDialogsPrefillValue": (!(checkbox == null) ? checkbox.value : false)
+            "preventDialogsPrefillValue": checkboxPrefill
         }
         var acceptFn = function(popup) {
             _popupObject = null
@@ -145,11 +158,12 @@ Timer {
     // Open confirm dialog
     function confirm(data) {
         var checkbox = getCheckbox(data)
+        var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
         var props = {
             "text": data.text,
             "preventDialogsVisible": !(checkbox == null),
-            "preventDialogsPrefillValue": (!(checkbox == null) ? checkbox.value : false)
+            "preventDialogsPrefillValue": checkboxPrefill
         }
         var acceptFn = function(popup) {
             _popupObject = null
@@ -180,12 +194,13 @@ Timer {
                             : "")
 
         var checkbox = getCheckbox(data)
+        var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
         var props = {
             "text": data.text,
             "defaultValue": defaultValue,
             "preventDialogsVisible": !(checkbox == null),
-            "preventDialogsPrefillValue": (!(checkbox == null) ? checkbox.value : false)
+            "preventDialogsPrefillValue": checkboxPrefill
         }
         var acceptFn = function(popup) {
             _popupObject = null
