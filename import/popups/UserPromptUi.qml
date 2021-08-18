@@ -23,11 +23,12 @@ Item {
 
     SilicaFlickable {
         anchors.fill: parent
-        contentHeight: contentColumn.height
+        contentHeight: contentContainer.height
 
-        Column {
-            id: contentColumn
+        Item {
+            id: contentContainer
             width: parent.width
+            height: header.height + promptContent.height + preventDialogs.height
 
             DialogHeader {
                 id: header
@@ -38,19 +39,16 @@ Item {
                 title: popupInterface.title
             }
 
-            Item {
+            Column {
                 id: promptContent
+                anchors.top: header.bottom
                 width: dialog.width
-
-                // So that anchoring works in user prompt dialog implementations
-                // and dialog looks visually good. This leaves annoying binding loop which happens
-                // when keyboard is opened as keyboard opening reduces dialog height.
-                height: Math.max(childrenRect.height, dialog.height - header.height - preventDialogs.height) - Theme.paddingLarge * 2
             }
 
             TextSwitch {
                 id: preventDialogs
 
+                anchors.top: promptContent.bottom
                 height: visible ? implicitHeight : 0
                 visible: popupInterface.preventDialogsVisible
                 checked: popupInterface.preventDialogsVisible && popupInterface.preventDialogsPrefillValue

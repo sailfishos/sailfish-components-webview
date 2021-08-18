@@ -12,27 +12,34 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-Label {
+Item {
+    id: root
+
     property bool largeFont: true
+    property alias text: label.text
 
-    x: Theme.horizontalPageMargin
-    width: parent.width - (2 * Theme.horizontalPageMargin)
-    anchors {
-        top: parent.top
-        topMargin: !largeFont ? Theme.paddingLarge : Theme.itemSizeSmall
-    }
-    font.pixelSize: largeFont ? Theme.fontSizeExtraLarge : Theme.fontSizeMedium
-    color: Theme.highlightColor
+    height: label.height + (largeFont ? Theme.itemSizeSmall : Theme.paddingLarge)
+    width: parent.width
 
-    onContentWidthChanged: {
-        // We want to get contentWidth text width only once. When wrapping
-        // goes enabled we get contentWidth that is less than width.
-        // Greater than ~ three liner will be rendered with smaller font.
-        if (contentWidth > width * 3 && wrapMode == Text.NoWrap) {
-            largeFont = false
-            wrapMode = Text.Wrap
-        } else if (contentWidth > width && wrapMode == Text.NoWrap) {
-            wrapMode = Text.Wrap
+    Label {
+        id: label
+        x: Theme.horizontalPageMargin
+        y: root.largeFont ? Theme.itemSizeSmall : Theme.paddingLarge
+        width: parent.width - (2 * Theme.horizontalPageMargin)
+
+        font.pixelSize: largeFont ? Theme.fontSizeExtraLarge : Theme.fontSizeMedium
+        color: Theme.highlightColor
+
+        onContentWidthChanged: {
+            // We want to get contentWidth text width only once. When wrapping
+            // goes enabled we get contentWidth that is less than width.
+            // Greater than ~ three liner will be rendered with smaller font.
+            if (contentWidth > width * 3 && wrapMode == Text.NoWrap) {
+                root.largeFont = false
+                wrapMode = Text.Wrap
+            } else if (contentWidth > width && wrapMode == Text.NoWrap) {
+                wrapMode = Text.Wrap
+            }
         }
     }
 }
