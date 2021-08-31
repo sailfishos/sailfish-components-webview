@@ -34,7 +34,8 @@ Timer {
         "embed:auth":           "authPopup",
         "embed:permissions":  { "geolocation": "locationPermissionPopup" },
         "embed:webrtcrequest":  "webrtcPermissionPopup",
-        "embed:popupblocked":   "blockedTabPopup"
+        "embed:popupblocked":   "blockedTabPopup",
+        "embed:select":         "selectorPopup"
     })
     readonly property var listeners: Object.keys(_messageTopicToPopupProviderPropertyMapping)
 
@@ -79,6 +80,24 @@ Timer {
             }
         }
         return false
+    }
+
+    function getMenuList(data) {
+        var inputs = data.inputs
+        for (var i = 0; inputs && (i < inputs.length); ++i) {
+            if (inputs[i].type === "menulist") {
+                return inputs[i].values
+            }
+        }
+        return null
+    }
+
+    function getButtonStringKeys(data, defaultButtons) {
+        var buttons = data.buttons || defaultButtons;
+        while (buttons.length < defaultButtons.length) {
+            buttons.push("")
+        }
+        return buttons
     }
 
     // Returns true if message is handled.
@@ -128,6 +147,7 @@ Timer {
         }
         case "embed:webrtcrequest": webrtc(data);   break;
         case "embed:popupblocked":  blocked(data);  break;
+        case "embed:select":        selector(data); break;
         }
         // If we end up here, message has been handled.
         return true
@@ -138,8 +158,11 @@ Timer {
         var checkbox = getCheckbox(data)
         var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
+        var buttons = getButtonStringKeys(data, ["OK", ""])
         var props = {
             "text": data.text,
+            "acceptText": buttons[0],
+            "cancelText": buttons[1],
             "preventDialogsVisible": !(checkbox == null),
             "preventDialogsPrefillValue": checkboxPrefill
         }
@@ -160,8 +183,14 @@ Timer {
         var checkbox = getCheckbox(data)
         var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
+        var buttons = getButtonStringKeys(data, ["OK", "Cancel"])
+        if (buttons.length > 2) {
+            console.log("Requesting " + buttons.length + " buttons, but only two are supported.")
+        }
         var props = {
             "text": data.text,
+            "acceptText": buttons[0],
+            "cancelText": buttons[1],
             "preventDialogsVisible": !(checkbox == null),
             "preventDialogsPrefillValue": checkboxPrefill
         }
@@ -196,9 +225,12 @@ Timer {
         var checkbox = getCheckbox(data)
         var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
+        var buttons = getButtonStringKeys(data, ["OK", "Cancel"])
         var props = {
             "text": data.text,
             "defaultValue": defaultValue,
+            "acceptText": buttons[0],
+            "cancelText": buttons[1],
             "preventDialogsVisible": !(checkbox == null),
             "preventDialogsPrefillValue": checkboxPrefill
         }
@@ -227,6 +259,7 @@ Timer {
     function login(data) {
         var props = {
             "notificationType": data.name,
+            "messageBundle": data.textBundle,
             "formData": data.formdata,
             "_internalData": { "contentItem": contentItem, "requestId": data.id }
         }
@@ -234,7 +267,8 @@ Timer {
             _popupObject = null
             popup._internalData.contentItem.sendAsyncMessage("embedui:login", {
                 "buttonidx": 0, // "Yes" button
-                "id": popup._internalData.requestId
+                "id": popup._internalData.requestId,
+                "selectedIndex": popup.selectedIndex // Only if there are multiple logins
             })
             root.loginSaved()
         }
@@ -266,17 +300,23 @@ Timer {
             }
         }
         var passwordOnly = !username
+        var buttons = getButtonStringKeys(data, ["AcceptLogin", ""])
+
         var props = {
-            "hostname": data.text,
-            "realm": data.title,
+            "messageBundle": data.text,
+            "acceptText": buttons[0],
+            "cancelText": buttons[1],
+            "hostname": data.hostname || "",
+            "realm": data.realm || "",
             "usernameVisible": !(username == null),
             "usernamePrefillValue": (!(username == null)) ? username.value : "",
             "usernameAutofocus": (!(username == null)) ? username.autofocus : false,
             "passwordPrefillValue": (!(password == null)) ? password.value : "",
             "rememberVisible": !(remember == null),
-            "rememberPrefillValue": (!(remember == null)) ? remember.value : "",
+            "rememberPrefillValue": (!(remember == null)) ? remember.checked : false,
+            "rememberMessageBundle": (!(remember == null)) ? remember.label : "",
             "passwordOnly": passwordOnly,
-            "privateBrowsing": data.privateBrowsing
+            "privateBrowsing": data.privateBrowsing || false
         }
         var acceptFn = function(popup) {
             _popupObject = null
@@ -391,6 +431,36 @@ Timer {
         )
     }
 
+    function selector(data) {
+        var winId = data.winId
+        var buttons = getButtonStringKeys(data, ["OK", ""])
+        var props = {
+            "title": data.title,
+            "text": data.text,
+            "acceptText": buttons[0],
+            "cancelText": buttons[1],
+            "values": getMenuList(data)
+        }
+
+        var acceptFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("selectresponse", {
+                "winId": winId,
+                "button": 0,
+                "menulist0": popup.selectedIndex
+            })
+        }
+        var rejectFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("selectresponse", {
+                "winId": winId,
+                "button": 1
+            })
+        }
+
+        openPopupByTopic("embed:select", data.title, props, acceptFn, rejectFn)
+    }
+
     // Handle pagestack busy change
     function busyChanged() {
         if (!pageStack.busy && root._delayedOpenValues) {
@@ -447,7 +517,7 @@ Timer {
     }
 
     function openPopupByTopic(topic, subtopic, properties, acceptedFn, rejectedFn) {
-        var comp =_resolveListenerComponent(topic, subtopic)
+        var comp = _resolveListenerComponent(topic, subtopic)
         var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
         if (comp === null || comp === undefined) {
             console.log("PopupOpener.qml: invalid component specified for: " + topic + " " + subtopic)

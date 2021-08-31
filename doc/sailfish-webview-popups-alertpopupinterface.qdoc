@@ -9,6 +9,7 @@
   \inqmlmodule Sailfish.WebView.Popups
   \ingroup sailfishos-webview-popups
   \brief A component which defines the interface for the alert popup
+  \inherits UserPromptInterface
 
   The \c{AlertPopupInterface} QML type is exposed through the
   \c{Sailfish.WebView.Popups} QML import namespace.
@@ -25,6 +26,11 @@
   Note that a custom implementation of an \c{AlertPopupInterface} need not
   offer separate accept and reject actions; simply providing an accept action
   is sufficient (e.g. an "OK" button to emit \c{accepted} when triggered).
+
+  The key assigned to \l{Sailfish.WebView.Popups::UserPromptInterface::acceptText}
+  {acceptText} will always be "OK" while
+  \l{Sailfish.WebView.Popups::UserPromptInterface::cancelText}{cancelText}
+  will always be assigned the empty string.
 
   \sa UserPromptInterface, custompopups
 */

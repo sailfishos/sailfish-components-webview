@@ -9,6 +9,7 @@
   \inqmlmodule Sailfish.WebView.Popups
   \ingroup sailfishos-webview-popups
   \brief A component which defines the interface for the auth popup
+  \inherits UserPromptInterface
 
   The \c{AuthPopupInterface} QML type is exposed through the
   \c{Sailfish.WebView.Popups} QML import namespace.
@@ -22,7 +23,43 @@
   tell the \l{WebView} to use their implementation via the \c{popupProvider}
   property.
 
+  The key assigned to \l{Sailfish.WebView.Popups::UserPromptInterface::acceptText}
+  {acceptText} will always be "AcceptLogin" while
+  \l{Sailfish.WebView.Popups::UserPromptInterface::cancelText}{cancelText}
+  will always be assigned the empty string.
+
   \sa UserPromptInterface, custompopups
+*/
+
+/*!
+  \qmlproperty var AuthPopupInterface::messageBundle
+  \brief The gecko localization bundle of the message to display to the user
+
+  A custom implementation can use this information to tailor the message
+  and details supplied to the user.
+
+  The value is either a string or an array. If it's an array then the first
+  value will be the gecko localization key taken from the commonDialogs.properties
+  file. The remaining items in the array are the parameter values to replace %1,
+  %2, etc. in the string.
+
+  If the value is a string then it will be a gecko localization key without
+  parameters.
+
+  You can search the \l{https://pontoon.mozilla.org/en-GB/firefox/}{Firefox
+  Pontoon localization database} for this file, followed by the appropriate key.
+  The key can be one of the following values:
+
+  \list
+    \li EnterLoginForRealm3
+    \li EnterLoginForProxy3
+    \li EnterUserPasswordFor2
+    \li EnterUserPasswordForCrossOrigin2
+    \li EnterPasswordFor
+  \endlist
+
+  Care must be taken as it's possible these values may change with future
+  engine updates.
 */
 
 /*!
@@ -117,6 +154,35 @@
   \brief The value which should be prefilled into the "remember" toggle switch
 */
 
+
+/*!
+  \qmlproperty var AuthPopupInterface::rememberMessageKey
+  \brief The gecko localization key of the message to display to the user
+         for the "remember" toggle switch
+
+  A custom implementation can use this information to tailor the message
+  shown alongside the "remember" toggle switch.
+
+  The value is either a string or an array. If it's an array then the first
+  value will be the gecko localization key taken from the commonDialogs.properties
+  file. The remaining items in the array are the parameter values to replace %1,
+  %2, etc. in the string.
+
+  If the value is a string then it will be a gecko localization key without
+  parameters.
+
+  You can search the \l{https://pontoon.mozilla.org/en-GB/firefox/}{Firefox
+  Pontoon localization database} for this file, followed by the appropriate key.
+
+  Currently there is only one value the key can take:
+
+  \list
+    \li rememberButton
+  \endlist
+
+  Care must be taken as it's possible these values may change with future
+  engine updates.
+*/
 
 /*!
   \qmlproperty string AuthPopupInterface::usernameValue
