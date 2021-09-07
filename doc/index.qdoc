@@ -1,6 +1,7 @@
 /****************************************************************************************
 **
 ** Copyright (c) 2021 Open Mobile Platform LLC
+** Copyright (c) 2021 Jolla Ltd.
 ** All rights reserved.
 **
 ****************************************************************************************/
@@ -17,13 +18,33 @@ Mozilla gecko.
 
 \section1 Using Sailfish WebView
 
-Currently you have to explicitly link against qtmozembed-qt5 at build time, to
-avoid a symbol issue which leads to a crash:
+Currently you have to explicitly link against qtmozembed-qt5 at build time.
+For this you need to modify both your spec file, and your pro file. In
+the spec file you should add line:
+
+\code
+BuildRequires:  pkgconfig(qt5embedwidget)
+\endcode
+
+And in your pro file you should add line:
+
+\code
+PKGCONFIG += qt5embedwidget
+\endcode
+
+In order for PkgConfig to work, you need to have either
+
+\code
+CONFIG += sailfishapp
+\endcode
+
+or
 
 \code
 CONFIG += link_pkgconfig
-PKGCONFIG += qt5embedwidget
 \endcode
+
+in your pro file.
 
 \section2 C++ API
 
