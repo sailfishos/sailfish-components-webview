@@ -30,8 +30,8 @@ qhp.SailfishWebView.customFilters.SailfishWebView.filterAttributes = sailfishos-
 
 qhp.SailfishWebView.subprojects        = overview qmltypes classes
 
-qhp.SailfishWebView.subprojects.overview.title = Sailfish WebView
-qhp.SailfishWebView.subprojects.overview.indexTitle = Sailfish WebView
+qhp.SailfishWebView.subprojects.overview.title = Sailfish WebView Overview
+qhp.SailfishWebView.subprojects.overview.indexTitle = Sailfish WebView Overview
 qhp.SailfishWebView.subprojects.overview.type = manual
 qhp.SailfishWebView.subprojects.qmltypes.title = QML Types
 qhp.SailfishWebView.subprojects.qmltypes.indexTitle = Sailfish.WebView QML Types
