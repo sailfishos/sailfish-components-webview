@@ -11,7 +11,7 @@
 \title Sailfish WebView
 
 The Sailfish WebView provides a straightforward and flexible way for you
-to introduce access to Web pages and websites into your applciation.
+to introduce access to Web pages and websites into your application.
 
 The WebView component utilises the Sailfish OS browser engine, built using
 Mozilla gecko.
