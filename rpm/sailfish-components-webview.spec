@@ -38,25 +38,11 @@ Requires:  nemo-qml-plugin-systemsettings
 %description popups
 %{summary}.
 
-%package popups-ts-devel
-Summary:   Translation source for sailfish-components-webview-popups-qt5
-Requires:  %{name} = %{version}
-
-%description popups-ts-devel
-%{summary}.
-
 %package pickers
 Summary:   Picker and selector QML components used by sailfish-components-webview
 Requires:  %{name} = %{version}
 
 %description pickers
-%{summary}.
-
-%package pickers-ts-devel
-Summary:   Translation source for sailfish-components-webview-pickers-qt5
-Requires:  %{name} = %{version}
-
-%description pickers-ts-devel
 %{summary}.
 
 %package devel
@@ -111,6 +97,8 @@ BuildRequires:  qt5-tools
 %defattr(-,root,root,-)
 %{_datadir}/translations/source/sailfish_components_webview_qt5.ts
 %{_datadir}/translations/source/sailfish_components_webview_controls_qt5.ts
+%{_datadir}/translations/source/sailfish_components_webview_popups_qt5.ts
+%{_datadir}/translations/source/sailfish_components_webview_pickers_qt5.ts
 
 %files popups
 %defattr(-,root,root,-)
@@ -126,14 +114,6 @@ BuildRequires:  qt5-tools
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/libsailfishwebviewpickersplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/*.qml
-
-%files popups-ts-devel
-%defattr(-,root,root,-)
-%{_datadir}/translations/source/sailfish_components_webview_popups_qt5.ts
-
-%files pickers-ts-devel
-%defattr(-,root,root,-)
-%{_datadir}/translations/source/sailfish_components_webview_pickers_qt5.ts
 
 %files devel
 %defattr(-,root,root,-)
