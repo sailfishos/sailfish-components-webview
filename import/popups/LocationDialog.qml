@@ -15,6 +15,7 @@ import Sailfish.Silica 1.0
 Dialog {
     id: dialog
 
+    property alias privateBrowsing: location.privateBrowsing
     property alias host: location.host
     property alias rememberValue: location.rememberValue
 
@@ -64,9 +65,22 @@ Dialog {
                 TextSwitch {
                     id: remember
 
+                    visible: !location.privateBrowsing
                     //: Remember decision for this site for later use
                     //% "Remember for this site"
                     text: qsTrId("sailfish_components_webview_popups-remember_for_site")
+                }
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - Theme.horizontalPageMargin * 2
+                    visible: location.privateBrowsing
+                    wrapMode: Text.Wrap
+                    color: Theme.highlightColor
+
+                    //: Description label for user when private mode active (entered permissions are not saved)
+                    //% "When in private browsing mode permissions choices are not stored"
+                    text: qsTrId("sailfish_components_webview_popups-la-private_browsing_premission_description")
                 }
             }
         }

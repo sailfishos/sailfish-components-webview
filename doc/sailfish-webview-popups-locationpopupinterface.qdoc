@@ -27,6 +27,19 @@
 */
 
 /*!
+  \qmlproperty bool LocationPopupInterface::privateBrowsing
+  \brief Will be true if the user is in private browsing mode
+
+  A custom implementation should use the value of this property to determine
+  how to change the look-and-feel of the popup, to ensure that the user is
+  reminded that the web view is currently in private browsing mode.
+
+  Also, if in private browsing mode, the custom implementation should not
+  ask the user if they would like the web view to store the permission,
+  and as such it should hide its "remember" toggle switch.
+*/
+
+/*!
   \qmlproperty string LocationPopupInterface::host
   \brief The name of the site which is asking for permission to access the
          user's location
