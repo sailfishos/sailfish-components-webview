@@ -84,6 +84,7 @@ RawWebView::RawWebView(QQuickItem *parent)
     : QuickMozView(parent)
     , m_viewCreator(ViewCreator::instance())
     , m_vkbMargin(0.0)
+    , m_footerMargin(0.0)
     , m_acceptTouchEvents(true)
 {
     m_viewCreator->views.push_back(this);
@@ -108,6 +109,9 @@ void RawWebView::setVirtualKeyboardMargin(qreal vkbMargin)
     if (m_vkbMargin != vkbMargin) {
         m_vkbMargin = vkbMargin;
         setMargins(QMargins(0, 0, 0, m_vkbMargin));
+
+        setDynamicToolbarHeight(m_vkbMargin != 0 ? m_footerMargin : 0);
+
         emit virtualKeyboardMarginChanged();
 
         QVariantMap map;
@@ -122,6 +126,22 @@ void RawWebView::setVirtualKeyboardMargin(qreal vkbMargin)
         map.insert("screenHeight", viewportHeight());
         QVariant data(map);
         sendAsyncMessage("embedui:vkbOpenCompositionMetrics", data);
+    }
+}
+
+qreal RawWebView::footerMargin() const
+{
+    return m_footerMargin;
+}
+
+void RawWebView::setFooterMargin(qreal margin)
+{
+    if (m_footerMargin != margin) {
+        m_footerMargin = margin;
+
+        setDynamicToolbarHeight(m_vkbMargin != 0 ? m_footerMargin : 0);
+
+        emit footerMarginChanged();
     }
 }
 
