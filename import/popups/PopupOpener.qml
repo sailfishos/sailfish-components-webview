@@ -342,7 +342,8 @@ Timer {
     // Open permissions dialog
     function permissions(data) {
         var props = {
-            "host": data.host
+            "host": data.host,
+            "privateBrowsing": data.privateBrowsing || true
         }
         var acceptFn = function(popup) {
             _popupObject = null

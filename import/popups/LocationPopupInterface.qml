@@ -13,6 +13,7 @@ import Sailfish.Silica 1.0
 
 UserPromptInterface {
     // inputs
+    property bool privateBrowsing // "Remember" should only be shown if !privateBrowsing
     property string host
 
     // outputs
