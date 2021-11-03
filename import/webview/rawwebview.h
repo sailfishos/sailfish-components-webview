@@ -28,6 +28,7 @@ class RawWebView : public QuickMozView
 {
     Q_OBJECT
     Q_PROPERTY(qreal virtualKeyboardMargin READ virtualKeyboardMargin WRITE setVirtualKeyboardMargin NOTIFY virtualKeyboardMarginChanged)
+    Q_PROPERTY(qreal footerMargin READ footerMargin WRITE setFooterMargin NOTIFY footerMarginChanged)
     Q_PROPERTY(bool _acceptTouchEvents READ acceptTouchEvents WRITE setAcceptTouchEvents NOTIFY acceptTouchEventsChanged)
 
 public:
@@ -37,6 +38,9 @@ public:
     qreal virtualKeyboardMargin() const;
     void setVirtualKeyboardMargin(qreal vkbMargin);
 
+    qreal footerMargin() const;
+    void setFooterMargin(qreal margin);
+
     bool acceptTouchEvents() const;
     void setAcceptTouchEvents(bool accept);
 
@@ -45,6 +49,7 @@ protected:
 
 signals:
     void virtualKeyboardMarginChanged();
+    void footerMarginChanged();
     void contentOrientationChanged(Qt::ScreenOrientation orientation);
     void acceptTouchEventsChanged();
     void openUrlInNewWindow();
@@ -54,6 +59,7 @@ private:
 
     std::shared_ptr<ViewCreator> m_viewCreator;
     qreal m_vkbMargin;
+    qreal m_footerMargin;
     QPointF m_startPos;
     bool m_acceptTouchEvents;
 };
