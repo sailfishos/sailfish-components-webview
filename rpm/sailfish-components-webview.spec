@@ -72,7 +72,7 @@ Examples using Sailfish WebView.
 
 %package doc
 Summary:    Documentation for Sailfish WebView
-BuildRequires:  mer-qdoc-template
+BuildRequires:  sailfish-qdoc-template
 BuildRequires:  qt5-qttools-qthelp-devel
 BuildRequires:  qt5-tools
 
