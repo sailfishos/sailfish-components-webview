@@ -147,6 +147,7 @@ BuildRequires:  qt5-tools
 %files examples
 %defattr(-,root,root,-)
 %{_bindir}/custompopups
+%{_bindir}/webview-test-app
 
 %files doc
 %defattr(-,root,root,-)
