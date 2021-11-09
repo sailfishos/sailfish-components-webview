@@ -343,7 +343,7 @@ Timer {
     function permissions(data) {
         var props = {
             "host": data.host,
-            "privateBrowsing": data.privateBrowsing || true
+            "privateBrowsing": data.privateBrowsing
         }
         var acceptFn = function(popup) {
             _popupObject = null
