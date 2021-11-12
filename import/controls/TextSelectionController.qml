@@ -49,9 +49,8 @@ MouseArea {
         var state = data.src
 
         // Start marker
-        start.fixedX = (data.start.xPos * resolution) - start.width - contentItem.scrollableOffset.x
-        start.fixedY = data.start.yPos * resolution - contentItem.scrollableOffset.y
-
+        start.fixedX = (data.start.xPos * resolution) - start.width
+        start.fixedY = data.start.yPos * resolution
         if (!selectionVisible) {
             start.x = start.fixedX
             start.y = start.fixedY
@@ -60,8 +59,8 @@ MouseArea {
         }
 
         // End marker
-        end.fixedX = data.end.xPos * resolution - contentItem.scrollableOffset.x
-        end.fixedY = data.end.yPos * resolution - contentItem.scrollableOffset.y
+        end.fixedX = data.end.xPos * resolution
+        end.fixedY = data.end.yPos * resolution
 
         if (!selectionVisible) {
             end.x = end.fixedX
@@ -140,12 +139,12 @@ MouseArea {
         return {
             change: markerTag,
             start: {
-                xPos: (start.x + contentItem.scrollableOffset.x + start.width) / resolution,
-                yPos: (start.y + contentItem.scrollableOffset.y) / resolution
+                xPos: (start.x + start.width) / resolution,
+                yPos: start.y / resolution
             },
             end: {
-                xPos: (end.x + contentItem.scrollableOffset.x) / resolution,
-                yPos: (end.y + contentItem.scrollableOffset.y) / resolution
+                xPos: end.x / resolution,
+                yPos: end.y / resolution
             },
             caret: {
                 xPos: 0,
