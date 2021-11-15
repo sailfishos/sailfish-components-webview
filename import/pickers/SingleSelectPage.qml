@@ -74,6 +74,7 @@ Page {
         }
 
         delegate: BackgroundItem {
+            height: Math.max(Theme.itemSizeSmall, selecetLabel.height + Theme.paddingMedium)
 
             enabled: !disabled
 
@@ -87,8 +88,12 @@ Page {
             }
 
             Label {
-                x: Theme.paddingLarge
+                id: selecetLabel
+
+                x: Theme.horizontalPageMargin
                 anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - x*2
+                wrapMode: Text.Wrap
                 text: label
                 color: {
                     if (disabled) {
