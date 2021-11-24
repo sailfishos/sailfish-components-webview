@@ -23,7 +23,8 @@ ApplicationWindow {
                     "webPageAddress": webPageAddress.text,
                     "creationDelay": creationDelay.value,
                     "destructionDelay": destructionDelay.value,
-                    "reloadInterval": reloadInterval.value
+                    "reloadInterval": reloadInterval.value,
+                    "viewportInfo": viewportInfoSwitch.checked
                 }
 
                 pageStack.push(webViewPageComponent, props)
@@ -71,6 +72,7 @@ ApplicationWindow {
                         MenuItem { text: "Open webpage" }
                         MenuItem { text: "Webview recreation" }
                         MenuItem { text: "Webpage reload" }
+                        MenuItem { text: "Webpage scrollable rect" }
                     }
                 }
 
@@ -110,6 +112,11 @@ ApplicationWindow {
                     stepSize: 0.1
                 }
 
+                TextSwitch {
+                    id: viewportInfoSwitch
+                    text: "Viewport info"
+                }
+
                 Item {
                     width: parent.width
                     height: Theme.paddingLarge
@@ -138,6 +145,7 @@ ApplicationWindow {
             property real creationDelay
             property real destructionDelay
             property real reloadInterval
+            property bool viewportInfo
 
             property bool webViewLoading: false
             property int webViewLoadProgress: 0
@@ -220,6 +228,77 @@ ApplicationWindow {
                     if (item) {
                         console.log("page loading: " + webPageAddress)
                         item.load(webPageAddress)
+                    }
+                }
+            }
+
+            Rectangle {
+                visible: viewportInfo
+                color: "grey"
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    right: parent.right
+                    margins: 22
+                }
+
+                height: contentColumn.height + Theme.paddingMedium * 2
+                radius: 5
+
+                Column {
+                    id: contentColumn
+                    y: Theme.paddingMedium
+                    x: Theme.paddingMedium
+                    width: parent.width - Theme.paddingMedium * 2
+
+                    Label {
+                        text: "Scrollable offset x: " + webViewLoader.item.scrollableOffset.x.toFixed(2) + ", y: " + webViewLoader.item.scrollableOffset.y.toFixed(2)
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Label {
+                        text: "Scrollable width: " + webViewLoader.item.scrollableSize.width.toFixed(2) + ", height: " + webViewLoader.item.scrollableSize.height.toFixed(2)
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Label {
+                        text: "Content width: " + webViewLoader.item.contentWidth.toFixed(2) + ", height: " + webViewLoader.item.contentHeight.toFixed(2)
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Label {
+                        text: "Content rect x: " + webViewLoader.item.contentRect.x.toFixed(2) + ", y: " + webViewLoader.item.contentRect.y.toFixed(2)
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Label {
+                        text: "Content rect width: " + webViewLoader.item.contentRect.width.toFixed(2) + ", height: " + webViewLoader.item.contentRect.height.toFixed(2)
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Label {
+                        text: "atXBeginning: " + webViewLoader.item.atXBeginning
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Label {
+                        text: "atYBeginning: " + webViewLoader.item.atYBeginning
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Label {
+                        text: "atXEnd: " + webViewLoader.item.atXEnd
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Label {
+                        text: "atYEnd: " + webViewLoader.item.atYEnd
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Label {
+                        text: "resolution: " + webViewLoader.item.resolution
+                        font.pixelSize: Theme.fontSizeSmall
                     }
                 }
             }
