@@ -190,7 +190,7 @@ ContextMenuInterface {
             }
 
             DownloadMenuItem {
-                visible: root.downloadsEnabled && root.isImage
+                visible: root.isImage
                 //: This menu item saves image to Gallery application
                 //% "Save image"
                 text: qsTrId("sailfish_components_webview_popups-me-save_image")
