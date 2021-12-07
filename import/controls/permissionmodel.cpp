@@ -134,9 +134,20 @@ void PermissionModel::handleRecvObserve(const QString &message, const QVariant &
 
 void PermissionModel::setPermissionList(const QVariantList &data)
 {
+    static const QStringList knownPermissions {
+        QStringLiteral("geolocation"),
+        QStringLiteral("cookie"),
+        QStringLiteral("popup"),
+        QStringLiteral("camera"),
+        QStringLiteral("microphone"),
+    };
+
     QList<Permission> permissions;
     for (const auto &iter : data) {
         QVariantMap varMap = iter.toMap();
+        if (!knownPermissions.contains(varMap.value("type").toString()))
+            continue;
+
         permissions.append(Permission(varMap.value("uri").toString(),
                                       varMap.value("type").toString(),
                                       PermissionManager::intToCapability(varMap.value("capability").toInt()),
