@@ -163,10 +163,22 @@
 */
 
 /*!
-    \qmlmethod WebEngineSettings::setPreferences(key, value)
+    \qmlmethod WebEngineSettings::setPreferences(key, value, type)
     \brief Directly set gecko engine preferences.
 
-    Sets the \a key preference to \a value.
+    Sets the \a key preference to \a value. The \a type is an optional argument that
+    is by default QMozEngineSettings.UnknownPref.
+
+    The \a type can be one of:
+
+    \value QMozEngineSettings.UnknownPref
+           Unknown preference type, the default
+    \value QMozEngineSettings.StringPref
+           Preference interpreted as string type, commonly used with float as well.
+    \value QMozEngineSettings.IntPref
+           Preference interpreted as int type.
+    \value QMozEngineSettings.BoolPref
+           Preference interpreted as bool type (true or false).
 
     This is a low-level API to set engine preferences. Higher-level calls, such
     as those provided by \l WebEngineSettings, \l WebEngine and \l WebView
