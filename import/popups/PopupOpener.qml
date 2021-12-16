@@ -13,6 +13,7 @@ import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Sailfish.WebView.Popups 1.0 as Popups
 import Sailfish.WebView.Controls 1.0 as Controls
+import org.nemomobile.configuration 1.0
 
 Timer {
     id: root
@@ -23,6 +24,18 @@ Timer {
     property QtObject contentItem
     readonly property bool active: contextMenu && contextMenu.active || false
     property Item contextMenu
+
+    property ConfigurationValue locationRequestsBlocked: ConfigurationValue {
+        key: "/apps/sailfish-browser/settings/location_req_blocked"
+    }
+
+    property ConfigurationValue cameraRequestsBlocked: ConfigurationValue {
+        key: "/apps/sailfish-browser/settings/camera_req_blocked"
+    }
+
+    property ConfigurationValue microphoneRequestsBlocked: ConfigurationValue {
+        key: "/apps/sailfish-browser/settings/microphone_req_blocked"
+    }
 
     property PopupProvider popupProvider: PopupProvider {}
     readonly property var _messageTopicToPopupProviderPropertyMapping: ({
@@ -133,7 +146,8 @@ Timer {
         case "embed:login":         login(data);    break;
         case "embed:auth":          auth(data);     break;
         case "embed:permissions": {
-            if (data.title === "geolocation") {
+            if (data.title === "geolocation"
+                && !locationRequestsBlocked.value) {
                 permissions(data)
             } else {
                 // Currently we don't support other permission requests.
@@ -370,8 +384,15 @@ Timer {
 
     function webrtc(data) {
         // Promote only supported requests and only from an observable origin
-        if (data.origin && ("camera" in data.devices ||
-                            "microphone" in data.devices)) {
+
+        // If both camera and microphone are requested, but at least one of them
+        // is blocked, deny the request
+        if (data.origin &&
+           ("camera" in data.devices && "microphone" in data.devices &&
+            !cameraRequestsBlocked.value && !microphoneRequestsBlocked.value ||
+            "camera" in data.devices && !("microphone" in data.devices) && !cameraRequestsBlocked.value ||
+            "microphone" in data.devices && !("camera" in data.devices) && !microphoneRequestsBlocked.value)) {
+
             openPopupByTopic("embed:webrtcrequest", null, {
                     "origin": data.origin,
                     "devices": data.devices
