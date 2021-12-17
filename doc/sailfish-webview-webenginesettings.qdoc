@@ -110,11 +110,11 @@
 
     The cookie behaviour can be one of:
 
-    \value QMozEngineSettings.AcceptAll
+    \value WebEngineSettings.AcceptAll
            Accept all cookies independent of their origin, the default
-    \value QMozEngineSettings.BlockThirdParty
+    \value WebEngineSettings.BlockThirdParty
            Accept cookies only if they are from the requested domain.
-    \value QMozEngineSettings.BlockAll
+    \value WebEngineSettings.BlockAll
            Do not accept any cookies.
 
     This corresponds to the "network.cookie.cookieBehavior" gecko preference.
@@ -171,13 +171,14 @@
 
     The \a type can be one of:
 
-    \value QMozEngineSettings.UnknownPref
-           Unknown preference type, the default
-    \value QMozEngineSettings.StringPref
+    \value WebEngineSettings.UnknownPref
+           Unknown preference type, the default.
+           WebEngineSettings interprets value on best effort basis
+    \value WebEngineSettings.StringPref
            Preference interpreted as string type, commonly used with float as well.
-    \value QMozEngineSettings.IntPref
+    \value WebEngineSettings.IntPref
            Preference interpreted as int type.
-    \value QMozEngineSettings.BoolPref
+    \value WebEngineSettings.BoolPref
            Preference interpreted as bool type (true or false).
 
     This is a low-level API to set engine preferences. Higher-level calls, such
