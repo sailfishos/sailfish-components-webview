@@ -220,12 +220,8 @@ void SailfishOS::WebEngineSettings::enableLowPrecisionBuffers(bool enabled);
 
     This is a low-level API to set engine preferences. Higher-level calls, such
     as those provided by \l WebEngineSettings,
-    \l {SailfishOS::WebEngineSettings}{WebEngineSettings},
     \l {SailfishOS::WebEngine}{WebEngine} and \l {SailfishOS::WebView}{WebView}
     should be used in preference whenever possible.
-
-    See the \l {https://developer.mozilla.org/en-US/docs/Mozilla/Preferences?retiredLocale=ar}{MDN docs}
-    for more info about the available preferences.
 */
 void SailfishOS::WebEngineSettings::setPreference(const QString &key, const QVariant &value);
 
