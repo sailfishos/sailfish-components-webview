@@ -47,6 +47,15 @@ public:
     };
     Q_ENUM(CookieBehavior)
 
+    // See https://github.com/sailfishos-mirror/gecko-dev/blob/esr78/modules/libpref/nsIPrefBranch.idl
+    enum PreferenceType {
+        UnknownPref = 0,
+        StringPref = 32,
+        IntPref = 64,
+        BoolPref = 128
+    };
+    Q_ENUM(PreferenceType)
+
     bool isInitialized() const;
 
     bool autoLoadImages() const;
@@ -77,6 +86,7 @@ public:
 
     // Low-level API to set engine preferences.
     Q_INVOKABLE void setPreference(const QString &key, const QVariant &value);
+    Q_INVOKABLE void setPreference(const QString &key, const QVariant &value, PreferenceType preferenceType);
 
 Q_SIGNALS:
     void autoLoadImagesChanged();

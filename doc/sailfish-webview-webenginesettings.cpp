@@ -88,6 +88,23 @@ namespace SailfishOS {
 */
 
 /*!
+    \enum SailfishOS::WebEngineSettings::PreferenceType
+
+    This enum type specifies possible preference types that can used.
+
+    \value UnknownPref
+           Unknown preference type.
+           WebEngineSettings interprets value on best effort basis.
+    \value StringPref
+           Preference interpreted as string type, commonly used with float as well.
+    \value IntPref
+           Preference interpreted as int type.
+    \value BoolPref
+           Preference interpreted as bool type (true or false).
+
+*/
+
+/*!
     \property SailfishOS::WebEngineSettings::cookieBehavior
     \brief Sets the cookie behaviour.
 
@@ -203,13 +220,20 @@ void SailfishOS::WebEngineSettings::enableLowPrecisionBuffers(bool enabled);
 
     This is a low-level API to set engine preferences. Higher-level calls, such
     as those provided by \l WebEngineSettings,
-    \l {SailfishOS::WebEngineSettings}{WebEngineSettings},
     \l {SailfishOS::WebEngine}{WebEngine} and \l {SailfishOS::WebView}{WebView}
     should be used in preference whenever possible.
-
-    See the \l {https://developer.mozilla.org/en-US/docs/Mozilla/Preferences?retiredLocale=ar}{MDN docs}
-    for more info about the available preferences.
 */
 void SailfishOS::WebEngineSettings::setPreference(const QString &key, const QVariant &value);
+
+/*!
+    \brief Directly set gecko engine preferences.
+
+    This function overloads setPreference().
+
+    Sets the \a key preference to \a value. The \a type is the type of the prererence value.
+
+    \sa setPreference
+*/
+void SailfishOS::WebEngineSettings::setPreference(const QString &key, const QVariant &value, PreferenceType preferenceType);
 
 } // namespace SailfishOS
