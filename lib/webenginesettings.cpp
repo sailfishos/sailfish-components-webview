@@ -88,11 +88,6 @@ void SailfishOS::WebEngineSettings::initialize()
     SailfishOS::WebEngineSettings *engineSettings = instance();
 
     // Standard settings.
-    engineSettings->setPreference(QStringLiteral("embedlite.azpc.handle.singletap"), QVariant::fromValue<bool>(false));
-    engineSettings->setPreference(QStringLiteral("embedlite.azpc.json.singletap"), QVariant::fromValue<bool>(true));
-    engineSettings->setPreference(QStringLiteral("embedlite.azpc.handle.longtap"), QVariant::fromValue<bool>(false));
-    engineSettings->setPreference(QStringLiteral("embedlite.azpc.json.longtap"), QVariant::fromValue<bool>(true));
-    engineSettings->setPreference(QStringLiteral("embedlite.azpc.json.viewport"), QVariant::fromValue<bool>(true));
     // TODO: Fix this so that it can be applied during runtime when QQuickItem based WebView is used with QQuickFlickable.
     // At the moment just disable it to avoid unnecessary events being fired. JB#39581
 #if 0
