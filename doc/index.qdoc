@@ -115,6 +115,36 @@ WebView currently supports customization via the following interfaces:
 \li \l{SelectorPopupInterface}
 \endlist
 
+
+\section2 Loading and using local resources
+
+When \l {https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS}{Cross-Origin Resource Sharing}
+is applied resources that are required and loaded from another origin should be made
+aware of the cross-origin boundary. It is preferable that resources are served from a web service instead of using
+local resources. When resources are served from a web service you can specify
+appropriate HTTP-headers to permit loading of resources. Content security manager
+will intercept and verify requests that you are performing and in case there is a violation
+the request is denied.
+
+In case one doesn't have the possibility to setup a web service and there is need
+to load resources with file uri scheme. You can set \c security.disable_cors_checks
+preference to \c true to bypass cross-origin resource sharing checks. This
+preference should be set before loading of any resources and only if you know what
+requests are sent.
+
+When debugging your application you can run it with the \c EMBED_CONSOLE=1 environment variable. In case
+you are interested in the requests that are made use the \c EMBED_CONSOLE=network environment
+variable. When \c EMBED_CONSOLE is enabled console messages are printed to the terminal.
+
+Example of failure could look like this:
+
+\code
+[JavaScript Error: "Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote
+resource at file:///path-to-resource/myfile.js. (Reason: CORS request not http)."]
+\endcode
+
+\sa WebEngineSettings
+
 */
 
 /*!
