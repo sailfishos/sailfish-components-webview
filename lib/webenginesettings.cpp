@@ -20,6 +20,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtGui/QStyleHints>
+#include <sys/sysinfo.h>
 
 Q_GLOBAL_STATIC(SailfishOS::WebEngineSettings, webEngineSettingsInstance)
 
@@ -40,6 +41,12 @@ static bool testScreenDimensions(qreal pixelRatio)
     qreal w = screen->size().width() / pixelRatio;
     qreal h = screen->size().height() / pixelRatio;
     return fmod(w, 1.0) == 0 && fmod(h, 1.0) == 0;
+}
+
+static quint64 getTotalMemory() {
+    struct sysinfo info;
+    sysinfo(&info);
+    return info.totalram;
 }
 
 const QSettings &quickSettings()
@@ -101,6 +108,14 @@ void SailfishOS::WebEngineSettings::initialize()
 
     // Make long press timeout equal to the one in Qt
     engineSettings->setPreference(QStringLiteral("ui.click_hold_context_menus.delay"), QVariant(PressAndHoldDelay));
+
+    // Disable wasm_baselinejit to avoid crashes on lower memory devices; see JB#56635
+    quint64 totalMemory = getTotalMemory();
+    if (totalMemory < (2.5 * 1024 * 1024 * 1024)) {
+        // Devices with roughly 2Gb and lower
+        qDebug() << "Lower memory: disabling wasm_baselinejit";
+        engineSettings->setPreference(QStringLiteral("javascript.options.wasm_baselinejit"), false);
+    }
 
     // DPI is passed to Gecko's View and APZTreeManager.
     // Touch tolerance is calculated with formula: dpi * tolerance = pixel threshold
