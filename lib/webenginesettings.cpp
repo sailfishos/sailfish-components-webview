@@ -22,6 +22,8 @@
 #include <QtGui/QStyleHints>
 #include <sys/sysinfo.h>
 
+#include "logging.h"
+
 Q_GLOBAL_STATIC(SailfishOS::WebEngineSettings, webEngineSettingsInstance)
 
 #define SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO 1.5
@@ -113,7 +115,7 @@ void SailfishOS::WebEngineSettings::initialize()
     quint64 totalMemory = getTotalMemory();
     if (totalMemory < (2.5 * 1024 * 1024 * 1024)) {
         // Devices with roughly 2Gb and lower
-        qDebug() << "Lower memory: disabling wasm_baselinejit";
+        qCInfo(lcWebengineLog) << "Lower memory: disabling wasm_baselinejit";
         engineSettings->setPreference(QStringLiteral("javascript.options.wasm_baselinejit"), false);
     }
 

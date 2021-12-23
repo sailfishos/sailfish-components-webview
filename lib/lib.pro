@@ -12,10 +12,12 @@ PKGCONFIG += qt5embedwidget sailfishsilica
 INCLUDEPATH += $$system(pkg-config --cflags sailfishsilica)
 
 SOURCES += downloadhelper.cpp \
+           logging.cpp \
            webengine.cpp \
            webenginesettings.cpp
 
 HEADERS += downloadhelper.h \
+           logging.h \
            webengine.h \
            webengine_p.h \
            webenginesettings.h \
@@ -23,6 +25,7 @@ HEADERS += downloadhelper.h \
 
 develheaders.path = /usr/include/libsailfishwebengine
 develheaders.files = downloadhelper.h \
+                     logging.h \
                      webengine.h \
                      webenginesettings.h
 
