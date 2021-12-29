@@ -163,7 +163,7 @@
 */
 
 /*!
-    \qmlmethod WebEngineSettings::setPreferences(key, value, type)
+    \qmlmethod WebEngineSettings::setPreference(key, value, type)
     \brief Directly set gecko engine preferences.
 
     Sets the \a key preference to \a value. The \a type is an optional argument that
