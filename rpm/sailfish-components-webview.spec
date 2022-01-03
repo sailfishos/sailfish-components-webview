@@ -100,6 +100,7 @@ BuildRequires:  qt5-tools
 
 %files
 %defattr(-,root,root,-)
+%license LICENSE.txt
 %{_libdir}/libsailfishwebengine.so.*
 %{_datadir}/translations/sailfish_components_webview_qt5_eng_en.qm
 %{_datadir}/translations/sailfish_components_webview_controls_qt5_eng_en.qm
