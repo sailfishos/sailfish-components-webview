@@ -41,6 +41,8 @@ Image {
     property alias targetPositionAnimation: targetPositionAnimation
 
     property string markerTag
+    // Mask area for touch handling, should cover whole mousearea
+    property rect mask: Qt.rect(0, 0, 0, 0)
 
     source: "image://theme/icon-m-textselection-" + markerTag
     width: Theme.iconSizeSmallPlus
@@ -59,8 +61,13 @@ Image {
     onVisibleChanged: {
         if (visible) {
             showAnimation.restart()
+        } else {
+            mask = Qt.rect(0, 0, 0, 0)
         }
     }
+
+    onXChanged: mask = Qt.rect(x - Theme.paddingLarge, y, width + 2 * Theme.paddingLarge, height + Theme.paddingLarge)
+    onYChanged: mask = Qt.rect(x - Theme.paddingLarge, y, width + 2 * Theme.paddingLarge, height + Theme.paddingLarge)
 
     MouseArea {
         id: mouseArea
@@ -68,14 +75,11 @@ Image {
         property real previousX: -1
         property real previousY: -1
 
-        width: Theme.itemSizeSmall
-        height: width
-
         anchors {
             fill: parent
-            leftMargin: -Theme.paddingLarge * 2
-            rightMargin: -Theme.paddingLarge * 2
-            bottomMargin: -Theme.paddingLarge * 2
+            leftMargin: -Theme.paddingLarge
+            rightMargin: -Theme.paddingLarge
+            bottomMargin: -Theme.paddingLarge
         }
 
         drag {
