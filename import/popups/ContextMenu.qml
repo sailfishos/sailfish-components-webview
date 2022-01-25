@@ -157,14 +157,24 @@ ContextMenuInterface {
             }
 
             MenuItem {
-                visible: !root.isImage
-                //: Copy link to clipboard from browser context menu
-                //% "Copy to clipboard"
-                text: qsTrId("sailfish_components_webview_popups-me-copy_to_clipboard")
+                visible: !root.isImage && root.url
+                //: Copy link to clipboard from context menu
+                //% "Copy link"
+                text: qsTrId("sailfish_components_webview_popups-me-copy_link_to_clipboard")
                 onClicked: {
                     root._hide()
-                    // Copy either url or title
-                    Clipboard.text = root.url || root.linkTitle
+                    Clipboard.text = root.url
+                }
+            }
+
+            MenuItem {
+                visible: !root.isImage && root.linkTitle && (root.linkTitle != root.url)
+                //: Copy text to clipboard from context menu
+                //% "Copy text"
+                text: qsTrId("sailfish_components_webview_popups-me-copy_text_to_clipboard")
+                onClicked: {
+                    root._hide()
+                    Clipboard.text = root.linkTitle
                 }
             }
 
