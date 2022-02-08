@@ -16,6 +16,8 @@ import MeeGo.QOfono 0.2
 MouseArea {
     id: root
 
+    propagateComposedEvents: true
+
     property bool selectionVisible
     readonly property bool active: selectionVisible
 
@@ -36,6 +38,9 @@ MouseArea {
     property var _selectionData
 
     property bool _phoneNumberSelected
+
+    property alias startHandleMask: start.mask
+    property alias endHandleMask: end.mask
 
     function selectionRangeUpdated(data) {
         var resolution = contentItem.resolution
@@ -159,7 +164,10 @@ MouseArea {
     }
 
     // Selection is copied upon state change.
-    onClicked: clearSelection()
+    onPressed: {
+        clearSelection()
+        mouse.accepted = false
+    }
 
     onStateChanged: {
         // Copy when selection starts and ends.

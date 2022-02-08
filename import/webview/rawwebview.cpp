@@ -156,14 +156,6 @@ void RawWebView::setAcceptTouchEvents(bool accept)
 {
     if (m_acceptTouchEvents != accept) {
         m_acceptTouchEvents = accept;
-
-        if (!m_acceptTouchEvents) {
-            ungrabMouse();
-            ungrabTouchPoints();
-            setKeepMouseGrab(false);
-            setKeepTouchGrab(false);
-        }
-
         emit acceptTouchEventsChanged();
     }
 }
