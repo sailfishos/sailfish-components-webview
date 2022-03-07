@@ -66,7 +66,7 @@ RawWebView {
     _acceptTouchEvents: !textSelectionActive
 
     viewportHeight: webViewPage
-            ? ((webViewPage.orientation & Orientation.PortraitMask) ? Screen.height : Screen.width)
+            ? ((webViewPage.orientation & Orientation.PortraitMask) ? height : width)
             : undefined
 
     orientation: {
