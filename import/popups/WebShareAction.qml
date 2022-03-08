@@ -14,12 +14,12 @@ import Sailfish.Share 1.0
 ShareAction {
     id: shareAction
 
-    function shareLink(linkHref, linkTitle)
+    function shareLink(linkHref, linkTitle, title)
     {
         _share(
             //: Header for link sharing
             //% "Share link"
-            qsTrId("sailfish_browser-he-share_link"),
+            title ? title : qsTrId("sailfish_browser-he-share_link"),
             {
                 "type": "text/x-url",
                 "linkTitle": linkTitle,
