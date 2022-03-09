@@ -230,7 +230,7 @@ RawWebView {
         transpose: appWindow ? appWindow._transpose : false
         onImSizeChanged: {
             if (imSize > 0 && opened) {
-                webview.virtualKeyboardMargin = virtualKeyboardObserver.imSize
+                webview.virtualKeyboardMargin = marginRequired(virtualKeyboardObserver.imSize)
             }
         }
 
@@ -238,13 +238,18 @@ RawWebView {
 
         onOpenedChanged: {
             if (opened) {
-                webview.virtualKeyboardMargin = virtualKeyboardObserver.panelSize
+                webview.virtualKeyboardMargin = marginRequired(virtualKeyboardObserver.panelSize)
             }
         }
         onClosedChanged: {
             if (closed) {
                 webview.virtualKeyboardMargin = 0
             }
+        }
+
+        function marginRequired(panelSize) {
+            var ypos = appWindow ? appWindow.mapFromItem(null, 0, webview.y).y : 0
+            return margin = panelSize + ypos + webview.height - Screen.height
         }
     }
 
