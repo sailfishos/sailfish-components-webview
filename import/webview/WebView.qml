@@ -249,7 +249,7 @@ RawWebView {
 
         function marginRequired(panelSize) {
             var ypos = appWindow ? appWindow.mapFromItem(null, 0, webview.y).y : 0
-            return margin = panelSize + ypos + webview.height - Screen.height
+            return panelSize + ypos + webview.height - Screen.height
         }
     }
 
