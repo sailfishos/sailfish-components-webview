@@ -211,6 +211,17 @@ ContextMenuInterface {
                 onClicked: root._hide()
             }
 
+            MenuItem {
+                visible: root.isImage
+                //: Share image from context menu
+                //% "Share image"
+                text: qsTrId("sailfish_components_webview_popups-me-share_image")
+                onClicked: {
+                    root._hide()
+                    webShareAction.shareLink(root.imageSrc, root.url, qsTrId("sailfish_components_webview_popups-me-share_image"))
+                }
+            }
+
             function highlightItem(yPos) {
                 var xPos = width/2
                 var child = childAt(xPos, yPos)
