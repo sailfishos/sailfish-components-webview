@@ -1,7 +1,7 @@
 /****************************************************************************************
 **
 ** Copyright (c) 2021 Open Mobile Platform LLC
-** Copyright (c) 2021 Jolla Ltd.
+** Copyright (c) 2021 - 2022 Jolla Ltd.
 ** All rights reserved.
 **
 ****************************************************************************************/
@@ -71,7 +71,8 @@ The QML types exposed in the QML API are as follows:
 
 \section1 Example
 
-The following examples demonstrates how the WebView component can be integrated into an existing application's QML code.
+The following examples demonstrates how the WebView component can be
+integrated into an existing application's QML code.
 
 Example:
 
@@ -95,10 +96,10 @@ ApplicationWindow {
 \section2 Popup Customization
 
 The appearance and behaviour of some aspects of the WebView (for example,
-popups and other user-interaction dialogs) may be customized via the QML API.
-To do so, clients must implement the appropriate interface type, and register
-their implementations with the WebView via a \l{PopupProvider} which is then
-bound to the WebView's \c{popupProvider} property.
+popups and other user-interaction dialogs) may be customized via the QML
+API. To do so, clients must implement the appropriate interface type, and
+register their implementations with the WebView via a \l{PopupProvider}
+which is then bound to the WebView's \c{popupProvider} property.
 
 WebView currently supports customization via the following interfaces:
 \list
@@ -115,33 +116,142 @@ WebView currently supports customization via the following interfaces:
 \li \l{SelectorPopupInterface}
 \endlist
 
+\section2 Debugging Web Applications
+
+When debugging your application you can run it with the \c EMBED_CONSOLE=1
+environment variable. In case you are interested in the requests that are
+made use the \c EMBED_CONSOLE=network environment variable. When
+\c EMBED_CONSOLE is enabled console messages are printed to the terminal.
 
 \section2 Loading and using local resources
 
 When \l {https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS}{Cross-Origin Resource Sharing}
-is applied resources that are required and loaded from another origin should be made
-aware of the cross-origin boundary. It is preferable that resources are served from a web service instead of using
-local resources. When resources are served from a web service you can specify
-appropriate HTTP-headers to permit loading of resources. Content security manager
-will intercept and verify requests that you are performing and in case there is a violation
-the request is denied.
+is applied resources that are required and loaded from another origin
+should be made aware of the cross-origin boundary. The content security
+manager will intercept and verify requests that you are performing and in
+case there is a violation the request is denied.
 
-In case one doesn't have the possibility to setup a web service and there is need
-to load resources with file uri scheme. You can set \c security.disable_cors_checks
-preference to \c true to bypass cross-origin resource sharing checks. This
-preference should be set before loading of any resources and only if you know what
-requests are sent.
-
-When debugging your application you can run it with the \c EMBED_CONSOLE=1 environment variable. In case
-you are interested in the requests that are made use the \c EMBED_CONSOLE=network environment
-variable. When \c EMBED_CONSOLE is enabled console messages are printed to the terminal.
-
-Example of failure could look like this:
+With debugging enabled as described above, an example CORS failure could
+look like this:
 
 \code
 [JavaScript Error: "Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote
 resource at file:///path-to-resource/myfile.js. (Reason: CORS request not http)."]
 \endcode
+
+In particular, this is likely to block files served from local storage
+using the file URI scheme. In case you're developing a Web App with the
+need to serve local files, there are several approaches you can use to
+circumnavigate this.
+
+\section3 Option 1. Don't serve the files locally at all
+
+In many cases, while it can initially seem sensible to serve local files,
+you may find you can get the same or better capabilities by serving a
+remote version of your app instead.
+
+Many Web Apps will use caching, \l {https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API}{Web Storage}
+and similar technologies so that they can operate fully even when offline.
+The app will be served from the remote server on first run, but then run
+locally subsequently.
+
+Running your app from a remote server also has the other obvious benefit
+that you can update your app remotely without having to upload a new
+version to the Jolla Store.
+
+Nevertheless, if you're certain you want to serve your app entirely from
+local storage, there are still other options available to you.
+
+\section3 Option 2. Use a local HTTP server
+
+Running a local HTTP server with your content allows you to control the
+headers and manage the CORS headers appropriately.
+
+In practice, running a local Web server doesn't need to be complex or
+resource intensive. There are various Qt-based web server implementations
+such as \l {https://code.qt.io/cgit/qt-labs/qthttpserver.git/}{QtHttpServer}
+and \l {http://stefanfrings.de/qtwebapp/index-en.html}{QtWebApp}.
+
+Mark Washeim has also created a very nice Sailfish
+\l {https://github.com/poetaster/harbour-wvex/tree/ca48c8468f9fed37dc5bb04152728b2967c5a584}{WebView example app}
+that uses a small Python script to expose a local web server for the
+WebView to pull its content from.
+
+There are two key files in this project needed to provide the functionality.
+
+The main QML file
+\l {https://github.com/poetaster/harbour-wvex/blob/ca48c8468f9fed37dc5bb04152728b2967c5a584/qml/harbour-wvex.qml#L8}{triggers execution} of the Python server
+
+\qml
+    Python {
+        id: py
+        Component.onCompleted: {
+            addImportPath(Qt.resolvedUrl('.'));
+            importModule('server', function () {});
+
+            setHandler('finished', function(newvalue) {
+                console.debug(newvalue)
+            });
+            startDownload();
+        }
+        function startDownload() {
+            call('server.downloader.serve', function() {});
+            console.debug("called")
+
+        }
+\endqml
+
+The code needed for the server lives in a single short
+\l {https://github.com/poetaster/harbour-wvex/blob/ca48c8468f9fed37dc5bb04152728b2967c5a584/qml/server.py}{Python file}
+which can be tailored to serve files from a specified root directory.
+
+\section3 Option 3. Disable CORS protection
+
+Since resources served from the local file system using the file URI scheme
+are served without headers, there's unfortunately no way to add the
+required headers to the responses.
+
+If neither of the two previous options are suitable for you and there is
+need to load resources with the file URI scheme, you can set the
+\c security.disable_cors_checks preference to \c true to bypass
+cross-origin resource sharing checks. This preference should be set before
+loading of any resources and only if you know what requests are sent.
+
+It's important to note that this is disabling a security feature, which
+should always give you pause. If you use this option without being clear
+that all of your requests are local and trusted, then this is likely to
+introduce a security vulnerability to your app, so care is needed.
+
+The following can be used to disable the CORS checks for all requests.
+
+\qml
+import Sailfish.WebEngine 1.0
+...
+    WebView {
+        ...
+        Component.onCompleted: {
+            WebEngineSettings.setPreference("security.disable_cors_checks",
+                                            true,
+                                            WebEngineSettings.BoolPref)
+        }
+    }
+\endqml
+
+Alternatively you can also try disabling strict origin policy on the file
+URI scheme using the following. This comes with a similar warning.
+
+\qml
+import Sailfish.WebEngine 1.0
+...
+    WebView {
+        ...
+        Component.onCompleted: {
+            WebEngineSettings.setPreference("security.fileuri.strict_origin_policy",
+                                            false,
+                                            WebEngineSettings.BoolPref)
+        }
+    }
+\endqml
 
 \sa WebEngineSettings
 
@@ -152,7 +262,7 @@ resource at file:///path-to-resource/myfile.js. (Reason: CORS request not http).
   \title Sailfish WebView custom popups example
   \subtitle
 
-  This example shows how to define custom components which the webview will
+  This example shows how to define custom components which the WebView will
   load and display after receiving the corresponding asynchronous message.
 
   It allows the client to provide custom chrome for various types of user
