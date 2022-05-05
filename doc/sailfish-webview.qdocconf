@@ -45,6 +45,7 @@ qhp.SailfishWebView.subprojects.classes.sortPages = true
 HTML.footer += \
     "<div class=\"footer\">\n" \
     "  <p><acronym title=\"Copyright\">&copy;</acronym> 2021 Open Mobile Platform LLC.</p>\n" \
+    "  <p><acronym title=\"Copyright\">&copy;</acronym> 2021 - 2022 Jolla Ltd.</p>\n" \
     "  <p>All other trademarks are property of their respective owners.</p>\n" \
     "  <p>\n" \
     "    This document may be used under the terms of the " \
