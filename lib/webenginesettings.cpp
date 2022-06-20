@@ -13,9 +13,11 @@
 
 #include <silicatheme.h>
 
+#include <QtCore/QFile>
 #include <QtCore/QLocale>
 #include <QtCore/QSettings>
 #include <QtCore/QSize>
+#include <QtCore/QStandardPaths>
 #include <QtCore/QtMath>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
@@ -96,6 +98,25 @@ void SailfishOS::WebEngineSettings::initialize()
 
     SailfishOS::WebEngineSettings *engineSettings = instance();
 
+    // Infer and set Accept-Language header from the current system locale
+    QString langs;
+    QStringList locale = QLocale::system().name().split("_", QString::SkipEmptyParts);
+    if (locale.size() > 1) {
+        langs = QString("%1-%2,%3").arg(locale.at(0)).arg(locale.at(1)).arg(locale.at(0));
+    } else {
+        langs = locale.at(0);
+    }
+    engineSettings->setPreference(QStringLiteral("intl.accept_languages"),
+                                  QVariant::fromValue<QString>(langs));
+
+    // Guard preferences that should be written only once. If a preference needs to be
+    // forcefully written upon each start that should happen before this.
+    QString appConfig = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QFile markerFile(QString("%1/__PREFS_WRITTEN__").arg(appConfig));
+    if (markerFile.exists()) {
+        return;
+    }
+
     // Standard settings.
     // TODO: Fix this so that it can be applied during runtime when QQuickItem based WebView is used with QQuickFlickable.
     // At the moment just disable it to avoid unnecessary events being fired. JB#39581
@@ -160,16 +181,6 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("embedlite.inputItemSize"),
                                   QVariant::fromValue<qreal>(silicaTheme->fontSizeSmall()));
 
-    // Infer and set Accept-Language header from the current system locale
-    QString langs;
-    QStringList locale = QLocale::system().name().split("_", QString::SkipEmptyParts);
-    if (locale.size() > 1) {
-        langs = QString("%1-%2,%3").arg(locale.at(0)).arg(locale.at(1)).arg(locale.at(0));
-    } else {
-        langs = locale.at(0);
-    }
-    engineSettings->setPreference(QStringLiteral("intl.accept_languages"),
-                                  QVariant::fromValue<QString>(langs));
     engineSettings->setPreference(QStringLiteral("browser.enable_automatic_image_resizing"),
                                   QVariant::fromValue<bool>(true));
 
@@ -178,6 +189,9 @@ void SailfishOS::WebEngineSettings::initialize()
                                   QVariant::fromValue<bool>(true));
 
     isInitialized = true;
+
+    markerFile.open(QIODevice::ReadWrite | QIODevice::Truncate);
+    markerFile.close();
 }
 
 /*!
