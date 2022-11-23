@@ -20,6 +20,7 @@ namespace SailfishOS {
 
 class WebEngineSettings : public QMozEngineSettings {
     Q_OBJECT
+    Q_PROPERTY(bool initialized READ isInitialized NOTIFY initialized)
     Q_PROPERTY(bool autoLoadImages READ autoLoadImages WRITE setAutoLoadImages NOTIFY autoLoadImagesChanged FINAL)
     Q_PROPERTY(bool javascriptEnabled READ javascriptEnabled WRITE setJavascriptEnabled NOTIFY javascriptEnabledChanged FINAL)
     Q_PROPERTY(bool popupEnabled READ popupEnabled WRITE setPopupEnabled NOTIFY popupEnabledChanged)
@@ -27,7 +28,8 @@ class WebEngineSettings : public QMozEngineSettings {
     Q_PROPERTY(bool useDownloadDir READ useDownloadDir WRITE setUseDownloadDir NOTIFY useDownloadDirChanged)
     Q_PROPERTY(QString downloadDir READ downloadDir WRITE setDownloadDir NOTIFY downloadDirChanged)
     Q_PROPERTY(qreal pixelRatio READ pixelRatio WRITE setPixelRatio NOTIFY pixelRatioChanged)
-    Q_PROPERTY(bool initialized READ isInitialized NOTIFY initialized)
+    Q_PROPERTY(bool doNotTrack READ doNotTrack WRITE setDoNotTrack NOTIFY doNotTrackChanged)
+    Q_PROPERTY(ColorScheme colorScheme READ colorScheme WRITE setColorScheme NOTIFY colorSchemeChanged)
 
 public:
     // C++ API
@@ -46,6 +48,13 @@ public:
         Deprecated = 3
     };
     Q_ENUM(CookieBehavior)
+
+    enum ColorScheme {
+        PrefersLightMode = 0,
+        PrefersDarkMode = 1,
+        FollowsAmbience = 2
+    };
+    Q_ENUM(ColorScheme)
 
     // See https://github.com/sailfishos-mirror/gecko-dev/blob/esr78/modules/libpref/nsIPrefBranch.idl
     enum PreferenceType {
@@ -80,6 +89,12 @@ public:
 
     void setPixelRatio(qreal pixelRatio);
     qreal pixelRatio() const;
+
+    bool doNotTrack() const;
+    void setDoNotTrack(bool doNotTrack);
+
+    ColorScheme colorScheme() const;
+    void setColorScheme(ColorScheme colorScheme);
 
     void enableProgressivePainting(bool enabled);
     void enableLowPrecisionBuffers(bool enabled);

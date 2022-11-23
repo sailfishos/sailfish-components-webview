@@ -106,7 +106,7 @@
 
 /*!
     \qmlproperty enumeration WebEngineSettings::cookieBehavior
-    \brief Sets the cookie behaviour.
+    \brief The cookie behaviour.
 
     The cookie behaviour can be one of:
 
@@ -122,7 +122,7 @@
 
 /*!
     \qmlproperty bool WebEngineSettings::useDownloadDir
-    \brief Sets whether or not to use the default download location.
+    \brief Whether or not to use the default download location.
 
     When set to \c true downloaded files will be saved to the default download
     location, as specified by the \l downloadDir property. When set to \c false
@@ -135,7 +135,7 @@
 
 /*!
     \qmlproperty string WebEngineSettings::downloadDir
-    \brief Sets the location to save downloaded files to.
+    \brief The location to save downloaded files to.
 
     Specifies an absolute path location to save downloaded files to. This
     property applies only if the \l useDownloadDir property is set to \c true.
@@ -147,7 +147,7 @@
 
 /*!
     \qmlproperty real WebEngineSettings::pixelRatio
-    \brief Specifies the device to logical pixel ratio.
+    \brief The device to logical pixel ratio.
 
     This property represents the number of physical device pixels used to
     represent each logical pixel of the web rendering.
@@ -160,6 +160,36 @@
 
     \note Unlike desktop Firefox, changing this value will only change the
     rendering of web content; it does not affect the UI scaling.
+*/
+
+/*!
+    \qmlproperty bool WebEngineSettings::doNotTrack
+    \brief Whether or not to send Do Not Track requests to websites
+
+    When set to \c true the browser will send "Do Not Track" requests
+    to websites using the DNT header field.
+
+    This corresponds to the "privacy.donottrackheader.enabled" gecko preference.
+*/
+
+/*!
+    \qmlproperty bool WebEngineSettings::colorScheme
+    \brief The theme to prefer when rendering websites.
+
+    Some websites provide sepearate "dark" and "light" themes. The
+    value of this property determines which of the variants the
+    browser will use to render the site:
+
+    The colour scheme can be one of:
+
+    \value WebEngineSettings.PrefersLightMode
+           Use the light theme for the website if one is available.
+    \value WebEngineSettings.PrefersDarkMode
+           Use the dark theme for the website if one is available.
+    \value WebEngineSettings.FollowsAmbience
+           Select a theme (light or dark) depending on the current ambience.
+
+    This corresponds to the "ui.systemUsesDarkTheme" gecko preference.
 */
 
 /*!
