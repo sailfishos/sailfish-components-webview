@@ -9,6 +9,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#include "webengine.h"
 #include "webenginesettings.h"
 
 #include <silicatheme.h>
@@ -109,6 +110,18 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("intl.accept_languages"),
                                   QVariant::fromValue<QString>(langs));
 
+    Silica::Theme *silicaTheme = Silica::Theme::instance();
+
+    // Notify gecko when the ambience switches between light and dark
+    if (engineSettings->isInitialized()) {
+        engineSettings->notifyColorSchemeChanged();
+    } else {
+        connect(engineSettings, &QMozEngineSettings::initialized,
+                engineSettings, &SailfishOS::WebEngineSettings::notifyColorSchemeChanged);
+    }
+    connect(silicaTheme, &Silica::Theme::colorSchemeChanged,
+            engineSettings, &SailfishOS::WebEngineSettings::notifyColorSchemeChanged);
+
     // Guard preferences that should be written only once. If a preference needs to be
     // forcefully written upon each start that should happen before this.
     QString appConfig = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -145,8 +158,6 @@ void SailfishOS::WebEngineSettings::initialize()
     const int dragThreshold = QGuiApplication::styleHints()->startDragDistance();
     qreal touchStartTolerance = dragThreshold / QGuiApplication::primaryScreen()->physicalDotsPerInch();
     engineSettings->setPreference(QString("apz.touch_start_tolerance"), QString("%1f").arg(touchStartTolerance));
-
-    Silica::Theme *silicaTheme = Silica::Theme::instance();
 
     qreal pixelRatio = SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO * silicaTheme->pixelRatio();
     // Round to nearest even rounding factor
@@ -192,6 +203,19 @@ void SailfishOS::WebEngineSettings::initialize()
 
     markerFile.open(QIODevice::ReadWrite | QIODevice::Truncate);
     markerFile.close();
+}
+
+/*!
+    \internal
+    \brief Notifies gecko about ambience color scheme changes.
+*/
+void SailfishOS::WebEngineSettings::notifyColorSchemeChanged()
+{
+    Silica::Theme *silicaTheme = Silica::Theme::instance();
+    QString scheme = silicaTheme->colorScheme() == Silica::Theme::LightOnDark
+            ? QStringLiteral("dark")
+            : QStringLiteral("light");
+    SailfishOS::WebEngine::instance()->notifyObservers(QStringLiteral("ambience-theme-changed"), scheme);
 }
 
 /*!

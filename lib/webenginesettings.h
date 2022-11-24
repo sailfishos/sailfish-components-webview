@@ -21,12 +21,16 @@ namespace SailfishOS {
 
 class WebEngineSettings : public QMozEngineSettings {
     Q_OBJECT
+
 public:
     static void initialize();
     static WebEngineSettings *instance();
 
     explicit WebEngineSettings(QObject *parent = 0);
     virtual ~WebEngineSettings();
+
+private slots:
+    void notifyColorSchemeChanged();
 };
 }
 
