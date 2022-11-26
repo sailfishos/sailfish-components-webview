@@ -105,8 +105,21 @@ namespace SailfishOS {
 */
 
 /*!
+    \enum SailfishOS::WebEngineSettings::ColorScheme
+
+    This enum type specifies the theme for the rendering engine to use.
+
+    \value PrefersLightMode
+           Use the light theme for the website if one is available.
+    \value PrefersDarkMode
+           Use the dark theme for the website if one is available.
+    \value FollowsAmbience
+           Select a theme (light or dark) depending on the current ambience.
+*/
+
+/*!
     \property SailfishOS::WebEngineSettings::cookieBehavior
-    \brief Sets the cookie behaviour.
+    \brief The cookie behaviour.
 
     The cookie behaviour can be one of:
 
@@ -124,7 +137,7 @@ namespace SailfishOS {
 
 /*!
     \property SailfishOS::WebEngineSettings::useDownloadDir
-    \brief Sets whether or not to use the default download location.
+    \brief Whether or not to use the default download location.
 
     When set to \c true downloaded files will be saved to the default download
     location, as specified by the \l downloadDir property. When set to \c false
@@ -137,7 +150,7 @@ namespace SailfishOS {
 
 /*!
     \property SailfishOS::WebEngineSettings::downloadDir
-    \brief Sets the location to save downloaded files to.
+    \brief The location to save downloaded files to.
 
     Specifies an absolute path location to save downloaded files to. This
     property applies only if the \l useDownloadDir property is set to \c true.
@@ -149,7 +162,7 @@ namespace SailfishOS {
 
 /*!
     \property SailfishOS::WebEngineSettings::pixelRatio
-    \brief Specifies the device to logical pixel ratio.
+    \brief The device to logical pixel ratio.
 
     This property represents the number of physical device pixels used to
     represent each logical pixel of the web rendering.
@@ -167,6 +180,36 @@ namespace SailfishOS {
 */
 
 /*!
+    \property SailfishOS::WebEngineSettings::doNotTrack
+    \brief Whether or not to send Do Not Track requests to websites
+
+    When set to \c true the browser will send "Do Not Track" requests
+    to websites using the DNT header field.
+
+    This corresponds to the "privacy.donottrackheader.enabled" gecko preference.
+*/
+
+/*!
+    \property SailfishOS::WebEngineSettings::colorScheme
+    \brief The theme to prefer when rendering websites.
+
+    Some websites provide sepearate "dark" and "light" themes. The
+    value of this property determines which of the variants the
+    browser will use to render the site:
+
+    The colour scheme can be one of:
+
+    \value WebEngineSettings.PrefersLightMode
+           Use the light theme for the website if one is available.
+    \value WebEngineSettings.PrefersDarkMode
+           Use the dark theme for the website if one is available.
+    \value WebEngineSettings.FollowsAmbience
+           Select a theme (light or dark) depending on the current ambience.
+
+    This corresponds to the "ui.systemUsesDarkTheme" gecko preference.
+*/
+
+/*!
     \brief Returns the instance of the singleton WebEngineSettings class.
 
     The returned instance may not be initialized.
@@ -180,7 +223,6 @@ namespace SailfishOS {
     {SailfishOS::WebEngineSettings::initialize}{WebEngineSettings::initialize}
 */
 WebEngineSettings *SailfishOS::WebEngineSettings::instance();
-
 
 /*!
     \brief Sets the tile \a size used for rendering pages.
