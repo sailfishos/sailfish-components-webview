@@ -65,9 +65,7 @@ RawWebView {
             || _appActive && (webViewPage.status === PageStatus.Deactivating)
     _acceptTouchEvents: !textSelectionActive
 
-    viewportHeight: webViewPage
-            ? ((webViewPage.orientation & Orientation.PortraitMask) ? height : width)
-            : undefined
+    viewportHeight: webViewPage ? height : undefined
 
     orientation: {
         switch (_pageOrientation) {
