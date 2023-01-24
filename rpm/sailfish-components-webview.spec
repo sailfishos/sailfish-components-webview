@@ -106,11 +106,14 @@ BuildRequires:  qt5-tools
 %{_datadir}/translations/sailfish_components_webview_controls_qt5_eng_en.qm
 %{_libdir}/qt5/qml/Sailfish/WebEngine/libsailfishwebengineplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebEngine/qmldir
+%{_libdir}/qt5/qml/Sailfish/WebEngine/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/libsailfishwebviewplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/qmldir
+%{_libdir}/qt5/qml/Sailfish/WebView/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/*.qml
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/libsailfishwebviewcontrolsplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/qmldir
+%{_libdir}/qt5/qml/Sailfish/WebView/Controls/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/*.qml
 
 %files ts-devel
@@ -125,6 +128,7 @@ BuildRequires:  qt5-tools
 %{_datadir}/translations/sailfish_components_webview_popups_qt5_eng_en.qm
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/libsailfishwebviewpopupsplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/qmldir
+%{_libdir}/qt5/qml/Sailfish/WebView/Popups/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/*.qml
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/*.js
 
@@ -133,6 +137,7 @@ BuildRequires:  qt5-tools
 %{_datadir}/translations/sailfish_components_webview_pickers_qt5_eng_en.qm
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/libsailfishwebviewpickersplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/qmldir
+%{_libdir}/qt5/qml/Sailfish/WebView/Pickers/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/*.qml
 
 %files devel
