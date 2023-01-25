@@ -1,5 +1,6 @@
 module Sailfish.WebView
 plugin sailfishwebviewplugin
+typeinfo plugins.qmltypes
 WebView 1.0 WebView.qml
 WebViewFlickable 1.0 WebViewFlickable.qml
 WebViewPage 1.0 WebViewPage.qml
