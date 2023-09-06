@@ -26,8 +26,8 @@ ContextMenuInterface {
     // Image has source. That can be used to distinguish from other links.
     readonly property bool isImage: !isJavascriptFunction && imageSrc.length > 0
 
-    // All except image elements are considered as links.
-    readonly property bool isLink: !isJavascriptFunction && linkHref.length > 0 && imageSrc.length === 0
+    // All elements are considered as links.
+    readonly property bool isLink: !isJavascriptFunction && linkHref.length > 0
 
     // Separate hyper text links from other content types.
     readonly property bool isHyperTextLink: linkProtocol === "http" || linkProtocol === "https" || linkProtocol === "file"
@@ -37,7 +37,7 @@ ContextMenuInterface {
     readonly property bool isTel: linkProtocol === "tel"
     readonly property bool isSMS: linkProtocol === "sms"
     readonly property bool isGeo: linkProtocol === "geo"
-    readonly property bool isNavigable: isLink && !knownPlatformProtocol && !isImage
+    readonly property bool isNavigable: isLink && !knownPlatformProtocol
 
     width: parent.width
     height: parent.height
@@ -157,7 +157,7 @@ ContextMenuInterface {
             }
 
             MenuItem {
-                visible: !root.isImage && root.url
+                visible: root.url
                 //: Copy link to clipboard from context menu
                 //% "Copy link"
                 text: qsTrId("sailfish_components_webview_popups-me-copy_link_to_clipboard")
