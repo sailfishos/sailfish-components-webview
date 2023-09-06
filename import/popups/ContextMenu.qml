@@ -222,6 +222,17 @@ ContextMenuInterface {
                 }
             }
 
+            MenuItem {
+                visible: root.isImage
+                //: Copy image link clipboard from context menu
+                //% "Copy image link"
+                text: qsTrId("sailfish_components_webview_popups-me-copy_image_link_to_clipboard")
+                onClicked: {
+                    root._hide()
+                    Clipboard.text = root.imageSrc
+                }
+            }
+
             function highlightItem(yPos) {
                 var xPos = width/2
                 var child = childAt(xPos, yPos)
