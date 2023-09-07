@@ -69,12 +69,12 @@ ContextMenuInterface {
             Label {
                 id: title
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: root.linkTitle.length > 0
-                text: root.linkTitle
+                visible: root.linkTitle || root.url
+                text: root.linkTitle || root.url
                 width: root.width - Theme.horizontalPageMargin*2
                 elide: Text.ElideRight
                 wrapMode: Text.Wrap
-                maximumLineCount: 2
+                maximumLineCount: 3
                 color: Theme.highlightColor
                 font.pixelSize: Theme.fontSizeExtraLarge
                 horizontalAlignment: Text.AlignHCenter
@@ -83,6 +83,7 @@ ContextMenuInterface {
 
             Label {
                 anchors.horizontalCenter: parent.horizontalCenter
+                visible: text !== title.text
                 color: Theme.highlightColor
                 text: root.imageSrc.length > 0 ? root.imageSrc : root.url
                 width: root.width - Theme.horizontalPageMargin*2
