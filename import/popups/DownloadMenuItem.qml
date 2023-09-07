@@ -15,7 +15,7 @@ import Sailfish.Silica 1.0
 import Sailfish.WebEngine 1.0
 import Sailfish.Pickers 1.0
 
-MenuItem {
+ContextMenuItem {
     id: root
 
     property string targetDirectory
