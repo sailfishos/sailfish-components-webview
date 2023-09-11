@@ -9,8 +9,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import QtQuick 2.0
+import QtQuick 2.6
 import Sailfish.Silica 1.0
+import Sailfish.Silica.private 1.0
 import Sailfish.WebView.Popups 1.0
 
 ContextMenuInterface {
@@ -51,6 +52,7 @@ ContextMenuInterface {
 
     function _hide() {
         opacity = 0.0
+        expander.open = false
     }
 
     Rectangle {
@@ -75,30 +77,43 @@ ContextMenuInterface {
                 anchors.top: parent.top
                 anchors.topMargin: Theme.paddingLarge*2
 
-                Label {
-                    id: title
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    visible: root.linkTitle || root.url
-                    text: root.linkTitle || root.url
-                    width: root.width - Theme.horizontalPageMargin*2
-                    elide: Text.ElideRight
-                    wrapMode: Text.Wrap
-                    maximumLineCount: 3
-                    color: Theme.highlightColor
-                    font.pixelSize: Theme.fontSizeExtraLarge
-                    horizontalAlignment: Text.AlignHCenter
-                    opacity: Theme.opacityHigh
+                Expander {
+                    id: expander
+                    horizontalMargin: Theme.horizontalPageMargin
 
-                    MouseArea {
-                        anchors {
-                            fill: parent
-                            topMargin: -content.anchors.topMargin
-                            leftMargin: -Theme.horizontalPageMargin
-                            rightMargin: -Theme.horizontalPageMargin
-                            bottomMargin: -Theme.paddingMedium
+                    width: parent.width
+                    collapsedHeight: title.y + Math.min(title.height, 4 * fontMetrics.height)
+                    expandedHeight: title.y + title.height + Theme.paddingLarge + Theme.paddingMedium
+
+                    FontMetrics {
+                        id: fontMetrics
+                        font: title.font
+                    }
+
+                    Label {
+                        id: title
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: root.linkTitle || root.url
+                        text: root.linkTitle || root.url
+                        width: root.width - Theme.horizontalPageMargin*2
+                        wrapMode: Text.Wrap
+                        color: Theme.highlightColor
+                        font.pixelSize: Theme.fontSizeLarge
+                        horizontalAlignment: Text.AlignHCenter
+                        opacity: Theme.opacityHigh
+
+                        MouseArea {
+                            enabled: !expander.expandable
+                            anchors {
+                                fill: parent
+                                topMargin: -content.anchors.topMargin
+                                leftMargin: -Theme.horizontalPageMargin
+                                rightMargin: -Theme.horizontalPageMargin
+                                bottomMargin: -Theme.paddingMedium
+                            }
+
+                            onClicked: root._hide()
                         }
-
-                        onClicked: root._hide()
                     }
                 }
 
@@ -137,7 +152,7 @@ ContextMenuInterface {
                         rightMargin: -Theme.horizontalPageMargin
                     }
 
-                    height: Math.max(Theme.itemSizeSmall, root.height - Theme.paddingLarge*2 - title.height - imageTitle.height - menu.height - (landscape ? Theme.paddingLarge : Theme.itemSizeSmall))
+                    height: Math.max(Theme.itemSizeSmall, root.height - Theme.paddingLarge*2 - expander.height - imageTitle.height - menu.height - (landscape ? Theme.paddingLarge : Theme.itemSizeSmall))
 
                     MouseArea {
                         anchors.fill: parent
