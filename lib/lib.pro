@@ -9,8 +9,6 @@ CONFIG += qt create_pc create_prl no_install_prl link_pkgconfig
 QT += gui
 PKGCONFIG += qt5embedwidget sailfishsilica
 
-INCLUDEPATH += $$system(pkg-config --cflags sailfishsilica)
-
 SOURCES += downloadhelper.cpp \
            logging.cpp \
            webengine.cpp \
@@ -25,7 +23,6 @@ HEADERS += downloadhelper.h \
 
 develheaders.path = /usr/include/libsailfishwebengine
 develheaders.files = downloadhelper.h \
-                     logging.h \
                      webengine.h \
                      webenginesettings.h
 
