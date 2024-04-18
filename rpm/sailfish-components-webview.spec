@@ -93,14 +93,7 @@ BuildRequires:  qt5-tools
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%post popups -p /sbin/ldconfig
-%postun popups -p /sbin/ldconfig
-
-%post pickers -p /sbin/ldconfig
-%postun pickers -p /sbin/ldconfig
-
 %files
-%defattr(-,root,root,-)
 %license LICENSE.txt
 %{_libdir}/libsailfishwebengine.so.*
 %{_datadir}/translations/sailfish_components_webview_qt5_eng_en.qm
@@ -118,14 +111,12 @@ BuildRequires:  qt5-tools
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/*.qml
 
 %files ts-devel
-%defattr(-,root,root,-)
 %{_datadir}/translations/source/sailfish_components_webview_qt5.ts
 %{_datadir}/translations/source/sailfish_components_webview_controls_qt5.ts
 %{_datadir}/translations/source/sailfish_components_webview_popups_qt5.ts
 %{_datadir}/translations/source/sailfish_components_webview_pickers_qt5.ts
 
 %files popups
-%defattr(-,root,root,-)
 %{_datadir}/translations/sailfish_components_webview_popups_qt5_eng_en.qm
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/libsailfishwebviewpopupsplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/qmldir
@@ -134,7 +125,6 @@ BuildRequires:  qt5-tools
 %{_libdir}/qt5/qml/Sailfish/WebView/Popups/*.js
 
 %files pickers
-%defattr(-,root,root,-)
 %{_datadir}/translations/sailfish_components_webview_pickers_qt5_eng_en.qm
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/libsailfishwebviewpickersplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/qmldir
@@ -142,21 +132,17 @@ BuildRequires:  qt5-tools
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/*.qml
 
 %files devel
-%defattr(-,root,root,-)
 %{_libdir}/libsailfishwebengine.so
 %{_libdir}/pkgconfig/sailfishwebengine.pc
 %{_includedir}/libsailfishwebengine/*
 
 %files tests
-%defattr(-,root,root,-)
 /opt/tests/sailfish-components-webview/*
 
 %files examples
-%defattr(-,root,root,-)
 %{_bindir}/custompopups
 %{_bindir}/webview-test-app
 
 %files doc
-%defattr(-,root,root,-)
 %dir %{_datadir}/doc/sailfish-components-webview
 %{_datadir}/doc/sailfish-components-webview/*
