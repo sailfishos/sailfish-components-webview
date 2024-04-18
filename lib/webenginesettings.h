@@ -12,6 +12,7 @@
 #ifndef SAILFISHOS_WEBENGINE_SETTINGS_H
 #define SAILFISHOS_WEBENGINE_SETTINGS_H
 
+#include <QObject>
 #include <QString>
 #include <qmozenginesettings.h>
 
@@ -19,7 +20,8 @@
 
 namespace SailfishOS {
 
-class WebEngineSettings : public QMozEngineSettings {
+class WebEngineSettings : public QMozEngineSettings
+{
     Q_OBJECT
 
 public:
@@ -32,6 +34,7 @@ public:
 private slots:
     void notifyColorSchemeChanged();
 };
+
 }
 
 #endif // !Q_QDOC

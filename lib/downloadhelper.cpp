@@ -26,7 +26,8 @@
 constexpr int FILEEXTENSION_MAX_LENGTH = 32;
 constexpr int FILENAME_MAX_LENGTH = 255;
 
-static QByteArray cutUtf8String(const QByteArray &str, int maxSize) {
+static QByteArray cutUtf8String(const QByteArray &str, int maxSize)
+{
     int size = str.size();
     if (str.size() > maxSize) {
         size = 0;
