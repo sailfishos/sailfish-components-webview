@@ -11,7 +11,7 @@
 
 import QtQuick 2.1
 import Sailfish.Silica 1.0
-import QOfono 0.2
+import MeeGo.QOfono 0.2
 
 MouseArea {
     id: root
