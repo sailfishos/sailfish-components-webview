@@ -110,6 +110,12 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("intl.accept_languages"),
                                   QVariant::fromValue<QString>(langs));
 
+    // Ensure the renderer is configured correctly
+    engineSettings->setPreference(QStringLiteral("gfx.webrender.force-disabled"),
+                                  QVariant(true));
+    engineSettings->setPreference(QStringLiteral("embedlite.compositor.external_gl_context"),
+                                  QVariant(false));
+
     Silica::Theme *silicaTheme = Silica::Theme::instance();
 
     // Notify gecko when the ambience switches between light and dark
@@ -121,6 +127,8 @@ void SailfishOS::WebEngineSettings::initialize()
     }
     connect(silicaTheme, &Silica::Theme::colorSchemeChanged,
             engineSettings, &SailfishOS::WebEngineSettings::notifyColorSchemeChanged);
+
+    isInitialized = true;
 
     // Guard preferences that should be written only once. If a preference needs to be
     // forcefully written upon each start that should happen before this.
@@ -198,8 +206,6 @@ void SailfishOS::WebEngineSettings::initialize()
     // Enable user agent overrides
     engineSettings->setPreference(QStringLiteral("general.useragent.updates.enabled"),
                                   QVariant::fromValue<bool>(true));
-
-    isInitialized = true;
 
     markerFile.open(QIODevice::ReadWrite | QIODevice::Truncate);
     markerFile.close();
