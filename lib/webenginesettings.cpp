@@ -11,6 +11,7 @@
 
 #include "webengine.h"
 #include "webenginesettings.h"
+#include "webenginesettings_p.h"
 
 #include <silicatheme.h>
 
@@ -28,6 +29,7 @@
 #include "logging.h"
 
 Q_GLOBAL_STATIC(SailfishOS::WebEngineSettings, webEngineSettingsInstance)
+Q_GLOBAL_STATIC(SailfishOS::WebEngineSettingsPrivate, webEngineSettingsPrivateInstance)
 
 #define SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO 1.5
 
@@ -66,6 +68,21 @@ int getPressAndHoldDelay()
 }
 
 const int PressAndHoldDelay(getPressAndHoldDelay());
+
+SailfishOS::WebEngineSettingsPrivate *SailfishOS::WebEngineSettingsPrivate::instance()
+{
+    return webEngineSettingsPrivateInstance();
+}
+
+SailfishOS::WebEngineSettingsPrivate::WebEngineSettingsPrivate(QObject *parent)
+    : QObject(parent)
+{
+}
+
+SailfishOS::WebEngineSettingsPrivate::~WebEngineSettingsPrivate()
+{
+}
+
 
 /*!
     \brief Initialises the WebEngineSettings class.
@@ -120,13 +137,20 @@ void SailfishOS::WebEngineSettings::initialize()
 
     // Notify gecko when the ambience switches between light and dark
     if (engineSettings->isInitialized()) {
-        engineSettings->notifyColorSchemeChanged();
+        engineSettings->d->notifyColorSchemeChanged();
     } else {
         connect(engineSettings, &QMozEngineSettings::initialized,
-                engineSettings, &SailfishOS::WebEngineSettings::notifyColorSchemeChanged);
+                engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::notifyColorSchemeChanged);
     }
     connect(silicaTheme, &Silica::Theme::colorSchemeChanged,
-            engineSettings, &SailfishOS::WebEngineSettings::notifyColorSchemeChanged);
+            engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::notifyColorSchemeChanged);
+
+    // Subscribe to gecko messages
+    // When the embedliteviewcreated notification is received the ambience notification will be sent again
+    SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
+    connect(webEngine, &SailfishOS::WebEngine::recvObserve,
+            engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::oneShotNotifyColorSchemeChanged);
+    webEngine->addObserver(QStringLiteral("embedliteviewcreated"));
 
     isInitialized = true;
 
@@ -215,13 +239,32 @@ void SailfishOS::WebEngineSettings::initialize()
     \internal
     \brief Notifies gecko about ambience color scheme changes.
 */
-void SailfishOS::WebEngineSettings::notifyColorSchemeChanged()
+void SailfishOS::WebEngineSettingsPrivate::notifyColorSchemeChanged()
 {
     Silica::Theme *silicaTheme = Silica::Theme::instance();
     QString scheme = silicaTheme->colorScheme() == Silica::Theme::LightOnDark
             ? QStringLiteral("dark")
             : QStringLiteral("light");
     SailfishOS::WebEngine::instance()->notifyObservers(QStringLiteral("ambience-theme-changed"), scheme);
+}
+
+/*!
+    \internal
+    \brief Notifies gecko about ambience color scheme change and removes observer.
+*/
+void SailfishOS::WebEngineSettingsPrivate::oneShotNotifyColorSchemeChanged(const QString &message, const QVariant &data)
+{
+    Q_UNUSED(data);
+    if (message == QLatin1String("embedliteviewcreated")) {
+        SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
+        // Remove the observer and disconnect the signal
+        webEngine->removeObserver(QStringLiteral("embedliteviewcreated"));
+        disconnect(webEngine, &SailfishOS::WebEngine::recvObserve,
+                   this, &SailfishOS::WebEngineSettingsPrivate::oneShotNotifyColorSchemeChanged);
+
+        // Notify about the ambience state
+        notifyColorSchemeChanged();
+    }
 }
 
 /*!
@@ -247,6 +290,7 @@ SailfishOS::WebEngineSettings *SailfishOS::WebEngineSettings::instance()
 */
 SailfishOS::WebEngineSettings::WebEngineSettings(QObject *parent)
     : QMozEngineSettings(parent)
+    , d(WebEngineSettingsPrivate::instance())
 {
 }
 
