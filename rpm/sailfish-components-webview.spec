@@ -1,6 +1,6 @@
 Name:    sailfish-components-webview-qt5
 Summary: Allows embedding Sailfish WebView into applications
-Version: 1.4.2
+Version: 1.5.21
 Release: 1
 License: MPLv2.0
 Url:     https://github.com/sailfishos/sailfish-components-webview
