@@ -20,6 +20,8 @@
 
 namespace SailfishOS {
 
+class WebEngineSettingsPrivate;
+
 class WebEngineSettings : public QMozEngineSettings
 {
     Q_OBJECT
@@ -31,8 +33,8 @@ public:
     explicit WebEngineSettings(QObject *parent = 0);
     virtual ~WebEngineSettings();
 
-private slots:
-    void notifyColorSchemeChanged();
+private:
+    WebEngineSettingsPrivate *d;
 };
 
 }
