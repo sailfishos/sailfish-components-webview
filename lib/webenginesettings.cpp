@@ -17,6 +17,7 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QLocale>
+#include <QtCore/QMap>
 #include <QtCore/QSettings>
 #include <QtCore/QSize>
 #include <QtCore/QStandardPaths>
@@ -42,12 +43,24 @@ Q_GLOBAL_STATIC(SailfishOS::WebEngineSettingsPrivate, webEngineSettingsPrivateIn
     Singleton class which provides access to the global Web engine settings.
 */
 
+// Let's gather here resolution to layout.css.devPixelsPerPx mappings.
+static QMap<QString, qreal> fixedDevPxMap {
+    { QStringLiteral("1080x2520"), 2.608695652173913 }
+};
+
 static bool testScreenDimensions(qreal pixelRatio)
 {
     QScreen *screen = QGuiApplication::primaryScreen();
     qreal w = screen->size().width() / pixelRatio;
     qreal h = screen->size().height() / pixelRatio;
     return fmod(w, 1.0) == 0 && fmod(h, 1.0) == 0;
+}
+
+static qreal mappedPixelRatio(const QSize &screenResolution)
+{
+    return fixedDevPxMap.value(QStringLiteral("%1x%2")
+                               .arg(screenResolution.width())
+                               .arg(screenResolution.height()), -1.0);
 }
 
 static quint64 getTotalMemory() {
@@ -191,20 +204,28 @@ void SailfishOS::WebEngineSettings::initialize()
     qreal touchStartTolerance = dragThreshold / QGuiApplication::primaryScreen()->physicalDotsPerInch();
     engineSettings->setPreference(QString("apz.touch_start_tolerance"), QString("%1f").arg(touchStartTolerance));
 
-    qreal pixelRatio = SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO * silicaTheme->pixelRatio();
-    // Round to nearest even rounding factor
-    pixelRatio = qRound(pixelRatio / 0.5) * 0.5;
+    QSize screenResolution = QGuiApplication::primaryScreen()->size();
+    int screenWidth = screenResolution.width();
 
-    int screenWidth = QGuiApplication::primaryScreen()->size().width();
+    // TODO : Add basic mappings to the table from supported devices.
+    qreal pixelRatio = mappedPixelRatio(screenResolution);
 
-    // Do not floor the pixel ratio if the pixel ratio less than 2.0 (1.5 is minimum).
-    if (pixelRatio >= 2.0 && !testScreenDimensions(pixelRatio)) {
-        qreal tempPixelRatio = qFloor(pixelRatio);
-        if (testScreenDimensions(tempPixelRatio)) {
-            pixelRatio = tempPixelRatio;
+    // Try to calculate pixelRatio only if not mapped.
+    if (pixelRatio == -1.0) {
+        pixelRatio = SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO * silicaTheme->pixelRatio();
+        // Round to nearest even rounding factor
+        pixelRatio = qRound(pixelRatio / 0.5) * 0.5;
+
+
+        // Do not floor the pixel ratio if the pixel ratio less than 2.0 (1.5 is minimum).
+        if (pixelRatio >= 2.0 && !testScreenDimensions(pixelRatio)) {
+            qreal tempPixelRatio = qFloor(pixelRatio);
+            if (testScreenDimensions(tempPixelRatio)) {
+                pixelRatio = tempPixelRatio;
+            }
+        } else if (screenWidth >= 1080) {
+            pixelRatio = qRound(pixelRatio);
         }
-    } else if (screenWidth >= 1080) {
-        pixelRatio = qRound(pixelRatio);
     }
 
     engineSettings->setPixelRatio(pixelRatio);
