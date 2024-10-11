@@ -169,7 +169,7 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("apz.asyncscroll.throttle"), QVariant::fromValue<int>(15));
     engineSettings->setPreference(QStringLiteral("apz.asyncscroll.timeout"), QVariant::fromValue<int>(15));
 #endif
-    engineSettings->setPreference(QStringLiteral("apz.fling_stopped_threshold"), QLatin1String("0.13f"));
+    engineSettings->setPreference(QStringLiteral("apz.fling_stopped_threshold"), QLatin1String("0.13"));
 
     // Theme settings.
     engineSettings->setPreference(QStringLiteral("ui.textSelectBackground"), QLatin1String("#878787"));
@@ -189,7 +189,7 @@ void SailfishOS::WebEngineSettings::initialize()
     // Touch tolerance is calculated with formula: dpi * tolerance = pixel threshold
     const int dragThreshold = QGuiApplication::styleHints()->startDragDistance();
     qreal touchStartTolerance = dragThreshold / QGuiApplication::primaryScreen()->physicalDotsPerInch();
-    engineSettings->setPreference(QString("apz.touch_start_tolerance"), QString("%1f").arg(touchStartTolerance));
+    engineSettings->setPreference(QString("apz.touch_start_tolerance"), QString("%1").arg(touchStartTolerance));
 
     qreal pixelRatio = SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO * silicaTheme->pixelRatio();
     // Round to nearest even rounding factor
