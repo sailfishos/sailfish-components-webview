@@ -227,7 +227,7 @@ ApplicationWindow {
                 onItemChanged: {
                     if (item) {
                         console.log("page loading: " + webPageAddress)
-                        item.load(webPageAddress)
+                        item.load(webPageAddress, false)
                     }
                 }
             }
