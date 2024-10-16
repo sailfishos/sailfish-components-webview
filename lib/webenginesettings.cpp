@@ -50,24 +50,25 @@ static bool testScreenDimensions(qreal pixelRatio)
     return fmod(w, 1.0) == 0 && fmod(h, 1.0) == 0;
 }
 
-static quint64 getTotalMemory() {
+static quint64 getTotalMemory()
+{
     struct sysinfo info;
     sysinfo(&info);
     return info.totalram;
 }
 
-const QSettings &quickSettings()
+static const QSettings &quickSettings()
 {
     static const QSettings settings(QSettings::SystemScope, QStringLiteral("QtProject"), QStringLiteral("QtQuick2"));
     return settings;
 }
 
-int getPressAndHoldDelay()
+static int getPressAndHoldDelay()
 {
     return quickSettings().value(QStringLiteral("QuickMouseArea/PressAndHoldDelay"), 800).toInt();
 }
 
-const int PressAndHoldDelay(getPressAndHoldDelay());
+static const int PressAndHoldDelay(getPressAndHoldDelay());
 
 SailfishOS::WebEngineSettingsPrivate *SailfishOS::WebEngineSettingsPrivate::instance()
 {
