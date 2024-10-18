@@ -210,7 +210,6 @@ RawWebView {
     }
 
     BusyIndicator {
-        id: busySpinner
         x: (webview.viewportWidth - width) / 2
         y: webview._indicatorVerticalOffset
            + ((webview.viewportHeight - webview._indicatorVerticalOffset - height) / 2)

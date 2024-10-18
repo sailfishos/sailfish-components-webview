@@ -17,7 +17,6 @@ SOURCES += downloadhelper.cpp \
 HEADERS += downloadhelper.h \
            logging.h \
            webengine.h \
-           webengine_p.h \
            webenginesettings.h \
            webenginesettings_p.h
 

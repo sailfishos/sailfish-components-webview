@@ -40,9 +40,9 @@ namespace SailfishOS {
     This method will be called automatically during QML initialisation of the
     WebView. However under some circumstances it may be useful to perform a
     custom initalization. In this case \c initialize can be called manually as
-    long as this id done before the QML engine initialization.
+    long as this is done before the QML engine initialization.
 
-    One reason for custom initialization would be to proivde additional
+    One reason for custom initialization would be to provide additional
     component manifests.
 
     \code
