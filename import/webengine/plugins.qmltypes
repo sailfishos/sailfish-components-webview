@@ -67,6 +67,13 @@ Module {
             type: "uint"
             Parameter { name: "parentId"; type: "uint" }
             Parameter { name: "parentBrowsingContext"; type: "uintptr_t" }
+            Parameter { name: "hidden"; type: "bool" }
+        }
+        Method {
+            name: "createView"
+            type: "uint"
+            Parameter { name: "parentId"; type: "uint" }
+            Parameter { name: "parentBrowsingContext"; type: "uintptr_t" }
         }
         Method {
             name: "createView"
