@@ -9,13 +9,13 @@ import QtQuick.tooling 1.2
 Module {
     dependencies: [
         "Amber.Mpris 1.0",
-        "MeeGo.QOfono 0.2",
         "Nemo.Configuration 1.0",
         "Nemo.FileManager 1.0",
         "Nemo.KeepAlive 1.2",
         "Nemo.Notifications 1.0",
         "Nemo.Policy 1.0",
         "Nemo.Thumbnailer 1.0",
+        "QOfono 0.2",
         "QtDocGallery 5.0",
         "QtGraphicalEffects 1.0",
         "QtGraphicalEffects.private 1.0",
@@ -45,6 +45,7 @@ Module {
         defaultProperty: "data"
         prototype: "QQuickItem"
         Property { name: "privateMode"; type: "bool" }
+        Property { name: "hidden"; type: "bool" }
         Property { name: "active"; type: "bool" }
         Property { name: "loaded"; type: "bool"; isReadonly: true }
         Property { name: "orientation"; type: "Qt::ScreenOrientation" }
@@ -170,6 +171,7 @@ Module {
         Method {
             name: "load"
             Parameter { type: "string" }
+            Parameter { name: "fromExternal"; type: "bool" }
         }
         Method {
             name: "sendAsyncMessage"

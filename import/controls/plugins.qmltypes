@@ -8,9 +8,9 @@ import QtQuick.tooling 1.2
 
 Module {
     dependencies: [
-        "MeeGo.QOfono 0.2",
         "Nemo.Configuration 1.0",
         "Nemo.Thumbnailer 1.0",
+        "QOfono 0.2",
         "QtQml.Models 2.2",
         "QtQuick 2.6",
         "QtQuick.Window 2.1",
