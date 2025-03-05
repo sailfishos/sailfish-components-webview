@@ -72,8 +72,7 @@ MouseArea {
         if (!selectionVisible) {
             end.x = end.fixedX
             end.y = end.fixedY
-        }
-        else if ((state === "end" || state === "reflow") && !end.dragActive) {
+        } else if ((state === "end" || state === "reflow") && !end.dragActive) {
             end.targetPositionAnimation.start()
         }
 
@@ -182,10 +181,9 @@ MouseArea {
 
     TextSelectionHandle {
         id: start
-        markerTag: "start"
 
-        // contentItem, contentWidth, and contentHeight are aliased
-        // from root
+        markerTag: "start"
+        // contentItem, contentWidth, and contentHeight are aliased from root
         visible: selectionVisible
         selectionController: root
     }
@@ -203,14 +201,13 @@ MouseArea {
 
     Notice {
         id: notification
+
         property bool published
 
+        verticalOffset: -Theme.itemSizeMedium
         duration: 3000
-
         //% "Copied to clipboard"
         text: qsTrId("sailfish_components_webview_textselection-la-selection_copied")
-
-        verticalOffset: -Theme.itemSizeMedium
     }
 
     OfonoManager {

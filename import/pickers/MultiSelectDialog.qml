@@ -51,6 +51,7 @@ Dialog {
 
     SilicaListView {
         id: listView
+
         anchors.fill: parent
         model: selectModel
 
@@ -69,7 +70,6 @@ Dialog {
         }
 
         delegate: BackgroundItem {
-
             enabled: !disabled
 
             onClicked: selectModel.setProperty(index, "selected", !selected)

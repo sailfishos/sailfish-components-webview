@@ -33,6 +33,7 @@ Dialog {
 
             DialogHeader {
                 id: header
+
                 //: Accept browser's request to save entered password
                 //% "Save"
                 acceptText: qsTrId("sailfish_components_webview_popups-he-accept_password_mgr_request")
@@ -41,6 +42,7 @@ Dialog {
 
             Column {
                 property bool _verticalCenter: passwordManager.notificationType !== "password-update-multiuser"
+
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: _verticalCenter ? Math.round(parent.height - height) / 2.0 : header.height
                 width: parent.width
@@ -75,9 +77,9 @@ Dialog {
 
                 ComboBox {
                     id: selector
+
                     visible: passwordManager.notificationType === "password-update-multiuser"
                     label: StringUtils.geckoKeyToString(passwordManager.formData["textBundle"] || "")
-
                     menu: ContextMenu {
                         Repeater {
                             model: passwordManager.formData["usernames"]

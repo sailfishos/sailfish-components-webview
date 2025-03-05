@@ -31,7 +31,9 @@ ContextMenuInterface {
     readonly property bool isLink: !isJavascriptFunction && linkHref.length > 0
 
     // Separate hyper text links from other content types.
-    readonly property bool isHyperTextLink: linkProtocol === "http" || linkProtocol === "https" || linkProtocol === "file"
+    readonly property bool isHyperTextLink: linkProtocol === "http"
+                                            || linkProtocol === "https"
+                                            || linkProtocol === "file"
 
     // Known platfrom content types.
     readonly property bool isMailto: linkProtocol === "mailto"
@@ -79,8 +81,8 @@ ContextMenuInterface {
 
                 Expander {
                     id: expander
-                    horizontalMargin: Theme.horizontalPageMargin
 
+                    horizontalMargin: Theme.horizontalPageMargin
                     width: parent.width
                     collapsedHeight: title.y + Math.min(title.height, 4 * fontMetrics.height)
                     expandedHeight: title.y + title.height + Theme.paddingLarge + Theme.paddingMedium
@@ -92,6 +94,7 @@ ContextMenuInterface {
 
                     Label {
                         id: title
+
                         anchors.horizontalCenter: parent.horizontalCenter
                         visible: root.linkTitle || root.url
                         text: root.linkTitle || root.url
@@ -119,6 +122,7 @@ ContextMenuInterface {
 
                 Label {
                     id: imageTitle
+
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: text !== title.text
                     color: Theme.highlightColor
@@ -152,7 +156,9 @@ ContextMenuInterface {
                         rightMargin: -Theme.horizontalPageMargin
                     }
 
-                    height: Math.max(Theme.itemSizeSmall, root.height - Theme.paddingLarge*2 - expander.height - imageTitle.height - menu.height - (landscape ? Theme.paddingLarge : Theme.itemSizeSmall))
+                    height: Math.max(Theme.itemSizeSmall,
+                                     root.height - Theme.paddingLarge*2 - expander.height - imageTitle.height - menu.height
+                                     - (landscape ? Theme.paddingLarge : Theme.itemSizeSmall))
 
                     MouseArea {
                         anchors.fill: parent
@@ -279,7 +285,8 @@ ContextMenuInterface {
                         text: qsTrId("sailfish_components_webview_popups-me-share_image")
                         onClicked: {
                             root._hide()
-                            webShareAction.shareLink(root.imageSrc, root.url, qsTrId("sailfish_components_webview_popups-me-share_image"))
+                            webShareAction.shareLink(root.imageSrc, root.url,
+                                                     qsTrId("sailfish_components_webview_popups-me-share_image"))
                         }
                     }
 

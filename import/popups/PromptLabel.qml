@@ -23,6 +23,7 @@ Item {
 
     Label {
         id: label
+
         x: Theme.horizontalPageMargin
         y: root.largeFont ? Theme.itemSizeSmall : Theme.paddingLarge
         width: parent.width - (2 * Theme.horizontalPageMargin)

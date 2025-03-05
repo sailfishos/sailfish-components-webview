@@ -12,7 +12,9 @@
 #include "permissionmodel.h"
 #include "webengine.h"
 
-PermissionManager::PermissionManager(QObject *parent) : QObject(parent) {
+PermissionManager::PermissionManager(QObject *parent)
+    : QObject(parent)
+{
     SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
 
     webEngine->addObserver(QStringLiteral("embed:perms:all"));

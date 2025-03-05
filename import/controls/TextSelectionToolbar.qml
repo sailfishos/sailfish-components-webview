@@ -163,16 +163,17 @@ Row {
             width: (root.width - root.leftPadding - root.rightPadding) / Math.max(1, repeater.count)
             height: root.height
             icon.source: modelData.icon
-            icon.anchors.horizontalCenterOffset: -(Math.min(landscapeLabel.width, landscapeLabel.implicitWidth) + root.horizontalSpacing) / 2
+            icon.anchors.horizontalCenterOffset: -(Math.min(landscapeLabel.width,
+                                                            landscapeLabel.implicitWidth) + root.horizontalSpacing) / 2
 
             onClicked: root.buttons[index].action()
 
             Label {
                 id: landscapeLabel
+
                 x: landscapeButton.icon.x + landscapeButton.icon.width + root.horizontalSpacing
                 y: (landscapeButton.height - height) / 2
                 width: landscapeButton.width - landscapeButton.icon.width - (2 * root.horizontalSpacing)
-
                 text: modelData.label
                 font.pixelSize: root.fontSize
                 truncationMode: TruncationMode.Fade

@@ -18,6 +18,7 @@ class PermissionFilterProxyModel : public QSortFilterProxyModel
     Q_OBJECT
     Q_PROPERTY(QString permissionType READ permissionType WRITE setPermissionType NOTIFY permissionTypeChanged)
     Q_PROPERTY(bool onlyPermanent READ onlyPermanent WRITE setOnlyPermanent NOTIFY onlyPermanentChanged)
+
 public:
     PermissionFilterProxyModel(QObject *parent = nullptr);
 

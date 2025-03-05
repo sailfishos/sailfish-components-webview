@@ -370,8 +370,8 @@ Timer {
 
     function webrtc(data) {
         // Promote only supported requests and only from an observable origin
-        if (data.origin && ("camera" in data.devices ||
-                            "microphone" in data.devices)) {
+        if (data.origin && ("camera" in data.devices
+                            || "microphone" in data.devices)) {
             openPopupByTopic("embed:webrtcrequest", null, {
                     "origin": data.origin,
                     "devices": data.devices
