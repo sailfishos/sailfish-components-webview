@@ -24,6 +24,7 @@ Dialog {
 
     UserPromptInterface {
         id: prompt
+
         anchors.fill: parent
 
         UserPromptUi {

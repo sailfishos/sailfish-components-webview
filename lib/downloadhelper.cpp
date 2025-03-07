@@ -23,6 +23,7 @@
 */
 
 #include <QFileInfo>
+
 constexpr int FILEEXTENSION_MAX_LENGTH = 32;
 constexpr int FILENAME_MAX_LENGTH = 255;
 
@@ -68,7 +69,8 @@ QString SailfishOS::WebEngineUtils::DownloadHelper::createUniqueFileUrl(QString 
     const QByteArray fileNameBuf = fileName.toUtf8();
 
     // Determine start position of file extension
-    int dotPosition = fileNameBuf.size() < FILEEXTENSION_MAX_LENGTH ? 0 : fileNameBuf.size() - FILEEXTENSION_MAX_LENGTH;
+    int dotPosition = fileNameBuf.size() < FILEEXTENSION_MAX_LENGTH ? 0
+                                                                    : fileNameBuf.size() - FILEEXTENSION_MAX_LENGTH;
     while (dotPosition < fileNameBuf.size() && fileNameBuf[dotPosition] != '.') {
         dotPosition += 1;
     }

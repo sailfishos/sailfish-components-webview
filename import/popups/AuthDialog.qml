@@ -100,8 +100,9 @@ Dialog {
                     placeholderText: qsTrId("sailfish_components_webview_popups-la-enter_password")
                     text: auth.passwordPrefillValue
 
-                    EnterKey.iconSource: (username.text.length > 0 && text.length > 0) ? "image://theme/icon-m-enter-accept"
-                                                                                       : "image://theme/icon-m-enter-next"
+                    EnterKey.iconSource: (username.text.length > 0 && text.length > 0)
+                                         ? "image://theme/icon-m-enter-accept"
+                                         : "image://theme/icon-m-enter-next"
                     EnterKey.onClicked: auth.accepted()
                 }
 

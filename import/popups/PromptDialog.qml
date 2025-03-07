@@ -43,6 +43,7 @@ Dialog {
 
             TextField {
                 id: input
+
                 height: implicitHeight
                 width: parent.width
                 focus: true

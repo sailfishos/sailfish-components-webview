@@ -40,8 +40,8 @@ Dialog {
 
             ComboBox {
                 id: selector
-                label: prompt.text
 
+                label: prompt.text
                 menu: ContextMenu {
                     Repeater {
                         model: prompt.values

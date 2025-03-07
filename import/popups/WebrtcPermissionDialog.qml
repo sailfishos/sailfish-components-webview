@@ -70,6 +70,7 @@ UserPromptDialog {
 
                 Label {
                     id: title
+
                     wrapMode: Text.WordWrap
                     x: Theme.horizontalPageMargin
                     width: parent.width - x * 2
@@ -81,6 +82,7 @@ UserPromptDialog {
 
                 Label {
                     id: label
+
                     wrapMode: Text.WordWrap
                     x: Theme.horizontalPageMargin
                     width: parent.width - x * 2

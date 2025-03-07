@@ -16,7 +16,10 @@ import Sailfish.WebEngine 1.0
 QtObject {
     property var pageStack
     property QtObject contentItem
-    readonly property var listeners: ["embed:filepicker", "embed:selectasync", "embedui:downloadpicker", "embed:downloadpicker"]
+    readonly property var listeners: [ "embed:filepicker",
+                                       "embed:selectasync",
+                                       "embedui:downloadpicker",
+                                       "embed:downloadpicker" ]
 
     // Defer compilation of picker components
     readonly property string _multiSelectComponentUrl: Qt.resolvedUrl("MultiSelectDialog.qml")

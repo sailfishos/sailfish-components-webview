@@ -14,8 +14,7 @@ import Sailfish.Share 1.0
 ShareAction {
     id: shareAction
 
-    function shareLink(linkHref, linkTitle, title)
-    {
+    function shareLink(linkHref, linkTitle, title) {
         _share(
             //: Header for link sharing
             //% "Share link"
@@ -27,8 +26,7 @@ ShareAction {
             })
     }
 
-    function shareText(text)
-    {
+    function shareText(text) {
         _share(
             //: Header for text sharing
             //% "Share"
@@ -41,8 +39,7 @@ ShareAction {
             })
     }
 
-    function _share(title, content)
-    {
+    function _share(title, content) {
         shareAction.title = title
         shareAction.resources = [content]
         shareAction.mimeType = content.type

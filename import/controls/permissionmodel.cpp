@@ -21,7 +21,8 @@ static const auto PERMS_ALL_FOR_URI = QStringLiteral("embed:perms:all-for-uri");
  * don't use PermissionManager::add() and PermissionManager::remove()
  * methods outside for this model.
 */
-PermissionModel::PermissionModel(QObject *parent) : QAbstractListModel(parent)
+PermissionModel::PermissionModel(QObject *parent)
+    : QAbstractListModel(parent)
 {
     SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
     connect(webEngine, &SailfishOS::WebEngine::recvObserve, this, &PermissionModel::handleRecvObserve);

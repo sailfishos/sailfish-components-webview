@@ -50,10 +50,12 @@ Image {
 
     onDragActiveChanged: {
         if (dragActive) {
-            contentItem.sendAsyncMessage("Browser:SelectionMoveStart", selectionController.getMarkerBaseMessage(markerTag))
+            contentItem.sendAsyncMessage("Browser:SelectionMoveStart",
+                                         selectionController.getMarkerBaseMessage(markerTag))
             moving = true
         } else {
-            contentItem.sendAsyncMessage("Browser:SelectionMoveEnd", selectionController.getMarkerBaseMessage(markerTag))
+            contentItem.sendAsyncMessage("Browser:SelectionMoveEnd",
+                                         selectionController.getMarkerBaseMessage(markerTag))
             moving = false
         }
     }
@@ -66,8 +68,10 @@ Image {
         }
     }
 
-    onXChanged: mask = Qt.rect(x - Theme.paddingLarge, y, width + 2 * Theme.paddingLarge, height + Theme.paddingLarge)
-    onYChanged: mask = Qt.rect(x - Theme.paddingLarge, y, width + 2 * Theme.paddingLarge, height + Theme.paddingLarge)
+    onXChanged: mask = Qt.rect(x - Theme.paddingLarge, y,
+                               width + 2 * Theme.paddingLarge, height + Theme.paddingLarge)
+    onYChanged: mask = Qt.rect(x - Theme.paddingLarge, y,
+                               width + 2 * Theme.paddingLarge, height + Theme.paddingLarge)
 
     MouseArea {
         id: mouseArea
@@ -108,6 +112,7 @@ Image {
 
     ParallelAnimation {
         id: showAnimation
+
         FadeAnimation {
             target: handle
             from: 0
@@ -116,7 +121,8 @@ Image {
         NumberAnimation {
             target: handle
             property: "x"
-            from: handle.markerTag === "start" ? handle.x - Theme.itemSizeExtraLarge : handle.x + Theme.itemSizeExtraLarge
+            from: handle.markerTag === "start" ? handle.x - Theme.itemSizeExtraLarge
+                                               : handle.x + Theme.itemSizeExtraLarge
             to: handle.x
             duration: 200
             easing.type: Easing.InOutQuad
@@ -125,6 +131,7 @@ Image {
 
     ParallelAnimation {
         id: targetPositionAnimation
+
         NumberAnimation {
             target: handle
             property: "x"

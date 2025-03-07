@@ -202,6 +202,7 @@ RawWebView {
 
     Timer {
         id: orientationDelayFailsafe
+
         running: !orientationFadeOut.running && orientationDelayOverlay.opacity === 1
         onTriggered: {
             orientationFadeOut.start()

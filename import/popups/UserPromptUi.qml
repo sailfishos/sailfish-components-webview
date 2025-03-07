@@ -28,11 +28,13 @@ Item {
 
         Item {
             id: contentContainer
+
             width: parent.width
             height: header.height + promptContent.height + preventDialogs.height
 
             DialogHeader {
                 id: header
+
                 dialog: dialog
                 _glassOnly: true
                 acceptText: StringUtils.geckoKeyToString(popupInterface.acceptText)
@@ -42,6 +44,7 @@ Item {
 
             Column {
                 id: promptContent
+
                 anchors.top: header.bottom
                 width: dialog.width
             }

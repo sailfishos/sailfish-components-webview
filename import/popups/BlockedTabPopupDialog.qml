@@ -49,7 +49,8 @@ Dialog {
                                             : blockedPopup.host
 
                 //: %1 is the page that wants to load a popup
-                //% "The page %1 attempted to open a new tab, which has been blocked. Would you like to allow it to open new tabs?"
+                //% "The page %1 attempted to open a new tab, which has been blocked. "
+                //% "Would you like to allow it to open new tabs?"
                 text: qsTrId("sailfish_components_webview_popups-la-popup_request").arg(truncatedUri)
 
                 wrapMode: Text.WordWrap
@@ -62,7 +63,8 @@ Dialog {
                 //: Remember decision for this site for later use
                 //% "Remember for this site"
                 text: qsTrId("sailfish_components_webview_popups-remember_for_site")
-                //% "You can change this setting in future by selecting the padlock icon in the toolbar, or from the Permissions page in Settings"
+                //% "You can change this setting in future by selecting the padlock icon in the toolbar, "
+                //% "or from the Permissions page in Settings"
                 description: qsTrId("sailfish_components_webview_popups-la-remember_popup_blocked_description")
             }
         }

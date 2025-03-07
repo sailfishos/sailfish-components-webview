@@ -14,6 +14,7 @@ import Sailfish.Pickers 1.0
 
 Item {
     id: pickerCreator
+
     property int winId
     property QtObject contentItem
     property string mimeType
@@ -35,7 +36,7 @@ Item {
                                  {
                                      "winId": winId,
                                      "accepted": filePath ? true : false,
-                                                            "items": [filePath]
+                                     "items": [filePath]
                                  })
         pickerCreator.destroy()
     }
