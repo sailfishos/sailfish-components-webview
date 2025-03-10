@@ -192,24 +192,31 @@ void SailfishOS::WebEngineSettings::initialize()
     qreal touchStartTolerance = dragThreshold / QGuiApplication::primaryScreen()->physicalDotsPerInch();
     engineSettings->setPreference(QString("apz.touch_start_tolerance"), QString("%1").arg(touchStartTolerance));
 
-    qreal pixelRatio = SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO * silicaTheme->pixelRatio();
-    // Round to nearest even rounding factor
-    pixelRatio = qRound(pixelRatio / 0.5) * 0.5;
-
-    int screenWidth = QGuiApplication::primaryScreen()->size().width();
-
-    // Do not floor the pixel ratio if the pixel ratio less than 2.0 (1.5 is minimum).
-    if (pixelRatio >= 2.0 && !testScreenDimensions(pixelRatio)) {
-        qreal tempPixelRatio = qFloor(pixelRatio);
-        if (testScreenDimensions(tempPixelRatio)) {
-            pixelRatio = tempPixelRatio;
-        }
-    } else if (screenWidth >= 1080) {
-        pixelRatio = qRound(pixelRatio);
+    qreal pixelRatio;
+    //DPI ranges and DPRs are taken from Android (lpdi, mdpi, hdpi etc.)
+    qreal dpi = QGuiApplication::primaryScreen()->physicalDotsPerInch();
+    if(dpi < 140) {
+        pixelRatio = 0.75;
+    } else if(dpi < 200) {
+        pixelRatio = 1.0;
+    } else if(dpi < 280) {
+        pixelRatio = 1.5;
+    } else if(dpi < 400) {
+        pixelRatio = 2.0;
+    } else if(dpi < 560) {
+        pixelRatio = 3.0;
+    } else {
+        pixelRatio = 4.0;
     }
-
+    
+    //reduce pR until screen dimensions can be divivded by it, but not lower than 1.0.
+    while (!testScreenDimensions(pixelRatio) && pixelRatio > 1.0) {
+        pixelRatio -= 0.5;
+    }
+	
     engineSettings->setPixelRatio(pixelRatio);
 
+    int screenWidth = QGuiApplication::primaryScreen()->size().width();
     int tileSize = screenWidth;
 
     // With bigger than FullHD screen fill with two tiles in row (portrait).
