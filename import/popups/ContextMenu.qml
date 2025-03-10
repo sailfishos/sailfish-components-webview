@@ -66,8 +66,7 @@ ContextMenuInterface {
 
         SilicaFlickable {
             anchors.fill: parent
-            // Extra height: content topMargin + 1 x paddingLarge to end.
-            contentHeight: content.height + Theme.paddingLarge * 3
+            contentHeight: content.height
 
             VerticalScrollDecorator {}
 
@@ -75,9 +74,9 @@ ContextMenuInterface {
                 id: content
 
                 width: parent.width
+                topPadding: Theme.paddingLarge*2
+                bottomPadding: Theme.paddingLarge
                 spacing: Theme.paddingMedium
-                anchors.top: parent.top
-                anchors.topMargin: Theme.paddingLarge*2
 
                 Expander {
                     id: expander
@@ -148,7 +147,7 @@ ContextMenuInterface {
                 }
 
                 // Padding between titles and menu.
-                Item {
+                MouseArea {
                     anchors {
                         left: parent.left
                         right: parent.right
@@ -156,14 +155,10 @@ ContextMenuInterface {
                         rightMargin: -Theme.horizontalPageMargin
                     }
 
-                    height: Math.max(Theme.itemSizeSmall,
-                                     root.height - Theme.paddingLarge*2 - expander.height - imageTitle.height - menu.height
-                                     - (landscape ? Theme.paddingLarge : Theme.itemSizeSmall))
+                    height: Math.max(Theme.itemSizeSmall - 2*content.spacing,
+                                     root.height - y - content.spacing - menu.height - content.bottomPadding)
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: root._hide()
-                    }
+                    onClicked: root._hide()
                 }
 
                 Column {
@@ -196,7 +191,6 @@ ContextMenuInterface {
                             Qt.openUrlExternally(root.linkHref)
                         }
                     }
-
 
                     ContextMenuItem {
                         visible: root.isNavigable && !!tabModel
