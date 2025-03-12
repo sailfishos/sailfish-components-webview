@@ -16,6 +16,8 @@ ApplicationWindow {
         Page {
             id: page
 
+            allowedOrientations: Orientation.All
+
             WebView {
                 anchors.fill: parent
                 active: true

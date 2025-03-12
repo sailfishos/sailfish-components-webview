@@ -15,7 +15,7 @@ ApplicationWindow {
         Page {
             id: page
 
-            anchors.fill: parent
+            allowedOrientations: Orientation.All
 
             function startTest() {
                 var props = {
@@ -151,8 +151,7 @@ ApplicationWindow {
             property bool webViewLoading
             property int webViewLoadProgress
 
-            anchors.fill: parent
-
+            allowedOrientations: Orientation.All
             showNavigationIndicator: false
             backNavigation: false
 
