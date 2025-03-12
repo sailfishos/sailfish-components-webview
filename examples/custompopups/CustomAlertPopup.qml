@@ -10,8 +10,9 @@ import Sailfish.WebView.Popups 1.0
 
 AlertPopupInterface {
     id: popup
-    width: (parent.width/5)*4
-    height: (parent.height/5)*4
+
+    width: (parent.width / 5) * 4
+    height: (parent.height / 5) * 4
     anchors.centerIn: parent
 
     acceptText: "Dismiss"
@@ -24,11 +25,13 @@ AlertPopupInterface {
 
         SilicaFlickable {
             id: flickable
+
             anchors.fill: parent
             contentHeight: content.height + Theme.paddingLarge
 
             Column {
                 id: content
+
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 anchors.centerIn: parent
                 spacing: Theme.paddingLarge
@@ -48,6 +51,7 @@ AlertPopupInterface {
                 }
                 TextSwitch {
                     id: toggle
+
                     anchors.horizontalCenter: parent.horizontalCenter
                     height: visible ? implicitHeight : 0
                     visible: popup.preventDialogsVisible

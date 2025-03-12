@@ -1,5 +1,5 @@
-TEMPLATE=app
-TARGET=webview-test-app
+TEMPLATE = app
+TARGET = webview-test-app
 TARGETPATH = /usr/bin/
 target.path = $$TARGETPATH
 QT += gui qml quick
