@@ -10,8 +10,9 @@ import Sailfish.WebView.Popups 1.0
 
 BlockedTabPopupInterface {
     id: popup
-    width: (parent.width/5)*4
-    height: (parent.height/5)*4
+
+    width: (parent.width / 5) * 4
+    height: (parent.height / 5) * 4
     anchors.centerIn: parent
 
     rememberValue: toggle.checked
@@ -26,11 +27,13 @@ BlockedTabPopupInterface {
 
         SilicaFlickable {
             id: flickable
+
             anchors.fill: parent
             contentHeight: content.height + Theme.paddingLarge
 
             Column {
                 id: content
+
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 anchors.centerIn: parent
                 spacing: Theme.paddingLarge
@@ -54,7 +57,10 @@ BlockedTabPopupInterface {
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: popup.cancelText
-                    onClicked: { popup.rejected(); popup.visible = false }
+                    onClicked: {
+                        popup.rejected()
+                        popup.visible = false
+                    }
                 }
             }
         }

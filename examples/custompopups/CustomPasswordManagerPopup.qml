@@ -10,8 +10,9 @@ import Sailfish.WebView.Popups 1.0
 
 PasswordManagerPopupInterface {
     id: popup
-    width: (parent.width/5)*4
-    height: (parent.height/5)*4
+
+    width: (parent.width / 5) * 4
+    height: (parent.height / 5) * 4
     anchors.centerIn: parent
 
     property string displayUser: popup.formData["displayUser"]
@@ -20,9 +21,9 @@ PasswordManagerPopupInterface {
                         ? (displayUser.length ? ("Save password for user " + displayUser + " on " + displayHost + "?")
                                               : ("Save password on " + displayHost + "?"))
                         : popup.notificationType == "password-change"
-                        ? (displayUser.length ? ("Update password for user " + displayUser + "?")
-                                              : ("Update password?"))
-                        : "Unknown password manager request!"
+                          ? (displayUser.length ? ("Update password for user " + displayUser + "?")
+                                                : ("Update password?"))
+                          : "Unknown password manager request!"
 
     Rectangle {
         anchors.fill: parent
@@ -31,11 +32,13 @@ PasswordManagerPopupInterface {
 
         SilicaFlickable {
             id: flickable
+
             anchors.fill: parent
             contentHeight: content.height + Theme.paddingLarge
 
             Column {
                 id: content
+
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 anchors.centerIn: parent
                 spacing: Theme.paddingLarge
@@ -49,12 +52,18 @@ PasswordManagerPopupInterface {
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "Save password"
-                    onClicked: { popup.accepted(); popup.visible = false }
+                    onClicked: {
+                        popup.accepted()
+                        popup.visible = false
+                    }
                 }
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "Cancel"
-                    onClicked: { popup.rejected(); popup.visible = false }
+                    onClicked: {
+                        popup.rejected()
+                        popup.visible = false
+                    }
                 }
             }
         }

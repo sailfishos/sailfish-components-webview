@@ -1,5 +1,5 @@
-TEMPLATE=app
-TARGET=custompopups
+TEMPLATE = app
+TARGET = custompopups
 TARGETPATH = /usr/bin/
 target.path = $$TARGETPATH
 QT += gui qml quick

@@ -142,9 +142,7 @@ RawWebView {
             opacity: canShowSelectionMarkers ? 1.0 : 0.0
             contentWidth: Math.max(webview.contentWidth, webview.width)
             contentHeight: Math.max(webview.contentHeight, webview.height)
-            anchors {
-                fill: parent
-            }
+            anchors.fill: parent
 
             Behavior on opacity { FadeAnimator {} }
         }
@@ -195,7 +193,6 @@ RawWebView {
             running: false
             duration: 200
             easing.type: Easing.InOutQuad
-
             to: 0
         }
     }

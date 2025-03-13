@@ -3,6 +3,7 @@ import Sailfish.Silica 1.0
 
 Item {
     id: root
+
     property alias label: textField.label
     property real minimumValue: -Infinity
     property real maximumValue: Infinity
@@ -20,6 +21,7 @@ Item {
 
         IconButton {
             id: buttonMinus
+
             width: height
             anchors.verticalCenter: textField.verticalCenter
             icon.source: "image://theme/icon-video-overlay-play"
@@ -39,13 +41,13 @@ Item {
 
             EnterKey.iconSource: "image://theme/icon-m-enter-next"
             EnterKey.onClicked: {
-                focus = false;
-                root.value = text;
+                focus = false
+                root.value = text
             }
 
             onFocusChanged: {
                 if (!focus) {
-                    root.value = text;
+                    root.value = text
                 }
             }
         }

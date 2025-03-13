@@ -10,8 +10,9 @@ import Sailfish.WebView.Popups 1.0
 
 ConfirmPopupInterface {
     id: popup
-    width: (parent.width/5)*4
-    height: (parent.height/5)*4
+
+    width: (parent.width / 5) * 4
+    height: (parent.height / 5) * 4
     anchors.centerIn: parent
 
     acceptText: "Confirm"
@@ -25,11 +26,13 @@ ConfirmPopupInterface {
 
         SilicaFlickable {
             id: flickable
+
             anchors.fill: parent
             contentHeight: content.height + Theme.paddingLarge
 
             Column {
                 id: content
+
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 anchors.centerIn: parent
                 spacing: Theme.paddingLarge
@@ -49,6 +52,7 @@ ConfirmPopupInterface {
                 }
                 TextSwitch {
                     id: toggle
+
                     anchors.horizontalCenter: parent.horizontalCenter
                     height: visible ? implicitHeight : 0
                     visible: popup.preventDialogsVisible
@@ -58,13 +62,18 @@ ConfirmPopupInterface {
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: popup.acceptText
-                    onClicked: { popup.accepted(); popup.visible = false }
+                    onClicked: {
+                        popup.accepted()
+                        popup.visible = false
+                    }
                 }
                 Button {
-                    id: rejectBtn
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: popup.cancelText
-                    onClicked: { popup.rejected(); popup.visible = false }
+                    onClicked: {
+                        popup.rejected()
+                        popup.visible = false
+                    }
                 }
             }
         }

@@ -13,8 +13,8 @@ PromptPopupInterface {
 
     property bool canAccept: input.text.length > 0
 
-    width: (parent.width/5)*4
-    height: (parent.height/5)*4
+    width: (parent.width / 5) * 4
+    height: (parent.height / 5) * 4
     anchors.centerIn: parent
 
     acceptText: "Ok"
@@ -30,11 +30,13 @@ PromptPopupInterface {
 
         SilicaFlickable {
             id: flickable
+
             anchors.fill: parent
             contentHeight: content.height + Theme.paddingLarge
 
             Column {
                 id: content
+
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 anchors.centerIn: parent
                 spacing: Theme.paddingLarge
@@ -48,6 +50,7 @@ PromptPopupInterface {
                 }
                 TextField {
                     id: input
+
                     width: parent.width
                     focus: true
                     label: text.length > 0 ? popup.text : ""
@@ -56,10 +59,16 @@ PromptPopupInterface {
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                     EnterKey.enabled: text.length > 0
                     EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                    EnterKey.onClicked: { if (popup.canAccept) { popup.accepted(); popup.visible = false } }
+                    EnterKey.onClicked: {
+                        if (popup.canAccept) {
+                            popup.accepted()
+                            popup.visible = false
+                        }
+                    }
                 }
                 TextSwitch {
                     id: toggle
+
                     anchors.horizontalCenter: parent.horizontalCenter
                     height: visible ? implicitHeight : 0
                     visible: popup.preventDialogsVisible
@@ -67,16 +76,21 @@ PromptPopupInterface {
                     text: "Don't show this again"
                 }
                 Button {
-                    id: acceptBtn
                     anchors.horizontalCenter: parent.horizontalCenter
                     enabled: popup.canAccept
                     text: popup.acceptText
-                    onClicked: { popup.accepted(); popup.visible = false }
+                    onClicked: {
+                        popup.accepted()
+                        popup.visible = false
+                    }
                 }
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: popup.cancelText
-                    onClicked: { popup.rejected(); popup.visible = false }
+                    onClicked: {
+                        popup.rejected()
+                        popup.visible = false
+                    }
                 }
             }
         }

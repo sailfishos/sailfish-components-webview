@@ -116,19 +116,6 @@ void RawWebView::setVirtualKeyboardMargin(qreal vkbMargin)
         setDynamicToolbarHeight(m_vkbMargin != 0 ? m_footerMargin : 0);
 
         emit virtualKeyboardMarginChanged();
-
-        QVariantMap map;
-        map.insert("imOpen", m_vkbMargin > 0);
-        map.insert("pixelRatio", SailfishOS::WebEngineSettings::instance()->pixelRatio());
-        map.insert("bottomMargin", m_vkbMargin);
-        // These map to max css composition size. Item's geometry might update right after this
-        // meaning that height() + m_vkbMargin doesn't yet equal to available max space.
-        // Nevertheless, it is not a big deal if we loose a pixel or two from
-        // max composition size.
-        map.insert("screenWidth", viewportWidth());
-        map.insert("screenHeight", viewportHeight());
-        QVariant data(map);
-        sendAsyncMessage("embedui:vkbOpenCompositionMetrics", data);
     }
 }
 

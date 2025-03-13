@@ -1,3 +1,4 @@
-TEMPLATE=subdirs
-SUBDIRS+=custompopups \
-         webview-test-app
+TEMPLATE = subdirs
+SUBDIRS += \
+    custompopups \
+    webview-test-app

@@ -15,7 +15,7 @@ ApplicationWindow {
         Page {
             id: page
 
-            anchors.fill: parent
+            allowedOrientations: Orientation.All
 
             function startTest() {
                 var props = {
@@ -114,6 +114,7 @@ ApplicationWindow {
 
                 TextSwitch {
                     id: viewportInfoSwitch
+
                     text: "Viewport info"
                 }
 
@@ -147,11 +148,10 @@ ApplicationWindow {
             property real reloadInterval
             property bool viewportInfo
 
-            property bool webViewLoading: false
-            property int webViewLoadProgress: 0
+            property bool webViewLoading
+            property int webViewLoadProgress
 
-            anchors.fill: parent
-
+            allowedOrientations: Orientation.All
             showNavigationIndicator: false
             backNavigation: false
 
@@ -162,10 +162,7 @@ ApplicationWindow {
             Timer {
                 id: webViewRecreationTimer
 
-                interval: (webViewLoader.active ?
-                               destructionDelay :
-                               creationDelay) * 1000.0
-
+                interval: (webViewLoader.active ? destructionDelay : creationDelay) * 1000.0
                 running: pageStack.currentPage === webViewPage && mode === 1
                 repeat: true
 
@@ -247,32 +244,38 @@ ApplicationWindow {
 
                 Column {
                     id: contentColumn
+
                     y: Theme.paddingMedium
                     x: Theme.paddingMedium
                     width: parent.width - Theme.paddingMedium * 2
 
                     Label {
-                        text: "Scrollable offset x: " + webViewLoader.item.scrollableOffset.x.toFixed(2) + ", y: " + webViewLoader.item.scrollableOffset.y.toFixed(2)
+                        text: "Scrollable offset x: " + webViewLoader.item.scrollableOffset.x.toFixed(2)
+                              + ", y: " + webViewLoader.item.scrollableOffset.y.toFixed(2)
                         font.pixelSize: Theme.fontSizeSmall
                     }
 
                     Label {
-                        text: "Scrollable width: " + webViewLoader.item.scrollableSize.width.toFixed(2) + ", height: " + webViewLoader.item.scrollableSize.height.toFixed(2)
+                        text: "Scrollable width: " + webViewLoader.item.scrollableSize.width.toFixed(2)
+                              + ", height: " + webViewLoader.item.scrollableSize.height.toFixed(2)
                         font.pixelSize: Theme.fontSizeSmall
                     }
 
                     Label {
-                        text: "Content width: " + webViewLoader.item.contentWidth.toFixed(2) + ", height: " + webViewLoader.item.contentHeight.toFixed(2)
+                        text: "Content width: " + webViewLoader.item.contentWidth.toFixed(2)
+                              + ", height: " + webViewLoader.item.contentHeight.toFixed(2)
                         font.pixelSize: Theme.fontSizeSmall
                     }
 
                     Label {
-                        text: "Content rect x: " + webViewLoader.item.contentRect.x.toFixed(2) + ", y: " + webViewLoader.item.contentRect.y.toFixed(2)
+                        text: "Content rect x: " + webViewLoader.item.contentRect.x.toFixed(2)
+                              + ", y: " + webViewLoader.item.contentRect.y.toFixed(2)
                         font.pixelSize: Theme.fontSizeSmall
                     }
 
                     Label {
-                        text: "Content rect width: " + webViewLoader.item.contentRect.width.toFixed(2) + ", height: " + webViewLoader.item.contentRect.height.toFixed(2)
+                        text: "Content rect width: " + webViewLoader.item.contentRect.width.toFixed(2)
+                              + ", height: " + webViewLoader.item.contentRect.height.toFixed(2)
                         font.pixelSize: Theme.fontSizeSmall
                     }
 
@@ -323,7 +326,9 @@ ApplicationWindow {
 
                 Label {
                     anchors.centerIn: parent
-                    text: !webViewLoader.active ? "destroyed" : (webViewPage.webViewLoading ? webViewPage.webViewLoadProgress + "%" : "loaded")
+                    text: !webViewLoader.active ? "destroyed"
+                                                : (webViewPage.webViewLoading ? webViewPage.webViewLoadProgress + "%"
+                                                                              : "loaded")
                 }
             }
 
