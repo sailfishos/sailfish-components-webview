@@ -39,10 +39,6 @@ Timer {
     })
     readonly property var listeners: Object.keys(_messageTopicToPopupProviderPropertyMapping)
 
-    property var authDialogContentItem
-    property var authDialogData
-    property var authDialogWinId
-
     property bool downloadsEnabled: true
 
     property Component _contextMenuComponent
