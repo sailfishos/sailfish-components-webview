@@ -51,7 +51,7 @@ Dialog {
 
                 Label {
                     x: Theme.horizontalPageMargin
-                    width: parent.width - x * 2
+                    width: parent.width - 2 * x
 
                     //: %1 is the site that wants know user location
                     //% "Allow %1 to use your location?"
@@ -73,7 +73,7 @@ Dialog {
 
                 Label {
                     x: Theme.horizontalPageMargin
-                    width: parent.width - Theme.horizontalPageMargin * 2
+                    width: parent.width - 2 * x
                     visible: location.privateBrowsing
                     wrapMode: Text.Wrap
                     color: Theme.highlightColor

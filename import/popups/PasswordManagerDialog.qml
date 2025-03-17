@@ -50,7 +50,7 @@ Dialog {
 
                 Label {
                     x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    width: parent.width - 2 * x
                     wrapMode: Text.Wrap
                     horizontalAlignment: Text.AlignHCenter
                     font {
@@ -65,7 +65,7 @@ Dialog {
 
                 Label {
                     x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    width: parent.width - 2 * x
                     wrapMode: Text.Wrap
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.fontSizeMedium

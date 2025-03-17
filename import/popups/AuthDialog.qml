@@ -68,7 +68,7 @@ Dialog {
 
                 Label {
                     x: Theme.horizontalPageMargin
-                    width: parent.width - Theme.horizontalPageMargin * 2
+                    width: parent.width - 2 * x
                     bottomPadding: Theme.paddingLarge
                     text: StringUtils.geckoKeyToString(auth.messageBundle)
                     wrapMode: Text.Wrap
@@ -118,7 +118,7 @@ Dialog {
 
                 Label {
                     x: Theme.horizontalPageMargin
-                    width: parent.width - Theme.horizontalPageMargin * 2
+                    width: parent.width - 2 * x
                     visible: auth.privateBrowsing
                     wrapMode: Text.Wrap
                     color: Theme.highlightColor

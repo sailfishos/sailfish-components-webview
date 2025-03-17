@@ -26,7 +26,7 @@ Item {
 
         x: Theme.horizontalPageMargin
         y: root.largeFont ? Theme.itemSizeSmall : Theme.paddingLarge
-        width: parent.width - (2 * Theme.horizontalPageMargin)
+        width: parent.width - 2 * x
 
         font.pixelSize: largeFont ? Theme.fontSizeExtraLarge : Theme.fontSizeMedium
         color: Theme.highlightColor
