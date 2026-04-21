@@ -36,6 +36,26 @@ RawWebView {
 
     property alias popupProvider: popupOpener.popupProvider
 
+    function _primarySafeAreaInsets() {
+        return {
+            top: Math.max(0,
+                          Screen.topCutout.y + Screen.topCutout.height,
+                          Screen.topLeftCorner.y,
+                          Screen.topRightCorner.y),
+            right: Math.max(0,
+                            Screen.width - Screen.topRightCorner.x,
+                            Screen.width - Screen.bottomRightCorner.x),
+            bottom: Math.max(0,
+                             Screen.height - Screen.bottomLeftCorner.y,
+                             Screen.height - Screen.bottomRightCorner.y),
+            left: Math.max(0,
+                           Screen.topLeftCorner.x,
+                           Screen.bottomLeftCorner.x)
+        }
+    }
+
+    readonly property var _safeAreaInsets: _primarySafeAreaInsets()
+
     signal aboutToOpenPopup(var topic, var data)
     signal linkClicked(string url)
 
@@ -66,6 +86,10 @@ RawWebView {
     _acceptTouchEvents: !textSelectionActive
 
     viewportHeight: webViewPage ? height : undefined
+    safeAreaInsetTop: _safeAreaInsets.top
+    safeAreaInsetRight: _safeAreaInsets.right
+    safeAreaInsetBottom: _safeAreaInsets.bottom
+    safeAreaInsetLeft: _safeAreaInsets.left
 
     orientation: {
         switch (_pageOrientation) {
@@ -82,6 +106,13 @@ RawWebView {
         }
     }
 
+    Binding {
+        target: webview.webViewPage
+        property: "cutoutMode"
+        value: CutoutMode.FullScreen
+        when: !!webview.webViewPage && webview.viewportFit === "cover"
+    }
+
     onOrientationChanged: {
         if (visible) {
             orientationDelayOverlay.opacity = 1
@@ -89,6 +120,7 @@ RawWebView {
     }
 
     onContentOrientationChanged: {
+        reapplySafeAreaInsets()
         orientationFadeOut.restart()
     }
 
