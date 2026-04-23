@@ -32,7 +32,6 @@ PermissionModel::PermissionModel(QObject *parent)
 
 void PermissionModel::classBegin()
 {
-
 }
 
 void PermissionModel::componentComplete()
@@ -144,6 +143,7 @@ void PermissionModel::setPermissionList(const QVariantList &data)
     };
 
     QList<Permission> permissions;
+
     for (const auto &iter : data) {
         QVariantMap varMap = iter.toMap();
         if (!knownPermissions.contains(varMap.value("type").toString()))
@@ -155,32 +155,31 @@ void PermissionModel::setPermissionList(const QVariantList &data)
                                       PermissionManager::intToExpiration(varMap.value("expireType").toInt())));
     }
 
-    int i = 0;
     int startIndex = -1;
-    for (i = 0; i < permissions.count() && i < m_permissionList.count(); i++) {
+    for (int i = 0; i < permissions.count() && i < m_permissionList.count(); i++) {
         if (m_permissionList.at(i) != permissions.at(i)) {
             m_permissionList[i] = permissions.at(i);
             if (startIndex < 0) {
                 startIndex = i;
             }
         } else if (startIndex >= 0) {
-            emit dataChanged(index(startIndex), index(i-1));
+            emit dataChanged(index(startIndex), index(i - 1));
             startIndex = -1;
         }
     }
 
     if (startIndex >= 0) {
-        emit dataChanged(index(startIndex), index(qMin(m_permissionList.count(), permissions.count())-1));
+        emit dataChanged(index(startIndex), index(qMin(m_permissionList.count(), permissions.count()) - 1));
     }
 
     int difference = permissions.count() - m_permissionList.count();
     if (difference != 0) {
         if (difference < 0) {
-            beginRemoveRows(QModelIndex(), permissions.count(), m_permissionList.count()-1);
-            m_permissionList.erase(m_permissionList.begin()+permissions.count(), m_permissionList.end());
+            beginRemoveRows(QModelIndex(), permissions.count(), m_permissionList.count() - 1);
+            m_permissionList.erase(m_permissionList.begin() + permissions.count(), m_permissionList.end());
             endRemoveRows();
         } else {
-            beginInsertRows(QModelIndex(), m_permissionList.count(), permissions.count()-1);
+            beginInsertRows(QModelIndex(), m_permissionList.count(), permissions.count() - 1);
             m_permissionList.append(permissions.mid(m_permissionList.count()));
             endInsertRows();
         }

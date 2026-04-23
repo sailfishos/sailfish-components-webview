@@ -121,6 +121,7 @@ Timer {
 
         _delayedOpenValues = null
         _popupObject = null
+
         switch (topic) {
         case "Content:ContextMenu": root._openContextMenu(data); break;
         case "embed:alert":         alert(data);    break;
@@ -295,6 +296,7 @@ Timer {
                 remember = inputs[i]
             }
         }
+
         var passwordOnly = !username
         var buttons = getButtonStringKeys(data, ["AcceptLogin", ""])
 
@@ -314,6 +316,7 @@ Timer {
             "passwordOnly": passwordOnly,
             "privateBrowsing": data.privateBrowsing || false
         }
+
         var acceptFn = function(popup) {
             _popupObject = null
             contentItem.sendAsyncMessage("authresponse", {

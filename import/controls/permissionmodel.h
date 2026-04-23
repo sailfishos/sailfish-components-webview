@@ -56,9 +56,9 @@ class PermissionModel : public QAbstractListModel, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
-
     Q_PROPERTY(QString host READ host WRITE setHost NOTIFY hostChanged)
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
+
 public:
     enum Roles {
         Uri = Qt::UserRole,
@@ -70,19 +70,18 @@ public:
 
     PermissionModel(QObject *parent = nullptr);
 
-    /*
-     * If the user hasn't set host, then you should request for all possible permissions.
-     * It is better to do it after we have made sure that all bindings are initialized.
-    */
+    // If the user hasn't set host, then you should request for all possible permissions.
+    // It is better to do it after we have made sure that all bindings are initialized.
     void classBegin() override;
     void componentComplete() override;
 
-    /* Add host to exclusion list. The type property can be "geolocation", "cookie",
-     * "desktop-notification", "popup", etc. */
+    // Add host to exclusion list. The type property can be "geolocation", "cookie",
+    // "desktop-notification", "popup", etc.
     Q_INVOKABLE void add(const QString &host, const QString &type, int capability);
     Q_INVOKABLE void setCapability(QModelIndex index, int capability);
-    /* Remove all items from model for permission type.
-     * It can be "geolocation", "cookie", "popup", etc*/
+
+    // Remove all items from model for permission type.
+    // It can be "geolocation", "cookie", "popup", etc
     Q_INVOKABLE void removeAllForPermissionType(const QString &type);
 
     void remove(int index);
@@ -103,7 +102,6 @@ private slots:
     void setPermissionList(const QVariantList &data);
     void requestPermissions(const QString &host);
 
-private slots:
     void handleRecvObserve(const QString &message, const QVariant &data);
 
 private:
