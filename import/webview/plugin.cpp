@@ -26,6 +26,9 @@
 #include <QJsonObject>
 #include <QJsonValue>
 
+#include <qmozsecurity.h>
+#include <qmozscrolldecorator.h>
+
 namespace SailfishOS {
 
 namespace WebView {
@@ -37,6 +40,11 @@ void SailfishOSWebViewPlugin::registerTypes(const char *uri)
 {
     Q_ASSERT(uri == QLatin1String("Sailfish.WebView"));
     qmlRegisterType<SailfishOS::WebView::RawWebView>("Sailfish.WebView", 1, 0, "RawWebView");
+    // RawWebView inherits QuickMozView which has some pointer typed properties which need some extra
+    // registration. a bit hazy where these should be really registered but here it works,
+    // on QuickMozView ctor it doesn't
+    qmlRegisterType<QMozSecurity>();
+    qmlRegisterType<QMozScrollDecorator>();
 }
 
 void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *uri)
