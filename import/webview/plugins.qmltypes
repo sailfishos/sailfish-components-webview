@@ -41,6 +41,82 @@ Module {
         "org.nemomobile.systemsettings 1.0"
     ]
     Component {
+        name: "QMozScrollDecorator"
+        prototype: "QObject"
+        Property { name: "position"; type: "int"; isReadonly: true }
+        Property { name: "size"; type: "int"; isReadonly: true }
+        Property { name: "moving"; type: "bool"; isReadonly: true }
+    }
+    Component {
+        name: "QMozSecurity"
+        prototype: "QObject"
+        Enum {
+            name: "TLS_VERSION"
+            values: {
+                "SSL_VERSION_INVALID": -1,
+                "SSL_VERSION_3": 0,
+                "TLS_VERSION_1": 1,
+                "TLS_VERSION_1_1": 2,
+                "TLS_VERSION_1_2": 3,
+                "TLS_VERSION_1_3": 4
+            }
+        }
+        Property { name: "allGood"; type: "bool"; isReadonly: true }
+        Property { name: "serverCertificate"; type: "QSslCertificate"; isReadonly: true }
+        Property { name: "domainMismatch"; type: "bool"; isReadonly: true }
+        Property { name: "notValidAtThisTime"; type: "bool"; isReadonly: true }
+        Property { name: "untrusted"; type: "bool"; isReadonly: true }
+        Property { name: "extendedValidation"; type: "bool"; isReadonly: true }
+        Property { name: "protocolVersion"; type: "TLS_VERSION"; isReadonly: true }
+        Property { name: "cipherName"; type: "string"; isReadonly: true }
+        Property { name: "validState"; type: "bool"; isReadonly: true }
+        Property { name: "isInsecure"; type: "bool"; isReadonly: true }
+        Property { name: "isBroken"; type: "bool"; isReadonly: true }
+        Property { name: "isSecure"; type: "bool"; isReadonly: true }
+        Property { name: "blockedMixedActiveContent"; type: "bool"; isReadonly: true }
+        Property { name: "loadedMixedActiveContent"; type: "bool"; isReadonly: true }
+        Property { name: "blockedMixedDisplayContent"; type: "bool"; isReadonly: true }
+        Property { name: "loadedMixedDisplayContent"; type: "bool"; isReadonly: true }
+        Property { name: "blockedTrackingContent"; type: "bool"; isReadonly: true }
+        Property { name: "identityEvToplevel"; type: "bool"; isReadonly: true }
+        Property { name: "usesSSL3"; type: "bool"; isReadonly: true }
+        Property { name: "usesWeakCrypto"; type: "bool"; isReadonly: true }
+        Property { name: "subjectDisplayName"; type: "string"; isReadonly: true }
+        Property { name: "issuerDisplayName"; type: "string"; isReadonly: true }
+        Property { name: "subjectOrganization"; type: "string"; isReadonly: true }
+        Property { name: "effectiveDate"; type: "QDateTime"; isReadonly: true }
+        Property { name: "expiryDate"; type: "QDateTime"; isReadonly: true }
+        Property { name: "certIsNull"; type: "bool"; isReadonly: true }
+        Property { name: "serverCertDetails"; type: "QVariantMap"; isReadonly: true }
+        Method { name: "allGood"; type: "bool" }
+        Method { name: "serverCertificate"; type: "QSslCertificate" }
+        Method { name: "domainMismatch"; type: "bool" }
+        Method { name: "notValidAtThisTime"; type: "bool" }
+        Method { name: "untrusted"; type: "bool" }
+        Method { name: "extendedValidation"; type: "bool" }
+        Method { name: "protocolVersion"; type: "TLS_VERSION" }
+        Method { name: "cipherName"; type: "string" }
+        Method { name: "validState"; type: "bool" }
+        Method { name: "isInsecure"; type: "bool" }
+        Method { name: "isBroken"; type: "bool" }
+        Method { name: "isSecure"; type: "bool" }
+        Method { name: "blockedMixedActiveContent"; type: "bool" }
+        Method { name: "loadedMixedActiveContent"; type: "bool" }
+        Method { name: "blockedMixedDisplayContent"; type: "bool" }
+        Method { name: "loadedMixedDisplayContent"; type: "bool" }
+        Method { name: "blockedTrackingContent"; type: "bool" }
+        Method { name: "identityEvToplevel"; type: "bool" }
+        Method { name: "usesSSL3"; type: "bool" }
+        Method { name: "usesWeakCrypto"; type: "bool" }
+        Method { name: "subjectDisplayName"; type: "string" }
+        Method { name: "issuerDisplayName"; type: "string" }
+        Method { name: "subjectOrganization"; type: "string" }
+        Method { name: "effectiveDate"; type: "QDateTime" }
+        Method { name: "expiryDate"; type: "QDateTime" }
+        Method { name: "certIsNull"; type: "bool" }
+        Method { name: "serverCertDetails"; type: "QVariantMap" }
+    }
+    Component {
         name: "QuickMozView"
         defaultProperty: "data"
         prototype: "QQuickItem"
