@@ -108,6 +108,7 @@ BuildRequires:  qt5-tools
 %{_libdir}/qt5/qml/Sailfish/WebView/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/*.qml
+%{_libdir}/qt5/qml/Sailfish/WebView/*.js
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/libsailfishwebviewcontrolsplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/plugins.qmltypes

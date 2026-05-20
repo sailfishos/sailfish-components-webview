@@ -21,11 +21,11 @@ HEADERS += plugin.h \
             rawwebview.h
 SOURCES += plugin.cpp \
             rawwebview.cpp
-OTHER_FILES += qmldir plugins.qmltypes *.qml
+OTHER_FILES += qmldir plugins.qmltypes *.qml *.js
 
 include(translations.pri)
 
-import.files = qmldir plugins.qmltypes *.qml
+import.files = qmldir plugins.qmltypes *.qml *.js
 import.path = $$TARGETPATH
 target.path = $$TARGETPATH
 

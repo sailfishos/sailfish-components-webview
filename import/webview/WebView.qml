@@ -37,6 +37,9 @@ RawWebView {
     readonly property int _topCutoutInset: Math.max(0, Screen.topCutout.y + Screen.topCutout.height)
 
     property alias popupProvider: popupOpener.popupProvider
+    property QtObject _textZoomController: TextZoomController {
+        webPage: webview
+    }
 
     function _cutoutSafeAreaTop(orientation) {
         return orientation === Qt.PortraitOrientation ? _topCutoutInset : 0
