@@ -40,6 +40,9 @@ public:
     RawWebView(QQuickItem *parent = 0);
     ~RawWebView();
 
+    static bool hasLiveViews();
+    static void destroyLiveViews();
+
     qreal virtualKeyboardMargin() const;
     void setVirtualKeyboardMargin(qreal vkbMargin);
 

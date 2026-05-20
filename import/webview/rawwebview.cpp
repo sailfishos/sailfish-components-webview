@@ -41,9 +41,16 @@ public:
     quint32 createView(const quint32 &parentId, const uintptr_t &parentBrowsingContext, const bool hidden = false) override;
 
     static std::shared_ptr<ViewCreator> instance();
+    static std::shared_ptr<ViewCreator> existingInstance();
 
     std::vector<RawWebView *> views;
 };
+
+std::weak_ptr<ViewCreator> &viewCreatorInstance()
+{
+    static std::weak_ptr<ViewCreator> instance;
+    return instance;
+}
 
 ViewCreator::ViewCreator()
 {
@@ -72,15 +79,18 @@ quint32 ViewCreator::createView(const quint32 &parentId, const uintptr_t &parent
 
 std::shared_ptr<ViewCreator> ViewCreator::instance()
 {
-    static std::weak_ptr<ViewCreator> instance;
-
-    std::shared_ptr<ViewCreator> creator = instance.lock();
+    std::shared_ptr<ViewCreator> creator = viewCreatorInstance().lock();
     if (!creator) {
         creator = std::make_shared<ViewCreator>();
-        instance = creator;
+        viewCreatorInstance() = creator;
     }
 
     return creator;
+}
+
+std::shared_ptr<ViewCreator> ViewCreator::existingInstance()
+{
+    return viewCreatorInstance().lock();
 }
 
 
@@ -101,6 +111,27 @@ RawWebView::RawWebView(QQuickItem *parent)
 RawWebView::~RawWebView()
 {
     m_viewCreator->views.erase(std::find(m_viewCreator->views.begin(), m_viewCreator->views.end(), this));
+}
+
+bool RawWebView::hasLiveViews()
+{
+    std::shared_ptr<ViewCreator> creator = ViewCreator::existingInstance();
+    return creator && !creator->views.empty();
+}
+
+void RawWebView::destroyLiveViews()
+{
+    std::shared_ptr<ViewCreator> creator = ViewCreator::existingInstance();
+    if (!creator) {
+        return;
+    }
+
+    const std::vector<RawWebView *> views = creator->views;
+    for (RawWebView *view : views) {
+        if (view) {
+            view->deleteLater();
+        }
+    }
 }
 
 qreal RawWebView::virtualKeyboardMargin() const
