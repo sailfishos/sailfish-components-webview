@@ -111,7 +111,7 @@ Dialog {
 
                     // If credentials are already remembered removing them via this is not feasible
                     // Better to hide the whole checkbox.
-                    visible: !auth.privateBrowsing && !(auth.rememberVisible && auth.rememberPrefillValue)
+                    visible: auth.rememberVisible && !auth.privateBrowsing && !auth.rememberPrefillValue
                     checked: auth.rememberPrefillValue // bind the output value for when the prefill value is true.
                     text: StringUtils.geckoKeyToString(auth.rememberMessageBundle)
                 }
