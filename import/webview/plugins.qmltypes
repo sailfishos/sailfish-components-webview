@@ -328,7 +328,12 @@ Module {
         exportMetaObjectRevisions: [0]
         Property { name: "virtualKeyboardMargin"; type: "float" }
         Property { name: "footerMargin"; type: "float" }
+        Property { name: "safeAreaTop"; type: "int" }
+        Property { name: "safeAreaRight"; type: "int" }
+        Property { name: "safeAreaBottom"; type: "int" }
+        Property { name: "safeAreaLeft"; type: "int" }
         Property { name: "_acceptTouchEvents"; type: "bool" }
+        Signal { name: "safeAreaChanged" }
         Signal {
             name: "contentOrientationChanged"
             Parameter { name: "orientation"; type: "Qt::ScreenOrientation" }

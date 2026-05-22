@@ -16,6 +16,7 @@
 
 #include <qmozviewcreator.h>
 
+#include <QtCore/QtGlobal>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtGui/QStyleHints>
@@ -135,6 +136,59 @@ void RawWebView::setFooterMargin(qreal margin)
     }
 }
 
+int RawWebView::safeAreaTop() const
+{
+    return m_safeAreaInsets.top();
+}
+
+void RawWebView::setSafeAreaTop(int top)
+{
+    applySafeAreaInsets(QMargins(m_safeAreaInsets.left(), qMax(0, top),
+                                 m_safeAreaInsets.right(), m_safeAreaInsets.bottom()));
+}
+
+int RawWebView::safeAreaRight() const
+{
+    return m_safeAreaInsets.right();
+}
+
+void RawWebView::setSafeAreaRight(int right)
+{
+    applySafeAreaInsets(QMargins(m_safeAreaInsets.left(), m_safeAreaInsets.top(),
+                                 qMax(0, right), m_safeAreaInsets.bottom()));
+}
+
+int RawWebView::safeAreaBottom() const
+{
+    return m_safeAreaInsets.bottom();
+}
+
+void RawWebView::setSafeAreaBottom(int bottom)
+{
+    applySafeAreaInsets(QMargins(m_safeAreaInsets.left(), m_safeAreaInsets.top(),
+                                 m_safeAreaInsets.right(), qMax(0, bottom)));
+}
+
+int RawWebView::safeAreaLeft() const
+{
+    return m_safeAreaInsets.left();
+}
+
+void RawWebView::setSafeAreaLeft(int left)
+{
+    applySafeAreaInsets(QMargins(qMax(0, left), m_safeAreaInsets.top(),
+                                 m_safeAreaInsets.right(), m_safeAreaInsets.bottom()));
+}
+
+void RawWebView::applySafeAreaInsets(const QMargins &insets)
+{
+    if (m_safeAreaInsets != insets) {
+        m_safeAreaInsets = insets;
+        setSafeAreaInsets(insets);
+        emit safeAreaChanged();
+    }
+}
+
 bool RawWebView::acceptTouchEvents() const
 {
     return m_acceptTouchEvents;
@@ -187,10 +241,27 @@ void RawWebView::touchEvent(QTouchEvent *event)
                         break;
                     }
 
-                    if ((delta.y() >= dragThreshold && !atYBeginning())
-                            || (delta.y() <= -dragThreshold && !atYEnd())
-                            || (delta.x() >= dragThreshold && !atXBeginning())
-                            || (delta.x() <= -dragThreshold && !atXEnd())) {
+                    const bool unavailableMetrics = scrollableSize().isEmpty();
+                    const qreal pageGestureMargin = qMax<qreal>(dragThreshold * 2,
+                                                                width() / 4.0);
+                    const qreal startX = mapFromScene(m_startPos).x();
+                    const bool pageGestureFromLeftEdge = startX <= pageGestureMargin;
+                    const bool pageGestureFromRightEdge = startX >= width() - pageGestureMargin;
+
+                    if ((delta.y() >= dragThreshold
+                                    && (!atYBeginning()
+                                        || (unavailableMetrics
+                                            && scrollableOffset().y() > 0.0)))
+                            || (delta.y() <= -dragThreshold
+                                    && (!atYEnd() || unavailableMetrics))
+                            || (delta.x() >= dragThreshold
+                                    && !pageGestureFromLeftEdge
+                                    && (!atXBeginning()
+                                        || (unavailableMetrics
+                                            && scrollableOffset().x() > 0.0)))
+                            || (delta.x() <= -dragThreshold
+                                    && !pageGestureFromRightEdge
+                                    && (!atXEnd() || unavailableMetrics))) {
                         setKeepMouseGrab(true);
                         setKeepTouchGrab(true);
                     }
@@ -236,4 +307,3 @@ void RawWebView::onAsyncMessage(const QString &message, const QVariant &data)
 } // namespace WebView
 
 } // namespace SailfishOS
-

@@ -12,6 +12,7 @@
 #ifndef SAILFISHOS_WEBVIEW_H
 #define SAILFISHOS_WEBVIEW_H
 
+#include <QtCore/QMargins>
 #include <QtQuick/QQuickItem>
 
 //mozembedlite-qt5
@@ -29,6 +30,10 @@ class RawWebView : public QuickMozView
     Q_OBJECT
     Q_PROPERTY(qreal virtualKeyboardMargin READ virtualKeyboardMargin WRITE setVirtualKeyboardMargin NOTIFY virtualKeyboardMarginChanged)
     Q_PROPERTY(qreal footerMargin READ footerMargin WRITE setFooterMargin NOTIFY footerMarginChanged)
+    Q_PROPERTY(int safeAreaTop READ safeAreaTop WRITE setSafeAreaTop NOTIFY safeAreaChanged)
+    Q_PROPERTY(int safeAreaRight READ safeAreaRight WRITE setSafeAreaRight NOTIFY safeAreaChanged)
+    Q_PROPERTY(int safeAreaBottom READ safeAreaBottom WRITE setSafeAreaBottom NOTIFY safeAreaChanged)
+    Q_PROPERTY(int safeAreaLeft READ safeAreaLeft WRITE setSafeAreaLeft NOTIFY safeAreaChanged)
     Q_PROPERTY(bool _acceptTouchEvents READ acceptTouchEvents WRITE setAcceptTouchEvents NOTIFY acceptTouchEventsChanged)
 
 public:
@@ -41,6 +46,18 @@ public:
     qreal footerMargin() const;
     void setFooterMargin(qreal margin);
 
+    int safeAreaTop() const;
+    void setSafeAreaTop(int top);
+
+    int safeAreaRight() const;
+    void setSafeAreaRight(int right);
+
+    int safeAreaBottom() const;
+    void setSafeAreaBottom(int bottom);
+
+    int safeAreaLeft() const;
+    void setSafeAreaLeft(int left);
+
     bool acceptTouchEvents() const;
     void setAcceptTouchEvents(bool accept);
 
@@ -50,16 +67,19 @@ protected:
 signals:
     void virtualKeyboardMarginChanged();
     void footerMarginChanged();
+    void safeAreaChanged();
     void contentOrientationChanged(Qt::ScreenOrientation orientation);
     void acceptTouchEventsChanged();
     void openUrlInNewWindow();
 
 private:
+    void applySafeAreaInsets(const QMargins &insets);
     void onAsyncMessage(const QString &message, const QVariant &data);
 
     std::shared_ptr<ViewCreator> m_viewCreator;
     qreal m_vkbMargin;
     qreal m_footerMargin;
+    QMargins m_safeAreaInsets;
     QPointF m_startPos;
     bool m_acceptTouchEvents;
 };
