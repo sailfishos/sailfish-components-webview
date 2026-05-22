@@ -128,12 +128,6 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("intl.accept_languages"),
                                   QVariant::fromValue<QString>(langs));
 
-    // Ensure the renderer is configured correctly
-    engineSettings->setPreference(QStringLiteral("gfx.webrender.force-disabled"),
-                                  QVariant(true));
-    engineSettings->setPreference(QStringLiteral("embedlite.compositor.external_gl_context"),
-                                  QVariant(false));
-
     Silica::Theme *silicaTheme = Silica::Theme::instance();
 
     // Notify gecko when the ambience switches between light and dark
@@ -152,6 +146,24 @@ void SailfishOS::WebEngineSettings::initialize()
     connect(webEngine, &SailfishOS::WebEngine::recvObserve,
             engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::oneShotNotifyColorSchemeChanged);
     webEngine->addObserver(QStringLiteral("embedliteviewcreated"));
+
+    qreal pixelRatio = SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO * silicaTheme->pixelRatio();
+    // Round to nearest even rounding factor
+    pixelRatio = qRound(pixelRatio / 0.5) * 0.5;
+
+    int screenWidth = QGuiApplication::primaryScreen()->size().width();
+
+    // Do not floor the pixel ratio if the pixel ratio less than 2.0 (1.5 is minimum).
+    if (pixelRatio >= 2.0 && !testScreenDimensions(pixelRatio)) {
+        qreal tempPixelRatio = qFloor(pixelRatio);
+        if (testScreenDimensions(tempPixelRatio)) {
+            pixelRatio = tempPixelRatio;
+        }
+    } else if (screenWidth >= 1080) {
+        pixelRatio = qRound(pixelRatio);
+    }
+
+    engineSettings->setPixelRatio(pixelRatio);
 
     isInitialized = true;
 
@@ -191,24 +203,6 @@ void SailfishOS::WebEngineSettings::initialize()
     const int dragThreshold = QGuiApplication::styleHints()->startDragDistance();
     qreal touchStartTolerance = dragThreshold / QGuiApplication::primaryScreen()->physicalDotsPerInch();
     engineSettings->setPreference(QString("apz.touch_start_tolerance"), QString("%1").arg(touchStartTolerance));
-
-    qreal pixelRatio = SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO * silicaTheme->pixelRatio();
-    // Round to nearest even rounding factor
-    pixelRatio = qRound(pixelRatio / 0.5) * 0.5;
-
-    int screenWidth = QGuiApplication::primaryScreen()->size().width();
-
-    // Do not floor the pixel ratio if the pixel ratio less than 2.0 (1.5 is minimum).
-    if (pixelRatio >= 2.0 && !testScreenDimensions(pixelRatio)) {
-        qreal tempPixelRatio = qFloor(pixelRatio);
-        if (testScreenDimensions(tempPixelRatio)) {
-            pixelRatio = tempPixelRatio;
-        }
-    } else if (screenWidth >= 1080) {
-        pixelRatio = qRound(pixelRatio);
-    }
-
-    engineSettings->setPixelRatio(pixelRatio);
 
     int tileSize = screenWidth;
 
