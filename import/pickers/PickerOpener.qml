@@ -16,7 +16,8 @@ import Sailfish.WebEngine 1.0
 QtObject {
     property var pageStack
     property QtObject contentItem
-    readonly property var listeners: [ "embed:filepicker",
+    readonly property var listeners: [ "embed:colorpicker",
+                                       "embed:filepicker",
                                        "embed:selectasync",
                                        "embedui:downloadpicker",
                                        "embed:downloadpicker" ]
@@ -24,6 +25,7 @@ QtObject {
     // Defer compilation of picker components
     readonly property string _multiSelectComponentUrl: Qt.resolvedUrl("MultiSelectDialog.qml")
     readonly property string _singleSelectComponentUrl: Qt.resolvedUrl("SingleSelectPage.qml")
+    readonly property string _colorPickerPageUrl: Qt.resolvedUrl("WebColorPickerPage.qml")
     readonly property string _filePickerComponentUrl: Qt.resolvedUrl("PickerCreator.qml")
     readonly property string _downloadPickerComponentUrl: Qt.resolvedUrl("DownloadPicker.qml")
     property Component _filePickerComponent
@@ -46,6 +48,14 @@ QtObject {
 
         var winId = data.winId
         switch (topic) {
+        case "embed:colorpicker": {
+            pageStack.animatorPush(_colorPickerPageUrl,
+                                   { "winId": winId,
+                                     "contentItem": contentItem,
+                                     "initialColor": data.initialColor,
+                                     "defaultColors": data.defaultColors })
+            break
+        }
         case "embed:selectasync": {
             pageStack.animatorPush(data.multiple ? _multiSelectComponentUrl : _singleSelectComponentUrl,
                                            { "options": data.options, "contentItem": contentItem })

@@ -11,6 +11,7 @@
 
 import QtQuick 2.2
 import Sailfish.Silica 1.0
+import Sailfish.WebEngine 1.0
 import Sailfish.WebView.Popups 1.0 as Popups
 import Sailfish.WebView.Controls 1.0 as Controls
 
@@ -405,6 +406,18 @@ Timer {
     }
 
     function blocked(data) {
+        function respond(allow) {
+            if (data.popupId === undefined || data.winId === undefined) {
+                return
+            }
+
+            WebEngine.notifyObservers("embedui:popupblocked", {
+                "allow": allow,
+                "popupId": data.popupId,
+                "winId": data.winId
+            })
+        }
+
         openPopupByTopic("embed:popupblocked", null,
             // properties
             { "host": data.host },
@@ -417,6 +430,7 @@ Timer {
                         popup.rememberValue // rule expiry
                             ? Controls.PermissionManager.Never
                             : Controls.PermissionManager.Session)
+                respond(true)
             },
             // reject
             function(popup) {
@@ -427,6 +441,7 @@ Timer {
                             Controls.PermissionManager.Deny,
                             Controls.PermissionManager.Never) // expiry
                 }
+                respond(false)
             }
         )
     }

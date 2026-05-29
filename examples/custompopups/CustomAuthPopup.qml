@@ -84,7 +84,7 @@ AuthPopupInterface {
                 TextSwitch {
                     id: remember
 
-                    visible: !popup.privateBrowsing && !(popup.rememberVisible && popup.rememberPrefillValue)
+                    visible: popup.rememberVisible && !popup.privateBrowsing && !popup.rememberPrefillValue
                     checked: popup.rememberPrefillValue // bind the output value for when the prefill value is true.
                     text: "Remember these details?"
                 }

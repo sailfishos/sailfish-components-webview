@@ -32,9 +32,30 @@ RawWebView {
     readonly property bool textSelectionActive: textSelectionController && textSelectionController.active
     property Item textSelectionController: null
     readonly property int _pageOrientation: webViewPage ? webViewPage.orientation : Orientation.None
+    property int _contentOrientation: orientation
     readonly property bool _appActive: Qt.application.state === Qt.ApplicationActive
+    readonly property int _topCutoutInset: Math.max(0, Screen.topCutout.y + Screen.topCutout.height)
 
     property alias popupProvider: popupOpener.popupProvider
+    property QtObject _textZoomController: TextZoomController {
+        webPage: webview
+    }
+
+    function _cutoutSafeAreaTop(orientation) {
+        return orientation === Qt.PortraitOrientation ? _topCutoutInset : 0
+    }
+
+    function _cutoutSafeAreaRight(orientation) {
+        return orientation === Qt.InvertedLandscapeOrientation ? _topCutoutInset : 0
+    }
+
+    function _cutoutSafeAreaBottom(orientation) {
+        return orientation === Qt.InvertedPortraitOrientation ? _topCutoutInset : 0
+    }
+
+    function _cutoutSafeAreaLeft(orientation) {
+        return orientation === Qt.LandscapeOrientation ? _topCutoutInset : 0
+    }
 
     signal aboutToOpenPopup(var topic, var data)
     signal linkClicked(string url)
@@ -66,6 +87,10 @@ RawWebView {
     _acceptTouchEvents: !textSelectionActive
 
     viewportHeight: webViewPage ? height : undefined
+    safeAreaTop: _cutoutSafeAreaTop(_contentOrientation)
+    safeAreaRight: _cutoutSafeAreaRight(_contentOrientation)
+    safeAreaBottom: _cutoutSafeAreaBottom(_contentOrientation)
+    safeAreaLeft: _cutoutSafeAreaLeft(_contentOrientation)
 
     orientation: {
         switch (_pageOrientation) {
@@ -83,12 +108,14 @@ RawWebView {
     }
 
     onOrientationChanged: {
+        _contentOrientation = orientation
         if (visible) {
             orientationDelayOverlay.opacity = 1
         }
     }
 
     onContentOrientationChanged: {
+        _contentOrientation = orientation
         orientationFadeOut.restart()
     }
 
