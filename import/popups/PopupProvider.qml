@@ -8,6 +8,7 @@ QtObject {
     property var authPopup: ({"type": "dialog", "component": "AuthDialog.qml" })
     property var passwordManagerPopup: ({"type": "dialog", "component": "PasswordManagerDialog.qml" })
     property var locationPermissionPopup: ({"type": "dialog", "component": "LocationDialog.qml" })
+    property var externalAppPermissionPopup: ({"type": "dialog", "component": "ExternalAppPermissionDialog.qml" })
     property var webrtcPermissionPopup: ({"type": "dialog", "component": "WebrtcPermissionDialog.qml"})
     property var blockedTabPopup: ({"type": "dialog", "component": "BlockedTabPopupDialog.qml"})
     property var selectorPopup: ({"type": "dialog", "component": "SelectorDialog.qml"})

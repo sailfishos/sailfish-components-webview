@@ -34,6 +34,7 @@ Timer {
         "embed:login":          "passwordManagerPopup",
         "embed:auth":           "authPopup",
         "embed:permissions":  { "geolocation": "locationPermissionPopup" },
+        "embed:externalapppermission": "externalAppPermissionPopup",
         "embed:webrtcrequest":  "webrtcPermissionPopup",
         "embed:popupblocked":   "blockedTabPopup",
         "embed:select":         "selectorPopup"
@@ -130,6 +131,7 @@ Timer {
         case "embed:prompt":        prompt(data);   break;
         case "embed:login":         login(data);    break;
         case "embed:auth":          auth(data);     break;
+        case "embed:externalapppermission": externalAppPermission(data); break;
         case "embed:permissions": {
             if (data.title === "geolocation") {
                 permissions(data)
@@ -366,6 +368,37 @@ Timer {
         }
 
         openPopupByTopic("embed:permissions", data.title, props, acceptFn, rejectFn)
+    }
+
+    function externalAppPermission(data) {
+        var winId = data.winId
+        var id = data.id
+        var props = {
+            "host": data.host || "",
+            "scheme": data.scheme || "",
+            "targetUrl": data.url || "",
+            "privateBrowsing": data.privateBrowsing
+        }
+        var acceptFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("externalapppermissionresponse", {
+                "winId": winId,
+                "id": id,
+                "accepted": true,
+                "remember": popup.rememberValue
+            })
+        }
+        var rejectFn = function(popup) {
+            _popupObject = null
+            contentItem.sendAsyncMessage("externalapppermissionresponse", {
+                "winId": winId,
+                "id": id,
+                "accepted": false,
+                "remember": popup.rememberValue
+            })
+        }
+
+        openPopupByTopic("embed:externalapppermission", null, props, acceptFn, rejectFn)
     }
 
     function webrtc(data) {
