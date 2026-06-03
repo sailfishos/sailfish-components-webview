@@ -8,6 +8,7 @@ AlertPopupInterface 1.0 AlertPopupInterface.qml
 AuthPopupInterface 1.0 AuthPopupInterface.qml
 ConfirmPopupInterface 1.0 ConfirmPopupInterface.qml
 LocationPopupInterface 1.0 LocationPopupInterface.qml
+ExternalAppPermissionInterface 1.0 ExternalAppPermissionInterface.qml
 WebrtcPermissionInterface 1.0 WebrtcPermissionInterface.qml
 PasswordManagerPopupInterface 1.0 PasswordManagerPopupInterface.qml
 PromptPopupInterface 1.0 PromptPopupInterface.qml
@@ -20,6 +21,7 @@ AlertDialog 1.0 AlertDialog.qml
 AuthDialog 1.0 AuthDialog.qml
 ConfirmDialog 1.0 ConfirmDialog.qml
 LocationDialog 1.0 LocationDialog.qml
+ExternalAppPermissionDialog 1.0 ExternalAppPermissionDialog.qml
 WebrtcPermissionDialog 1.0 WebrtcPermissionDialog.qml
 PasswordManagerDialog 1.0 PasswordManagerDialog.qml
 PromptDialog 1.0 PromptDialog.qml
