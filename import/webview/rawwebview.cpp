@@ -259,14 +259,15 @@ void RawWebView::touchEvent(QTouchEvent *event)
                     QPointF delta = touchPoint.scenePos() - m_startPos;
 
                     switch (orientation()) {
+                    case Qt::PortraitOrientation:
+                    case Qt::InvertedPortraitOrientation:
+                        // Item coordinates already match the presented orientation.
+                        break;
                     case Qt::LandscapeOrientation:
                         delta = QPointF(delta.y(), -delta.x());
                         break;
                     case Qt::InvertedLandscapeOrientation:
                         delta = QPointF(-delta.y(), delta.x());
-                        break;
-                    case Qt::InvertedPortraitOrientation:
-                        delta = QPointF(-delta.x(), -delta.y());
                         break;
                     default:
                         break;
@@ -322,16 +323,24 @@ void RawWebView::touchEvent(QTouchEvent *event)
 void RawWebView::onAsyncMessage(const QString &message, const QVariant &data)
 {
     if (message == CONTENT_ORIENTATION_CHANGED) {
-        QString orientation = data.toMap().value("orientation").toString();
-        Qt::ScreenOrientation mappedOrientation = Qt::PortraitOrientation;
-        if (orientation == QStringLiteral("landscape-primary")) {
+        const QString orientationName = data.toMap().value("orientation").toString();
+        Qt::ScreenOrientation mappedOrientation;
+        if (orientationName == QStringLiteral("portrait-primary")) {
+            mappedOrientation = Qt::PortraitOrientation;
+        } else if (orientationName == QStringLiteral("landscape-primary")) {
             mappedOrientation = Qt::LandscapeOrientation;
-        } else if (orientation == QStringLiteral("landscape-secondary")) {
+        } else if (orientationName == QStringLiteral("landscape-secondary")) {
             mappedOrientation = Qt::InvertedLandscapeOrientation;
-        } else if (orientation == QStringLiteral("portrait-secondary")) {
+        } else if (orientationName == QStringLiteral("portrait-secondary")) {
             mappedOrientation = Qt::InvertedPortraitOrientation;
+        } else {
+            qWarning() << "Ignoring unknown WebView content orientation:" << orientationName;
+            return;
         }
         emit contentOrientationChanged(mappedOrientation);
+        // Force a fresh scene-graph update so the reoriented WebRender frame
+        // is presented without waiting for additional user interaction.
+        update();
     }
 }
 
