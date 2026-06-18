@@ -17,7 +17,7 @@ QtObject {
     property var webPage
     property bool _frameScriptLoaded
 
-    readonly property real textZoom: Theme.fontSizeMedium / Theme.fontSizeMediumBase
+    readonly property real textZoom: Math.pow(Theme.fontSizeMedium / Theme.fontSizeMediumBase, 1.25)
 
     property Connections webPageConnections: Connections {
         target: controller.webPage
