@@ -147,6 +147,16 @@ void SailfishOS::WebEngineSettings::initialize()
             engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::oneShotNotifyColorSchemeChanged);
     webEngine->addObserver(QStringLiteral("embedliteviewcreated"));
 
+    isInitialized = true;
+
+    // Guard preferences that should be written only once. If a preference needs to be
+    // forcefully written upon each start that should happen before this.
+    QString appConfig = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QFile markerFile(QString("%1/__PREFS_WRITTEN__").arg(appConfig));
+    if (markerFile.exists()) {
+        return;
+    }
+
     qreal pixelRatio = SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO * silicaTheme->pixelRatio();
     // Round to nearest even rounding factor
     pixelRatio = qRound(pixelRatio / 0.5) * 0.5;
@@ -164,16 +174,6 @@ void SailfishOS::WebEngineSettings::initialize()
     }
 
     engineSettings->setPixelRatio(pixelRatio);
-
-    isInitialized = true;
-
-    // Guard preferences that should be written only once. If a preference needs to be
-    // forcefully written upon each start that should happen before this.
-    QString appConfig = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QFile markerFile(QString("%1/__PREFS_WRITTEN__").arg(appConfig));
-    if (markerFile.exists()) {
-        return;
-    }
 
     // Standard settings.
     // TODO: Fix this so that it can be applied during runtime when QQuickItem based WebView is used with QQuickFlickable.
