@@ -23,6 +23,7 @@
 */
 
 #include <QFileInfo>
+#include <QRegularExpression>
 
 constexpr int FILEEXTENSION_MAX_LENGTH = 32;
 constexpr int FILENAME_MAX_LENGTH = 255;
@@ -54,16 +55,16 @@ QString SailfishOS::WebEngineUtils::DownloadHelper::createUniqueFileUrl(QString 
     }
 
     // Remove illegal characters from filename
-    fileName.replace(QRegExp("[<>:\"|?*%/\\\\]+"), "");
+    fileName.replace(QRegularExpression("[<>:\"|?*%/\\\\]+"), "");
 
     // Remove trailing dots and whitespaces
-    fileName.replace(QRegExp("[\\.\\s_]+$"), "");
+    fileName.replace(QRegularExpression("[\\.\\s_]+$"), "");
 
     // Remove leading whitespaces
-    fileName.replace(QRegExp("^[\\s_]+"), "");
+    fileName.replace(QRegularExpression("^[\\s_]+"), "");
 
     // Replace whitespace characters with underscores
-    fileName.replace(QRegExp("[\\s_]+"), "_");
+    fileName.replace(QRegularExpression("[\\s_]+"), "_");
 
     // Convert to UTF-8
     const QByteArray fileNameBuf = fileName.toUtf8();
