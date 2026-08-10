@@ -1,4 +1,4 @@
-%global min_qtmozembed_version 2.0.0
+%global min_qtmozembed_version 2.1.0
 
 Name:    sailfish-components-webview-qt5
 Summary: Allows embedding Sailfish WebView into applications
