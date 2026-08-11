@@ -45,6 +45,27 @@ Timer {
     property Component _contextMenuComponent
     property var _popupObject
     property var _delayedOpenValues
+    property var _delayedResponse
+    property bool _responseWaitingForIdle
+
+    interval: 1
+    onTriggered: {
+        if (!_delayedResponse) {
+            return
+        }
+
+        if (pageStack.busy) {
+            if (!_responseWaitingForIdle) {
+                pageStack.busyChanged.connect(responseBusyChanged)
+                _responseWaitingForIdle = true
+            }
+            return
+        }
+
+        var response = _delayedResponse
+        _delayedResponse = null
+        response()
+    }
 
     property Notice positioningDisabledNotice: Notice {
         duration: 3000
@@ -181,6 +202,7 @@ Timer {
         var checkbox = getCheckbox(data)
         var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
+        var target = contentItem
         var buttons = getButtonStringKeys(data, ["OK", "Cancel"])
         if (buttons.length > 2) {
             console.log("Requesting " + buttons.length + " buttons, but only two are supported.")
@@ -192,21 +214,36 @@ Timer {
             "preventDialogsVisible": !(checkbox == null),
             "preventDialogsPrefillValue": checkboxPrefill
         }
-        var acceptFn = function(popup) {
+        var responded = false
+        var respond = function(popup, accepted) {
+            if (responded) {
+                return
+            }
+            responded = true
             _popupObject = null
-            contentItem.sendAsyncMessage("confirmresponse", {
+            var responseData = {
                 "winId": winId,
-                "accepted": true,
+                "accepted": accepted,
                 "checkvalue": popup.preventDialogsValue
-            })
+            }
+            var response = function() {
+                if (data.inPermitUnload && !accepted) {
+                    target.cancelPendingNavigation()
+                }
+                target.sendAsyncMessage("confirmresponse", responseData)
+            }
+
+            if (data.inPermitUnload) {
+                respondAfterPageStackIdle(response)
+            } else {
+                response()
+            }
+        }
+        var acceptFn = function(popup) {
+            respond(popup, true)
         }
         var rejectFn = function(popup) {
-            _popupObject = null
-            contentItem.sendAsyncMessage("confirmresponse", {
-                "winId": winId,
-                "accepted": false,
-                "checkvalue": popup.preventDialogsValue
-            })
+            respond(popup, false)
         }
 
         openPopupByTopic("embed:confirm", null, props, acceptFn, rejectFn)
@@ -487,6 +524,19 @@ Timer {
                       root._delayedOpenValues[4])
             root._delayedOpenValues = null
         }
+    }
+
+    function responseBusyChanged() {
+        if (!pageStack.busy) {
+            pageStack.busyChanged.disconnect(responseBusyChanged)
+            _responseWaitingForIdle = false
+            root.restart()
+        }
+    }
+
+    function respondAfterPageStackIdle(response) {
+        _delayedResponse = response
+        root.restart()
     }
 
     function handlesMessage(topic) {
