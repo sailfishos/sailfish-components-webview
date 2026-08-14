@@ -282,8 +282,13 @@ void SailfishOSWebViewPlugin::registerTypes(const char *uri)
     // RawWebView inherits QuickMozView which has some pointer typed properties which need some extra
     // registration. a bit hazy where these should be really registered but here it works,
     // on QuickMozView ctor it doesn't
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    qmlRegisterAnonymousType<QMozSecurity>(uri, 1);
+    qmlRegisterAnonymousType<QMozScrollDecorator>(uri, 1);
+#else
     qmlRegisterType<QMozSecurity>();
     qmlRegisterType<QMozScrollDecorator>();
+#endif
 }
 
 void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *uri)

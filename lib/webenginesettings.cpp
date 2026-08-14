@@ -119,7 +119,11 @@ void SailfishOS::WebEngineSettings::initialize()
 
     // Infer and set Accept-Language header from the current system locale
     QString langs;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    QStringList locale = QLocale::system().name().split("_", Qt::SkipEmptyParts);
+#else
     QStringList locale = QLocale::system().name().split("_", QString::SkipEmptyParts);
+#endif
     if (locale.size() > 1) {
         langs = QString("%1-%2,%3").arg(locale.at(0)).arg(locale.at(1)).arg(locale.at(0));
     } else {
