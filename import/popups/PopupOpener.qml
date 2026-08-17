@@ -226,6 +226,12 @@ Timer {
                 "accepted": accepted,
                 "checkvalue": popup.preventDialogsValue
             }
+            if (data.requestId !== undefined) {
+                responseData.requestId = data.requestId
+            }
+            if (data.tabId !== undefined) {
+                responseData.tabId = data.tabId
+            }
             var response = function() {
                 if (data.inPermitUnload && !accepted) {
                     target.cancelPendingNavigation()
