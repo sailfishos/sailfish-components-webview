@@ -16,6 +16,7 @@ FolderPickerPage {
     id: root
 
     property var data
+    property var closedCallback
     property bool responseSent
 
     showSystemFiles: false
@@ -61,6 +62,9 @@ FolderPickerPage {
                 response.persistentId = data.persistentId
             }
             WebEngine.notifyObservers("embedui:downloadpicker", response)
+        }
+        if (closedCallback) {
+            closedCallback()
         }
     }
 }
