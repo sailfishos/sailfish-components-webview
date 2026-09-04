@@ -14,6 +14,8 @@ import QtQuick 2.2
 import Sailfish.WebEngine 1.0
 
 QtObject {
+    id: root
+
     property var pageStack
     property QtObject contentItem
     readonly property var listeners: [ "embed:colorpicker",
@@ -29,6 +31,8 @@ QtObject {
     readonly property string _filePickerComponentUrl: Qt.resolvedUrl("PickerCreator.qml")
     readonly property string _downloadPickerComponentUrl: Qt.resolvedUrl("DownloadPicker.qml")
     property Component _filePickerComponent
+
+    signal downloadPickerClosed
 
     // Returns true if message is handled.
     function message(topic, data) {
@@ -80,7 +84,15 @@ QtObject {
             break
         }
         case "embed:downloadpicker": {
-            var page = pageStack.push(_downloadPickerComponentUrl, { "data": data })
+            var page = pageStack.push(_downloadPickerComponentUrl, {
+                                          "data": data,
+                                          "closedCallback": function() {
+                                              root.downloadPickerClosed()
+                                          }
+                                      })
+            if (!page) {
+                return false
+            }
             break
         }
         }
