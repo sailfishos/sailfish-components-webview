@@ -14,4 +14,8 @@ import Sailfish.Silica 1.0
 UserPromptInterface {
     // inputs
     property string text
+    property string thirdButtonText
+
+    // output
+    property int buttonNumClicked: 1
 }
