@@ -42,6 +42,13 @@ namespace WebView {
 
 namespace {
 
+QEvent::Type shutdownEventType()
+{
+    static const QEvent::Type type = static_cast<QEvent::Type>(
+            QEvent::registerEventType());
+    return type;
+}
+
 class WebViewShutdownController : public QObject
 {
 public:
@@ -90,10 +97,22 @@ public:
             QWindow *window = qobject_cast<QWindow *>(object);
             if (window && isLastVisibleWindow(window)) {
                 scheduleShutdown(true);
+                // Keep the scene graph alive until hosted Gecko windows have
+                // drained. The contextDestroyed handler will quit the application.
+                return true;
             }
         }
 
         return QObject::eventFilter(object, event);
+    }
+
+    bool event(QEvent *event) override
+    {
+        if (event->type() == shutdownEventType()) {
+            shutdown();
+            return true;
+        }
+        return QObject::event(event);
     }
 
 private:
@@ -145,19 +164,17 @@ private:
         }
 
         m_shutdownScheduled = true;
-        QTimer::singleShot(0, this, [this]() {
-            shutdown();
-        });
+        QCoreApplication::postEvent(this, new QEvent(shutdownEventType()));
     }
 
-    bool hasGeckoViews() const
+    bool hasGeckoWindows() const
     {
-        return QMozContext::instance()->getNumberOfViews() != 0;
+        return QMozContext::instance()->getNumberOfWindows() != 0;
     }
 
     void destroyViewsAndWait()
     {
-        if ((!RawWebView::hasLiveViews() && !hasGeckoViews()) || !m_webEngine) {
+        if ((!RawWebView::hasLiveViews() && !hasGeckoWindows()) || !m_webEngine) {
             return;
         }
 
@@ -165,22 +182,22 @@ private:
         QTimer watchdog;
         watchdog.setSingleShot(true);
         connect(&watchdog, &QTimer::timeout, &waitLoop, &QEventLoop::quit);
-        connect(m_webEngine, &SailfishOS::WebEngine::lastViewDestroyed,
+        connect(m_webEngine, &SailfishOS::WebEngine::lastWindowDestroyed,
                 &waitLoop, &QEventLoop::quit);
 
         RawWebView::destroyLiveViews();
         QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
         QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 
-        if (RawWebView::hasLiveViews() || hasGeckoViews()) {
+        if (RawWebView::hasLiveViews() || hasGeckoWindows()) {
             watchdog.start(2000);
             waitLoop.exec(QEventLoop::ExcludeUserInputEvents);
             QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
             QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
         }
 
-        if (RawWebView::hasLiveViews() || hasGeckoViews()) {
-            qWarning() << "Timed out waiting for WebView items to be destroyed";
+        if (RawWebView::hasLiveViews() || hasGeckoWindows()) {
+            qWarning() << "Timed out waiting for hosted WebView windows to close";
         }
     }
 

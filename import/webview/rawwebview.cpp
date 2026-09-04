@@ -14,9 +14,8 @@
 #include "webengine.h"
 #include "webenginesettings.h"
 
-#include <qmozviewcreator.h>
-
 #include <QtCore/QtGlobal>
+#include <QtCore/QSet>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtGui/QStyleHints>
@@ -24,84 +23,34 @@
 #include <QtQuick/QQuickWindow>
 #include <private/qquickwindow_p.h>
 
-#include <algorithm>
-
 #define CONTENT_ORIENTATION_CHANGED QLatin1String("embed:contentOrientationChanged")
 
 namespace SailfishOS {
 
 namespace WebView {
 
-class ViewCreator : public QMozViewCreator
+namespace {
+
+QSet<RawWebView *> &liveViews()
 {
-public:
-    ViewCreator();
-    ~ViewCreator();
-
-    quint32 createView(const quint32 &parentId, const uintptr_t &parentBrowsingContext, const bool hidden = false) override;
-
-    static std::shared_ptr<ViewCreator> instance();
-    static std::shared_ptr<ViewCreator> existingInstance();
-
-    std::vector<RawWebView *> views;
-};
-
-std::weak_ptr<ViewCreator> &viewCreatorInstance()
-{
-    static std::weak_ptr<ViewCreator> instance;
-    return instance;
+    static QSet<RawWebView *> views;
+    return views;
 }
 
-ViewCreator::ViewCreator()
-{
-    SailfishOS::WebEngine::instance()->setViewCreator(this);
 }
-
-ViewCreator::~ViewCreator()
-{
-    SailfishOS::WebEngine::instance()->setViewCreator(nullptr);
-}
-
-quint32 ViewCreator::createView(const quint32 &parentId, const uintptr_t &parentBrowsingContext, const bool hidden)
-{
-    Q_UNUSED(parentBrowsingContext)
-    Q_UNUSED(hidden)
-
-    for (RawWebView *view : views) {
-        if (view->uniqueId() == parentId) {
-            view->openUrlInNewWindow();
-            break;
-        }
-    }
-
-    return 0;
-}
-
-std::shared_ptr<ViewCreator> ViewCreator::instance()
-{
-    std::shared_ptr<ViewCreator> creator = viewCreatorInstance().lock();
-    if (!creator) {
-        creator = std::make_shared<ViewCreator>();
-        viewCreatorInstance() = creator;
-    }
-
-    return creator;
-}
-
-std::shared_ptr<ViewCreator> ViewCreator::existingInstance()
-{
-    return viewCreatorInstance().lock();
-}
-
 
 RawWebView::RawWebView(QQuickItem *parent)
     : QuickMozView(parent)
-    , m_viewCreator(ViewCreator::instance())
     , m_vkbMargin(0.0)
     , m_footerMargin(0.0)
     , m_acceptTouchEvents(true)
 {
-    m_viewCreator->views.push_back(this);
+    // Use Gecko's remote browser backend.  The initial tab must exist before
+    // QuickMozView replays a URL assigned during QML component construction.
+    setProperty("_qmozChromeHosted", true);
+    setProperty("_qmozChromeInitialUrl", QStringLiteral("about:blank"));
+
+    liveViews().insert(this);
 
     addMessageListener(CONTENT_ORIENTATION_CHANGED);
 
@@ -110,23 +59,17 @@ RawWebView::RawWebView(QQuickItem *parent)
 
 RawWebView::~RawWebView()
 {
-    m_viewCreator->views.erase(std::find(m_viewCreator->views.begin(), m_viewCreator->views.end(), this));
+    liveViews().remove(this);
 }
 
 bool RawWebView::hasLiveViews()
 {
-    std::shared_ptr<ViewCreator> creator = ViewCreator::existingInstance();
-    return creator && !creator->views.empty();
+    return !liveViews().isEmpty();
 }
 
 void RawWebView::destroyLiveViews()
 {
-    std::shared_ptr<ViewCreator> creator = ViewCreator::existingInstance();
-    if (!creator) {
-        return;
-    }
-
-    const std::vector<RawWebView *> views = creator->views;
+    const QSet<RawWebView *> views = liveViews();
     for (RawWebView *view : views) {
         if (view) {
             view->deleteLater();
