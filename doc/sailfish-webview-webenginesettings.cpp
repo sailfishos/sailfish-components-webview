@@ -12,10 +12,6 @@
 
 // This file is used only for documentation purposes
 
-// These items are all part of QMozEngineSettings, but inherited by
-// WebEngineSettings, so we take some notational liberty and present them
-// as part of the the subclass.
-
 namespace SailfishOS {
 
 /*!
@@ -26,7 +22,6 @@ namespace SailfishOS {
     and false otherwise
 
     \sa {SailfishOS::WebEngine::initialize}{WebEngine::initialize}
-    \sa {SailfishOS::QMozContext::initialize}{QMozContext::initialize}
 */
 
 /*!
@@ -214,9 +209,9 @@ namespace SailfishOS {
 
     The returned instance may not be initialized.
 
-    In most situations the singleton
-    {SailfishOS::WebEngineSettings::instance}{WebEngineSettings::instance},
-    which inherits\c WebEngineSettings, should be used instead.
+    In most situations the singleton returned by
+    {SailfishOS::WebEngineSettings::instance}{WebEngineSettings::instance}
+    should be used.
 
     \sa initialized,
     {SailfishOS::WebEngineSettings::instance}{WebEngineSettings::instance}

@@ -12,13 +12,9 @@
 
 // This file is used only for documentation purposes
 
-// These items are all part of QMozEngineSettings, but inherited by
-// WebEngineSettings, so we take some notational liberty and present them
-// as part of the the subclass.
-
 namespace SailfishOS {
 
-class WebEngineSettings : public QMozEngineSettings {
+class WebEngineSettings : public QObject {
     Q_OBJECT
     Q_PROPERTY(bool initialized READ isInitialized NOTIFY initialized)
     Q_PROPERTY(bool autoLoadImages READ autoLoadImages WRITE setAutoLoadImages NOTIFY autoLoadImagesChanged FINAL)
@@ -112,6 +108,8 @@ Q_SIGNALS:
     void downloadDirChanged();
     void initialized();
     void pixelRatioChanged();
+    void doNotTrackChanged();
+    void colorSchemeChanged();
 };
 
 } // namespace SailfishOS

@@ -10,7 +10,6 @@ include(../../defaults.pri)
 
 CONFIG += link_pkgconfig plugin
 QT += qml
-PKGCONFIG += qt5embedwidget
 
 QMAKE_CXXFLAGS += -fPIC
 

@@ -17,6 +17,7 @@ SOURCES += downloadhelper.cpp \
 HEADERS += downloadhelper.h \
            logging.h \
            webengine.h \
+           webengine_p.h \
            webenginesettings.h \
            webenginesettings_p.h
 
@@ -34,6 +35,7 @@ QMAKE_PKGCONFIG_DESCRIPTION = Sailfish OS WebEngine development files
 QMAKE_PKGCONFIG_LIBDIR = $$target.path
 QMAKE_PKGCONFIG_INCDIR = $$develheaders.path
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
-QMAKE_PKGCONFIG_REQUIRES = Qt5Core qt5embedwidget
+QMAKE_PKGCONFIG_REQUIRES = Qt5Core
+QMAKE_PKGCONFIG_REQUIRES_PRIVATE = qt5embedwidget
 
 INSTALLS += target develheaders pkgconfig

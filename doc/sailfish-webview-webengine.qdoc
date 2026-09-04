@@ -6,7 +6,7 @@
 
 /*!
     \qmltype WebEngine
-    \inherits Item
+    \inherits QtObject
     \inqmlmodule Sailfish.WebEngine
     \ingroup sailfishos-webview
     \brief Provides access to the web engine context.
@@ -57,102 +57,34 @@
 */
 
 /*!
-    \qmlmethod WebEngine::addComponentManifest(manifestPath)
-    \brief Register JavaScript chrome components to be loaded into the WebEngine.
+    \qmlmethod WebEngine::isAccelerated()
+    \brief Returns whether hardware-accelerated rendering is enabled.
 
-    The sailfish WebEngine has three main layers. The top layer is exposed as
-    QML components with a developer-facing interface. The lowest level is the
-    native Gecko rendering engine.
+    Returns \c false if the engine backend is not available.
 
-    Between the two sits a JavaScript chrome layer that can communicate with
-    either of the other layers using an observer/notification pattern. These
-    JavaScript components are considered privileged code and run with the
-    \l {https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Script_security#security_principals}{system principal}.
+    \sa setIsAccelerated
+*/
 
-    This call allows new JavaScript components to be added and executed as part
-    of this intermediary layer.
+/*!
+    \qmlmethod WebEngine::setIsAccelerated(accelerated)
+    \brief Enables or disables hardware-accelerated rendering.
 
-    The \a manifestPath should be an absolute path pointing to a manifest file.
-    The manifest file should contain references to components in the same folder,
-    as shown in the following example. The example is comprised of three files:
-    a QML user interface file that calls \c addComponentManifest, the manifest
-    file and a component referenced in the manifest.
+    The call has no effect if the engine backend is not available.
 
-    The WebEngine \b page.qml file calls \c addComponentManifest.
+    \sa isAccelerated
+*/
 
-    \qml
-        import QtQuick 2.1
-        import Sailfish.Silica 1.0
-        import Sailfish.Browser 1.0
-        import Sailfish.WebEngine 1.0
+/*!
+    \qmlmethod WebEngine::addUserStyleSheet(url)
+    \brief Loads a user stylesheet into hosted web content.
 
-        ApplicationWindow {
-            id: root
-            initialPage: Component {
-                WebViewPage {
-                    WebView {
-                        anchors.fill: parent
-                        url: "http://www.sailfishos.org"
-                        onLinkClicked: {
-                            WebEngine.notifyObservers("exampleTopic", url)
-                        }
-                    }
+    The \a url must identify a stylesheet. It applies to content hosted by
+    this WebEngine.
+*/
 
-                    Component.onCompleted: {
-                        WebEngine.addComponentManifest("/path/file.manifest")
-                    }
-                }
-            }
-        }
-    \endqml
-
-    The \b manifest file at /path/file.manifest
-
-    \code
-        component {20227a22-1722-4753-b8f6-c842b401b4c3} ExampleComponent.js
-        contract @mozilla.org/embedlite-example-component;1 {20227a22-1722-4753-b8f6-c842b401b4c3}
-        category app-startup ExampleComponent service,@mozilla.org/embedlite-example-component;1
-    \endcode
-
-    The JavaScript chrome \b component referenced in the manifest and stored
-    at /path/ExampleComponent.js
-
-    \code
-        const Ci = Components.interfaces;
-        const Cu = Components.utils;
-
-        Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-        Cu.import("resource://gre/modules/Services.jsm");
-
-        XPCOMUtils.defineLazyServiceGetter(Services, "embedlite",
-                                            "@mozilla.org/embedlite-app-service;1",
-                                            "nsIEmbedAppService");
-
-        Services.scriptloader.loadSubScript("chrome://embedlite/content/Logger.js");
-
-        function ExampleComponent() {
-          Logger.debug("JSComp: ExampleComponent.js loaded");
-        }
-
-        ExampleComponent.prototype = {
-          classID: Components.ID("{20227a22-1722-4753-b8f6-c842b401b4c3}"),
-
-          QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver]),
-
-          observe: function(aSubject, aTopic, aData) {
-            switch (aTopic) {
-            case "app-startup":
-              Services.obs.addObserver(this, "exampleTopic", false);
-              break;
-            case "exampleTopic":
-              Logger.debug("ExampleComponent: exapleTopic data: " + aData);
-              break;
-            }
-          },
-        };
-
-        this.NSGetFactory = XPCOMUtils.generateNSGetFactory([ExampleComponent]);
-    \endcode
+/*!
+    \qmlmethod WebEngine::removeUserStyleSheet(url)
+    \brief Removes a previously loaded user stylesheet.
 */
 
 /*!
@@ -213,14 +145,14 @@
     When WebEngine is instantiated as a QML component this is called
     automatically during initialization.
 
-    The \a aDelay allows for an asynchronous startup. Calling without the
-    \a aDelay parameter specified will cause execution to happen on the nested
-    main loop, which will block until \l stopEmbedding is called.
+    Gecko is initialized on the Qt application thread and integrated with the
+    Qt event dispatcher. The retained \a aDelay argument is ignored for source
+    compatibility.
 
     Useful when rolling your own initialization, but that can only be done from
     C++ code.
 
-    \sa stopEmbedding, setProfile
+    \sa stopEmbedding
 */
 
 /*!
@@ -228,11 +160,9 @@
     \qmlmethod WebEngine::stopEmbedding()
     \brief Stops the engine event loop.
 
-    Causes execution of the WebEngine to halt. If \l runEmbedding was called
-    without an \a aDelay parameter, this will cause the \l runEmbedding call to
-    unblock.
+    Closes hosted windows and then terminates the WebEngine asynchronously.
 
-    \sa runEmbedding, setProfile
+    \sa runEmbedding
 */
 
 /*!
@@ -241,43 +171,6 @@
     \brief Sends the "final-ui-startup" notification to observers.
 
     For internal use? I don't actually see it used anywhere.
-*/
-
-/*!
-    \internal
-    \qmlmethod WebEngine::setProfile(profilePath)
-    \brief Sets the location for the profile directory.
-
-    This is called during the startup process to set the location of profile
-    files storage (inside which the \c{.mozilla} directory will be created). By
-    default this is set to the cache location for the app
-    (\c{~/.cache/orgname/appname}) and should not be changed after
-    initialization.
-
-    Useful when rolling your own initialization, but that can only be done from
-    C++ code.
-
-    \sa runEmbedding, stopEmbedding
-*/
-
-/*!
-    \internal
-    \qmlmethod WebEngine::setViewCreator(viewCreator)
-    \brief Called automatically on WebView creation so that the engine can create views.
-
-    For internal use.
-
-    \sa setViewCreator
-*/
-
-/*!
-    \internal
-    \qmlmethod WebEngine::createView()
-    \brief Opens a new view that can contain web content.
-
-    For internal use.
-
-    \sa setViewCreator
 */
 
 /*!
@@ -307,18 +200,9 @@
 
 /*!
     \internal
-    \qmlsignal WebEngine::lastViewDestroyed()
-    \brief This signal is emitted when when the last view has been destroyed.
-
-    In practice it doesn't seem to be emitted anywhere.
-*/
-
-/*!
-    \internal
     \qmlsignal WebEngine::lastWindowDestroyed()
     \brief This signal is emitted when the last registered window has been destroyed.
 
     This is used to delay execution of \l stopEmbedding until after the last
     window has closed.
 */
-
