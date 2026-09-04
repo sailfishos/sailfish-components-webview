@@ -226,6 +226,12 @@ Timer {
                 "accepted": accepted,
                 "checkvalue": popup.preventDialogsValue
             }
+            if (data.requestId !== undefined) {
+                responseData.requestId = data.requestId
+            }
+            if (data.tabId !== undefined) {
+                responseData.tabId = data.tabId
+            }
             var response = function() {
                 if (data.inPermitUnload && !accepted) {
                     target.cancelPendingNavigation()
@@ -448,11 +454,17 @@ Timer {
                 return
             }
 
-            WebEngine.notifyObservers("embedui:popupblocked", {
+            var response = {
                 "allow": allow,
                 "popupId": data.popupId,
                 "winId": data.winId
-            })
+            }
+            if (data.tabId !== undefined && contentItem) {
+                response.tabId = data.tabId
+                contentItem.sendAsyncMessage("embedui:popupblocked", response)
+            } else {
+                WebEngine.notifyObservers("embedui:popupblocked", response)
+            }
         }
 
         openPopupByTopic("embed:popupblocked", null,
