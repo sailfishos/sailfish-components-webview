@@ -1,8 +1,8 @@
-%global min_qtmozembed_version 1.56.0
+%global min_qtmozembed_version 2.0.0
 
 Name:    sailfish-components-webview-qt5
 Summary: Allows embedding Sailfish WebView into applications
-Version: 1.7.0
+Version: 1.8.0
 Release: 1
 License: MPLv2.0
 Url:     https://github.com/sailfishos/sailfish-components-webview
@@ -20,7 +20,7 @@ Requires: sailfishsilica-qt5 >= 1.1.123
 Requires: qtmozembed-qt5 >= %{min_qtmozembed_version}
 Requires: sailfish-components-media-qt5
 Requires: sailfish-components-pickers-qt5
-Requires: embedlite-components-qt5 >= 2.0.0
+Requires: embedlite-components-qt5 >= 2.1.0
 Requires: libqofono-qt5-declarative >= 0.117
 
 %description
