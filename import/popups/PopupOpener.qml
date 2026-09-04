@@ -204,9 +204,6 @@ Timer {
         var winId = data.winId
         var target = contentItem
         var buttons = getButtonStringKeys(data, ["OK", "Cancel"])
-        if (buttons.length > 2) {
-            console.log("Requesting " + buttons.length + " buttons, but only two are supported.")
-        }
         var props = {
             "text": data.text,
             "acceptText": buttons[0],
@@ -214,8 +211,11 @@ Timer {
             "preventDialogsVisible": !(checkbox == null),
             "preventDialogsPrefillValue": checkboxPrefill
         }
+        if (buttons.length > 2) {
+            props.thirdButtonText = buttons[2]
+        }
         var responded = false
-        var respond = function(popup, accepted) {
+        var respond = function(popup, buttonNumClicked) {
             if (responded) {
                 return
             }
@@ -223,7 +223,8 @@ Timer {
             _popupObject = null
             var responseData = {
                 "winId": winId,
-                "accepted": accepted,
+                "accepted": buttonNumClicked === 0,
+                "buttonNumClicked": buttonNumClicked,
                 "checkvalue": popup.preventDialogsValue
             }
             if (data.requestId !== undefined) {
@@ -233,7 +234,7 @@ Timer {
                 responseData.tabId = data.tabId
             }
             var response = function() {
-                if (data.inPermitUnload && !accepted) {
+                if (data.inPermitUnload && buttonNumClicked !== 0) {
                     target.cancelPendingNavigation()
                 }
                 target.sendAsyncMessage("confirmresponse", responseData)
@@ -246,10 +247,10 @@ Timer {
             }
         }
         var acceptFn = function(popup) {
-            respond(popup, true)
+            respond(popup, 0)
         }
         var rejectFn = function(popup) {
-            respond(popup, false)
+            respond(popup, popup.buttonNumClicked === 2 ? 2 : 1)
         }
 
         openPopupByTopic("embed:confirm", null, props, acceptFn, rejectFn)

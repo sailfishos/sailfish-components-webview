@@ -24,11 +24,11 @@
   property.
 
   The keys assigned to \l{Sailfish.WebView.Popups::UserPromptInterface::acceptText}
-  {acceptText} and \l{Sailfish.WebView.Popups::UserPromptInterface::cancelText}
-  {cancelText} will always be one of "OK", "Cancel", "Yes", "No", "Save",
-  "DontSave", "Revert" or the empty string. If only DOM javascript is
-  being used, only "OK" and "Cancel" will ever be sent. A custom
-  implementation using privileged code to call functions from the
+  {acceptText}, \l{Sailfish.WebView.Popups::UserPromptInterface::cancelText}
+  {cancelText}, and \l thirdButtonText will always be one of "OK", "Cancel",
+  "Yes", "No", "Save", "DontSave", "Revert" or the empty string. If only
+  DOM JavaScript is being used, only "OK" and "Cancel" will ever be sent. A
+  custom implementation using privileged code to call functions from the
   \l{https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPromptService}{nsIPromptService}
   or \l{https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrompt}{nsIPrompt}
   interfaces has more flexibility to trigger popups which use the other keys.
@@ -48,4 +48,22 @@
   rejection decision.
 */
 
+/*!
+  \qmlproperty string ConfirmPopupInterface::thirdButtonText
+  \brief The Gecko localization key for an optional third button
 
+  If this value is not empty, a custom implementation should show a third
+  button with the corresponding localized label. When that button is selected,
+  the implementation must set \l buttonNumClicked to \c 2 before rejecting the
+  popup.
+*/
+
+/*!
+  \qmlproperty int ConfirmPopupInterface::buttonNumClicked
+  \brief The index of the button selected by the user
+
+  The value is \c 0 for the accept button, \c 1 for the cancel button, and
+  \c 2 for the optional third button. The default value is \c 1.
+
+  \sa thirdButtonText
+*/
