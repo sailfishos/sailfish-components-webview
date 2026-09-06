@@ -206,12 +206,6 @@ void SailfishOS::WebEngineSettings::initialize()
         engineSettings->setPreference(QStringLiteral("javascript.options.wasm_baselinejit"), false);
     }
 
-    // DPI is passed to Gecko's View and APZTreeManager.
-    // Touch tolerance is calculated with formula: dpi * tolerance = pixel threshold
-    const int dragThreshold = QGuiApplication::styleHints()->startDragDistance();
-    qreal touchStartTolerance = dragThreshold / QGuiApplication::primaryScreen()->physicalDotsPerInch();
-    engineSettings->setPreference(QString("apz.touch_start_tolerance"), QString("%1").arg(touchStartTolerance));
-
     int tileSize = screenWidth;
 
     // With bigger than FullHD screen fill with two tiles in row (portrait).
