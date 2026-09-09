@@ -21,6 +21,7 @@ QtObject {
     readonly property var listeners: [ "embed:colorpicker",
                                        "embed:filepicker",
                                        "embed:selectasync",
+                                       "embed:selectabort",
                                        "embedui:downloadpicker",
                                        "embed:downloadpicker" ]
 
@@ -31,6 +32,19 @@ QtObject {
     readonly property string _filePickerComponentUrl: Qt.resolvedUrl("PickerCreator.qml")
     readonly property string _downloadPickerComponentUrl: Qt.resolvedUrl("DownloadPicker.qml")
     property Component _filePickerComponent
+
+    property var _selectRequests: ({})
+    property Component _selectRequestComponent: Component {
+        QtObject {
+            property bool active: true
+            property string requestId
+
+            function release() {
+                delete root._selectRequests[requestId]
+                destroy()
+            }
+        }
+    }
 
     signal downloadPickerClosed
 
@@ -61,8 +75,18 @@ QtObject {
             break
         }
         case "embed:selectasync": {
-            pageStack.animatorPush(data.multiple ? _multiSelectComponentUrl : _singleSelectComponentUrl,
-                                           { "options": data.options, "contentItem": contentItem })
+            var requestId = String(data.id)
+            var request = _selectRequestComponent.createObject(root, { "requestId": requestId })
+            _selectRequests[requestId] = request
+            pageStack.animatorPush(
+                        data.multiple ? _multiSelectComponentUrl : _singleSelectComponentUrl,
+                        { "options": data.options, "contentItem": contentItem,
+                          "requestId": requestId, "requestState": request })
+            break
+        }
+        case "embed:selectabort": {
+            var cancelledRequest = _selectRequests[String(data.id)]
+            if (cancelledRequest) cancelledRequest.active = false
             break
         }
         case "embed:filepicker": {
