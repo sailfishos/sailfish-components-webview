@@ -47,7 +47,6 @@ RawWebView::RawWebView(QQuickItem *parent)
 {
     // Use Gecko's remote browser backend.  The initial tab must exist before
     // QuickMozView replays a URL assigned during QML component construction.
-    setProperty("_qmozChromeHosted", true);
     setProperty("_qmozChromeInitialUrl", QStringLiteral("about:blank"));
 
     liveViews().insert(this);
