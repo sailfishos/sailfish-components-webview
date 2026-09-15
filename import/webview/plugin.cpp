@@ -399,8 +399,12 @@ void SailfishOSWebViewPlugin::initUserAgentOverrides(const QString &path)
         }
         if (changed) {
             // Content changed so write it
-            destFile.seek(0);
-            destFile.write(sourceDoc.toJson());
+            const QByteArray data = QJsonDocument(dest).toJson();
+            if (!destFile.resize(0)
+                    || !destFile.seek(0)
+                    || destFile.write(data) != data.size()) {
+                qWarning() << "Could not write" << destFile.fileName();
+            }
         }
         destFile.close();
     } else {
