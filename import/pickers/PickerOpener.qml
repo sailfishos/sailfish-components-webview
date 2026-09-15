@@ -22,7 +22,6 @@ QtObject {
                                        "embed:filepicker",
                                        "embed:selectasync",
                                        "embed:selectabort",
-                                       "embedui:downloadpicker",
                                        "embed:downloadpicker" ]
 
     // Defer compilation of picker components
