@@ -14,7 +14,7 @@ function geckoKeyToString(textBundle, prefix) {
     var string
     var bundle = (typeof textBundle !== "string")
     var key = bundle ? textBundle[0] : textBundle
-    var id = _convert_key(key)
+    var id = _convert_key(key, prefix)
     string = qsTrId(id)
     if (string === id) {
         // If the key has no translation, use the original gecko key instead
