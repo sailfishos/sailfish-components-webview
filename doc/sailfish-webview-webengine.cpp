@@ -271,7 +271,8 @@ void SailfishOS::WebEngine::stopEmbedding();
 
 /*!
     \internal
-    \brief Sends the "final-ui-startup" notification to observers
+    \deprecated WebView startup no longer calls this method. It is retained
+    for source and binary compatibility.
 
     For internal use during the Gecko engine startup.
 */

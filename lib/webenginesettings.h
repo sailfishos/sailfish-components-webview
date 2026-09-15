@@ -79,15 +79,15 @@ public:
     void setUseDownloadDir(bool useDownloadDir);
     QString downloadDir() const;
     void setDownloadDir(const QString &downloadDir);
-    void setTileSize(const QSize &size);
+    QT_DEPRECATED void setTileSize(const QSize &size);
     void setPixelRatio(qreal pixelRatio);
     qreal pixelRatio() const;
     bool doNotTrack() const;
     void setDoNotTrack(bool doNotTrack);
     ColorScheme colorScheme() const;
     void setColorScheme(ColorScheme colorScheme);
-    void enableProgressivePainting(bool enabled);
-    void enableLowPrecisionBuffers(bool enabled);
+    QT_DEPRECATED void enableProgressivePainting(bool enabled);
+    QT_DEPRECATED void enableLowPrecisionBuffers(bool enabled);
 
     Q_INVOKABLE void setPreference(const QString &key, const QVariant &value);
     Q_INVOKABLE void setPreference(const QString &key, const QVariant &value,

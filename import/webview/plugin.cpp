@@ -319,14 +319,6 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
     SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
 
     SailfishOS::WebEngineSettings::initialize();
-    SailfishOS::WebEngineSettings *engineSettings = SailfishOS::WebEngineSettings::instance();
-
-    // For some yet unknown reason QmlMozView crashes when
-    // flicking quickly if progressive-paint is enabled.
-    engineSettings->setPreference("layers.progressive-paint", QVariant::fromValue<bool>(false));
-    // Disable low-precision-buffer so that background underdraw works
-    // correctly.
-    engineSettings->setPreference("layers.low-precision-buffer", QVariant::fromValue<bool>(false));
 
     shutdownController(webEngine)->watchEngine(engine);
 

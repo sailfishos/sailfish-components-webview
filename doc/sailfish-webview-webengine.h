@@ -52,7 +52,7 @@ public Q_SLOTS:
     void removeUserStyleSheet(const QUrl &url);
     void runEmbedding(int aDelay = -1);
     void stopEmbedding();
-    void notifyFirstUIInitialized();
+    QT_DEPRECATED void notifyFirstUIInitialized();
 };
 
 } // namespace SailfishOS

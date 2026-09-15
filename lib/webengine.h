@@ -63,7 +63,7 @@ public slots:
 
     void runEmbedding(int delay = -1);
     void stopEmbedding();
-    void notifyFirstUIInitialized();
+    QT_DEPRECATED void notifyFirstUIInitialized();
 
 signals:
     void initialized();
