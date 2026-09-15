@@ -183,13 +183,6 @@ void SailfishOS::WebEngineSettings::initialize()
         return;
     }
 
-    // Standard settings.
-    // TODO: Fix this so that it can be applied during runtime when QQuickItem based WebView is used with QQuickFlickable.
-    // At the moment just disable it to avoid unnecessary events being fired. JB#39581
-#if 0
-    engineSettings->setPreference(QStringLiteral("apz.asyncscroll.throttle"), QVariant::fromValue<int>(15));
-    engineSettings->setPreference(QStringLiteral("apz.asyncscroll.timeout"), QVariant::fromValue<int>(15));
-#endif
     engineSettings->setPreference(QStringLiteral("apz.fling_stopped_threshold"), QLatin1String("0.13"));
 
     // Theme settings.
@@ -205,21 +198,6 @@ void SailfishOS::WebEngineSettings::initialize()
         qCInfo(lcWebengineLog) << "Lower memory: disabling wasm_baselinejit";
         engineSettings->setPreference(QStringLiteral("javascript.options.wasm_baselinejit"), false);
     }
-
-    int tileSize = screenWidth;
-
-    // With bigger than FullHD screen fill with two tiles in row (portrait).
-    // Landscape will be filled with same tile size.
-    if (screenWidth > 1080) {
-        tileSize = screenWidth / 2;
-    }
-    engineSettings->setTileSize(QSize(tileSize, tileSize));
-
-    // Zooming related preferences.
-    engineSettings->setPreference(QStringLiteral("embedlite.zoomMargin"),
-                                  QVariant::fromValue<qreal>(silicaTheme->paddingMedium()));
-    engineSettings->setPreference(QStringLiteral("embedlite.inputItemSize"),
-                                  QVariant::fromValue<qreal>(silicaTheme->fontSizeSmall()));
 
     engineSettings->setPreference(QStringLiteral("browser.enable_automatic_image_resizing"),
                                   QVariant::fromValue<bool>(true));
@@ -391,7 +369,7 @@ void SailfishOS::WebEngineSettings::setDownloadDir(const QString &downloadDir)
 
 void SailfishOS::WebEngineSettings::setTileSize(const QSize &size)
 {
-    d->backend()->setTileSize(size);
+    Q_UNUSED(size)
 }
 
 void SailfishOS::WebEngineSettings::setPixelRatio(qreal pixelRatio)
@@ -428,12 +406,12 @@ void SailfishOS::WebEngineSettings::setColorScheme(ColorScheme colorScheme)
 
 void SailfishOS::WebEngineSettings::enableProgressivePainting(bool enabled)
 {
-    d->backend()->enableProgressivePainting(enabled);
+    Q_UNUSED(enabled)
 }
 
 void SailfishOS::WebEngineSettings::enableLowPrecisionBuffers(bool enabled)
 {
-    d->backend()->enableLowPrecisionBuffers(enabled);
+    Q_UNUSED(enabled)
 }
 
 void SailfishOS::WebEngineSettings::setPreference(

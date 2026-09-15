@@ -81,7 +81,7 @@ public:
     QString downloadDir() const;
     void setDownloadDir(const QString &downloadDir);
 
-    void setTileSize(const QSize &size);
+    QT_DEPRECATED void setTileSize(const QSize &size);
 
     void setPixelRatio(qreal pixelRatio);
     qreal pixelRatio() const;
@@ -92,8 +92,8 @@ public:
     ColorScheme colorScheme() const;
     void setColorScheme(ColorScheme colorScheme);
 
-    void enableProgressivePainting(bool enabled);
-    void enableLowPrecisionBuffers(bool enabled);
+    QT_DEPRECATED void enableProgressivePainting(bool enabled);
+    QT_DEPRECATED void enableLowPrecisionBuffers(bool enabled);
 
     // Low-level API to set engine preferences.
     Q_INVOKABLE void setPreference(const QString &key, const QVariant &value);
