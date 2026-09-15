@@ -71,8 +71,6 @@ Dialog {
 
     ListModel {
         id: selectModel
-
-        property int selectedIndex: -1
     }
 
     SilicaListView {

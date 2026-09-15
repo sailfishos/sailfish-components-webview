@@ -74,10 +74,6 @@ RawWebView {
         return null
     }
 
-    function _hasWebViewPage() {
-        return (webview.webViewPage != null && webview.webViewPage != undefined)
-    }
-
     function clearSelection() {
         if (textSelectionActive) {
             textSelectionController.clearSelection()
@@ -164,13 +160,6 @@ RawWebView {
                                 webview, {"contentItem" : webview})
                 }
                 textSelectionController.selectionRangeUpdated(data)
-                break
-            }
-            case "Content:SelectionSwap": {
-                if (textSelectionController) {
-                    textSelectionController.swap()
-                }
-
                 break
             }
             default: {
@@ -341,6 +330,5 @@ RawWebView {
         webview.addMessageListener("Content:ContextMenu")
         webview.addMessageListener("Content:SelectionRange")
         webview.addMessageListener("Content:SelectionCopied")
-        webview.addMessageListener("Content:SelectionSwap")
     }
 }

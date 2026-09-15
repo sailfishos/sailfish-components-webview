@@ -23,8 +23,6 @@ Row {
     property bool selectAllEnabled
     property bool portrait: true
 
-    property real _buttonWidth: width / (repeater.count + 1)
-
     readonly property var defaultButtons: {
         var buttons = []
 

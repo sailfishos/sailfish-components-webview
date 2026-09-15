@@ -18,6 +18,7 @@ Image {
     property real contentWidth
     property real contentHeight
 
+    // Deprecated compatibility property; no longer used by selection handling.
     property real lineHeight
 
     property real fixedX
