@@ -17,7 +17,6 @@ BuildRequires:  qt5-qttools-linguist
 Requires: sailfishsilica-qt5 >= 1.1.123
 Requires: qtmozembed-qt5 >= %{min_qtmozembed_version}
 Requires: sailfish-components-pickers-qt5
-Requires: embedlite-components-qt5 >= 2.1.0
 Requires: libqofono-qt5-declarative >= 0.117
 
 %description
