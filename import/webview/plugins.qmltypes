@@ -165,6 +165,7 @@ Module {
         Property { name: "chromeGestureThreshold"; type: "float" }
         Property { name: "security"; type: "QMozSecurity"; isReadonly: true; isPointer: true }
         Property { name: "desktopMode"; type: "bool" }
+        Property { name: "javascriptEnabled"; type: "bool" }
         Property { name: "parentId"; type: "int"; isReadonly: true }
         Property { name: "uniqueId"; type: "int"; isReadonly: true }
         Property { name: "httpUserAgent"; type: "string" }
@@ -339,6 +340,5 @@ Module {
             Parameter { name: "orientation"; type: "Qt::ScreenOrientation" }
         }
         Signal { name: "acceptTouchEventsChanged" }
-        Signal { name: "openUrlInNewWindow" }
     }
 }

@@ -9,6 +9,8 @@
 #include <QString>
 #include <webenginesettings.h>
 
+class QMozEngineSettings;
+
 #ifndef Q_QDOC
 
 namespace SailfishOS {
@@ -23,11 +25,16 @@ public:
     explicit WebEngineSettingsPrivate(QObject *parent = 0);
     ~WebEngineSettingsPrivate();
 
+    QMozEngineSettings *backend() const;
+
 public slots:
     void notifyColorSchemeChanged();
     void oneShotNotifyColorSchemeChanged(const QString &message, const QVariant &data);
 
     friend class WebEngineSettings;
+
+private:
+    QMozEngineSettings *m_backend;
 };
 
 }

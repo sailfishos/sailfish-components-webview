@@ -13,7 +13,11 @@ import Sailfish.WebEngine 1.0
 import Sailfish.Pickers 1.0
 
 FolderPickerPage {
+    id: root
+
     property var data
+    property var closedCallback
+    property bool responseSent
 
     showSystemFiles: false
 
@@ -21,11 +25,46 @@ FolderPickerPage {
     dialogTitle: qsTrId("sailfish_browser-ti-download-to")
 
     onSelectedPathChanged: {
-        WebEngine.notifyObservers("embedui:downloadpicker",
-                                     {
-                                         "downloadDirectory": selectedPath,
-                                         "defaultFileName": data.defaultFileName,
-                                         "suggestedFileExtension": data.suggestedFileExtension
-                                     })
+        var response = {
+            "downloadDirectory": selectedPath,
+            "defaultFileName": data.defaultFileName,
+            "suggestedFileExtension": data.suggestedFileExtension
+        }
+        if (data.winId !== undefined) {
+            response.winId = data.winId
+        }
+        if (data.tabId !== undefined) {
+            response.tabId = data.tabId
+        }
+        if (data.persistentId !== undefined) {
+            response.persistentId = data.persistentId
+        }
+        if (data.requestId !== undefined) {
+            response.requestId = data.requestId
+        }
+        responseSent = true
+        WebEngine.notifyObservers("embedui:downloadpicker", response)
+    }
+
+    Component.onDestruction: {
+        if (!responseSent && data && data.requestId !== undefined) {
+            var response = {
+                "cancelled": true,
+                "requestId": data.requestId
+            }
+            if (data.winId !== undefined) {
+                response.winId = data.winId
+            }
+            if (data.tabId !== undefined) {
+                response.tabId = data.tabId
+            }
+            if (data.persistentId !== undefined) {
+                response.persistentId = data.persistentId
+            }
+            WebEngine.notifyObservers("embedui:downloadpicker", response)
+        }
+        if (closedCallback) {
+            closedCallback()
+        }
     }
 }

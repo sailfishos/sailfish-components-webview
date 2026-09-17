@@ -28,7 +28,10 @@ RawWebView {
     }
     property bool canShowSelectionMarkers: true
     property real _indicatorVerticalOffset
+    property bool _contentCrashed
+    property bool _crashRecoveryPending
 
+    readonly property bool crashed: _contentCrashed
     readonly property bool textSelectionActive: textSelectionController && textSelectionController.active
     property Item textSelectionController: null
     readonly property int _pageOrientation: webViewPage ? webViewPage.orientation : Orientation.None
@@ -71,10 +74,6 @@ RawWebView {
         return null
     }
 
-    function _hasWebViewPage() {
-        return (webview.webViewPage != null && webview.webViewPage != undefined)
-    }
-
     function clearSelection() {
         if (textSelectionActive) {
             textSelectionController.clearSelection()
@@ -84,7 +83,7 @@ RawWebView {
     active: !webViewPage
             || _appActive && (webViewPage.status === PageStatus.Active)
             || _appActive && (webViewPage.status === PageStatus.Deactivating)
-    _acceptTouchEvents: !textSelectionActive
+    _acceptTouchEvents: !textSelectionActive && !_contentCrashed
 
     viewportHeight: webViewPage ? height : undefined
     safeAreaTop: _cutoutSafeAreaTop(_contentOrientation)
@@ -119,12 +118,38 @@ RawWebView {
         orientationFadeOut.restart()
     }
 
+    onLoadingChanged: {
+        if (_contentCrashed && loading) {
+            _crashRecoveryPending = true
+        }
+    }
+
+    onFirstPaint: {
+        if (_contentCrashed && _crashRecoveryPending) {
+            _contentCrashed = false
+            _crashRecoveryPending = false
+        }
+    }
+
+    function _markContentCrashed() {
+        if (_contentCrashed) {
+            return
+        }
+        _contentCrashed = true
+        _crashRecoveryPending = false
+        clearSelection()
+    }
+
     onRecvAsyncMessage: {
         if (pickerOpener.message(message, data) || popupOpener.message(message, data)) {
             return
         }
 
         switch(message) {
+            case "EmbedLiteChrome:TabCrashed": {
+                _markContentCrashed()
+                break
+            }
             case "embed:linkclicked": {
                 webview.linkClicked(data.uri)
                 break
@@ -137,16 +162,15 @@ RawWebView {
                 textSelectionController.selectionRangeUpdated(data)
                 break
             }
-            case "Content:SelectionSwap": {
-                if (textSelectionController) {
-                    textSelectionController.swap()
-                }
-
-                break
-            }
             default: {
                 break
             }
+        }
+    }
+
+    onRecvAsyncMessageFromTab: {
+        if (message === "EmbedLiteChrome:TabCrashed") {
+            _markContentCrashed()
         }
     }
     onRecvSyncMessage: {
@@ -212,7 +236,7 @@ RawWebView {
         height: webview.height
 
         opacity: 0
-        color: webview.backgroundColor
+        color: Theme.colorScheme === Theme.LightOnDark ? "black" : "white"
 
         NumberAnimation on opacity {
             id: orientationFadeOut
@@ -241,6 +265,31 @@ RawWebView {
         running: true
         visible: webview.loading
         size: BusyIndicatorSize.Large
+    }
+
+    Rectangle {
+        parent: webview.parent
+        anchors.fill: webview
+        z: webview.z + 1
+
+        color: Theme.colorScheme === Theme.LightOnDark ? "black" : "white"
+        visible: webview.visible && webview._contentCrashed
+
+        MouseArea {
+            anchors.fill: parent
+        }
+
+        Label {
+            x: Theme.horizontalPageMargin
+            y: Math.max(0, (parent.height - webview.footerMargin - height) / 2)
+            width: parent.width - 2 * Theme.horizontalPageMargin
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.Wrap
+            color: Theme.colorScheme === Theme.LightOnDark ? "white" : "black"
+            font.pixelSize: Theme.fontSizeLarge
+            //% "WebView crashed"
+            text: qsTrId("sailfish_components_webview-la-webview_crashed")
+        }
     }
 
     SilicaPrivate.VirtualKeyboardObserver {
@@ -276,10 +325,10 @@ RawWebView {
     }
 
     Component.onCompleted: {
+        webview.addMessageListener("EmbedLiteChrome:TabCrashed")
         webview.addMessageListener("embed:linkclicked")
         webview.addMessageListener("Content:ContextMenu")
         webview.addMessageListener("Content:SelectionRange")
         webview.addMessageListener("Content:SelectionCopied")
-        webview.addMessageListener("Content:SelectionSwap")
     }
 }

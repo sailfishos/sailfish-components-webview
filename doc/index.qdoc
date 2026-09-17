@@ -18,18 +18,20 @@ Mozilla gecko.
 
 \section1 Using Sailfish WebView
 
-Currently you have to explicitly link against qtmozembed-qt5 at build time.
-For this you need to modify both your spec file, and your pro file. In
-the spec file you should add line:
+Applications which use WebView only from QML do not need to link against a
+WebEngine library. Applications which use the
+\l{SailfishOS::WebEngine}{WebEngine} or
+\l{SailfishOS::WebEngineSettings}{WebEngineSettings} C++ APIs should link
+against the stable Sailfish WebEngine library. In the spec file add:
 
 \code
-BuildRequires:  pkgconfig(qt5embedwidget)
+BuildRequires:  pkgconfig(sailfishwebengine)
 \endcode
 
-And in your pro file you should add line:
+And in the pro file add:
 
 \code
-PKGCONFIG += qt5embedwidget
+PKGCONFIG += sailfishwebengine
 \endcode
 
 In order for PkgConfig to work, you need to have either

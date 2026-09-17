@@ -12,10 +12,6 @@
 
 // This file is used only for documentation purposes
 
-// These items are all part of QMozEngineSettings, but inherited by
-// WebEngineSettings, so we take some notational liberty and present them
-// as part of the the subclass.
-
 namespace SailfishOS {
 
 /*!
@@ -26,7 +22,6 @@ namespace SailfishOS {
     and false otherwise
 
     \sa {SailfishOS::WebEngine::initialize}{WebEngine::initialize}
-    \sa {SailfishOS::QMozContext::initialize}{QMozContext::initialize}
 */
 
 /*!
@@ -214,9 +209,9 @@ namespace SailfishOS {
 
     The returned instance may not be initialized.
 
-    In most situations the singleton
-    {SailfishOS::WebEngineSettings::instance}{WebEngineSettings::instance},
-    which inherits\c WebEngineSettings, should be used instead.
+    In most situations the singleton returned by
+    {SailfishOS::WebEngineSettings::instance}{WebEngineSettings::instance}
+    should be used.
 
     \sa initialized,
     {SailfishOS::WebEngineSettings::instance}{WebEngineSettings::instance}
@@ -225,33 +220,26 @@ namespace SailfishOS {
 WebEngineSettings *SailfishOS::WebEngineSettings::instance();
 
 /*!
-    \brief Sets the tile \a size used for rendering pages.
+    \deprecated This method is retained for source and binary compatibility
+    and no longer has any effect.
 
-    Setting the tile \a size is equivalent to setting the two gecko properties
-    "layers.tile-width" and "layers.tile-height".
+    The \a size argument is ignored.
 */
 void SailfishOS::WebEngineSettings::setTileSize(const QSize &size);
 
 /*!
-    \brief Sets whether or not to use progressive rendering.
+    \deprecated This method is retained for source and binary compatibility
+    and no longer has any effect.
 
-    When \a enabled the rendering engine will use progressive rendering for
-    the page.
-
-    This corresponds to the "layers.progressive-paint" gecko preference.
+    The \a enabled argument is ignored.
 */
 void SailfishOS::WebEngineSettings::enableProgressivePainting(bool enabled);
 
 /*!
-    \brief Sets whether to enable low precision buffers.
+    \deprecated This method is retained for source and binary compatibility
+    and no longer has any effect.
 
-    When \a enabled the rendering engine will display low resolution
-    tiles to the screen while the full resolution tiles are being rendered.
-
-    This can be used to make scrolling more responsive, but initially only
-    showing a lower resolution version of the page.
-
-    This corresponds to the "layers.low-precision-buffer" gecko preference.
+    The \a enabled argument is ignored.
 */
 void SailfishOS::WebEngineSettings::enableLowPrecisionBuffers(bool enabled);
 

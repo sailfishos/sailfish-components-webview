@@ -11,6 +11,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "StringUtils.js" as StringUtils
 
 Dialog {
     id: dialog
@@ -19,10 +20,12 @@ Dialog {
 
     property alias acceptText: confirm.acceptText
     property alias cancelText: confirm.cancelText
+    property alias thirdButtonText: confirm.thirdButtonText
     property alias title: confirm.title
     property alias preventDialogsVisible: confirm.preventDialogsVisible
     property alias preventDialogsPrefillValue: confirm.preventDialogsPrefillValue
     property alias preventDialogsValue: confirm.preventDialogsValue
+    property alias buttonNumClicked: confirm.buttonNumClicked
 
     ConfirmPopupInterface {
         id: confirm
@@ -36,6 +39,16 @@ Dialog {
 
             PromptLabel {
                 text: confirm.text
+            }
+
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: text.length > 0
+                text: StringUtils.geckoKeyToString(confirm.thirdButtonText)
+                onClicked: {
+                    confirm.buttonNumClicked = 2
+                    dialog.reject()
+                }
             }
         }
     }

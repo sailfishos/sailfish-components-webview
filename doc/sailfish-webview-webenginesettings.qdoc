@@ -10,7 +10,7 @@
 
 /*!
     \qmltype WebEngineSettings
-    \inherits Item
+    \inherits QtObject
     \inqmlmodule Sailfish.WebEngine
     \ingroup sailfishos-webview
     \brief Provides access to the global Web engine settings.
@@ -197,7 +197,7 @@
     \brief Directly set gecko engine preferences.
 
     Sets the \a key preference to \a value. The \a type is an optional argument that
-    is by default QMozEngineSettings.UnknownPref.
+    is by default WebEngineSettings.UnknownPref.
 
     The \a type can be one of:
 
@@ -218,4 +218,3 @@
     See the \l {https://developer.mozilla.org/en-US/docs/Mozilla/Preferences?retiredLocale=ar}{MDN docs}
     for more info about the available preferences.
 */
-

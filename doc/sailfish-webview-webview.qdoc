@@ -80,6 +80,24 @@
 */
 
 /*!
+  \qmlproperty bool WebView::crashed
+  \readonly
+  \brief Whether the content process hosting this WebView terminated unexpectedly.
+
+  A crashed WebView displays a neutral placeholder. It does not automatically
+  reload content because the hosting application owns the content state. The
+  application may load the content again, replace the WebView, or close it.
+*/
+
+/*!
+  \qmlproperty bool WebView::javascriptEnabled
+  \brief Whether JavaScript is enabled for content hosted by this WebView.
+
+  This policy is scoped to the WebView's hosted content session and defaults
+  to \c true. Set it before loading content when JavaScript must be disabled.
+*/
+
+/*!
   \qmlproperty QUrl WebView::url
   \brief The URL being loaded and displayed by the webview.
 
@@ -330,10 +348,4 @@
   \internal
   \qmlsignal WebView::windowCloseRequested()
   \brief Emitted when the current window should be closed.
-*/
-
-/*!
-  \internal
-  \qmlsignal WebView::openUrlInNewWindow()
-  \brief This signal is emitted to indicate a request to open a new window.
 */

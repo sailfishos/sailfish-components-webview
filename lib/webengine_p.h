@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (c) 2021 Open Mobile Platform LLC.
+** Copyright (C) 2026 Jolla Mobile Ltd
 **
 ****************************************************************************/
 
@@ -8,14 +8,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import QtQuick 2.0
-import Sailfish.Silica 1.0
+#ifndef SAILFISHOS_WEBENGINE_P_H
+#define SAILFISHOS_WEBENGINE_P_H
 
-UserPromptInterface {
-    // inputs
-    property string text
-    property string thirdButtonText
+#include <QStringList>
 
-    // output
-    property int buttonNumClicked: 1
+class QMozContext;
+
+namespace SailfishOS {
+
+class WebEnginePrivate
+{
+public:
+    WebEnginePrivate();
+
+    QMozContext *context;
+    QStringList userStyleSheets;
+};
+
 }
+
+#endif // SAILFISHOS_WEBENGINE_P_H

@@ -14,21 +14,54 @@ import QtQuick 2.2
 import Sailfish.WebEngine 1.0
 
 QtObject {
+    id: root
+
     property var pageStack
     property QtObject contentItem
     readonly property var listeners: [ "embed:colorpicker",
+                                       "embed:datepicker",
+                                       "embed:datepickerabort",
                                        "embed:filepicker",
                                        "embed:selectasync",
-                                       "embedui:downloadpicker",
+                                       "embed:selectabort",
                                        "embed:downloadpicker" ]
 
     // Defer compilation of picker components
     readonly property string _multiSelectComponentUrl: Qt.resolvedUrl("MultiSelectDialog.qml")
     readonly property string _singleSelectComponentUrl: Qt.resolvedUrl("SingleSelectPage.qml")
     readonly property string _colorPickerPageUrl: Qt.resolvedUrl("WebColorPickerPage.qml")
+    readonly property string _datePickerDialogUrl: Qt.resolvedUrl("WebDatePickerDialog.qml")
     readonly property string _filePickerComponentUrl: Qt.resolvedUrl("PickerCreator.qml")
     readonly property string _downloadPickerComponentUrl: Qt.resolvedUrl("DownloadPicker.qml")
     property Component _filePickerComponent
+
+    property var _selectRequests: ({})
+    property Component _selectRequestComponent: Component {
+        QtObject {
+            property bool active: true
+            property string requestId
+
+            function release() {
+                delete root._selectRequests[requestId]
+                destroy()
+            }
+        }
+    }
+
+    property var _dateRequests: ({})
+    property Component _dateRequestComponent: Component {
+        QtObject {
+            property bool active: true
+            property string requestId
+
+            function release() {
+                delete root._dateRequests[requestId]
+                destroy()
+            }
+        }
+    }
+
+    signal downloadPickerClosed
 
     // Returns true if message is handled.
     function message(topic, data) {
@@ -56,9 +89,41 @@ QtObject {
                                      "defaultColors": data.defaultColors })
             break
         }
+        case "embed:datepicker": {
+            var dateRequestId = String(data.id)
+            var dateRequest = _dateRequestComponent.createObject(root,
+                                                                 { "requestId": dateRequestId })
+            _dateRequests[dateRequestId] = dateRequest
+            pageStack.animatorPush(_datePickerDialogUrl,
+                                   { "winId": winId,
+                                     "requestId": dateRequestId,
+                                     "requestState": dateRequest,
+                                     "contentItem": contentItem,
+                                     "initialValue": data.value,
+                                     "minimumValue": data.min,
+                                     "maximumValue": data.max,
+                                     "stepValue": data.step,
+                                     "stepBase": data.stepBase })
+            break
+        }
+        case "embed:datepickerabort": {
+            var cancelledDateRequest = _dateRequests[String(data.id)]
+            if (cancelledDateRequest) cancelledDateRequest.active = false
+            break
+        }
         case "embed:selectasync": {
-            pageStack.animatorPush(data.multiple ? _multiSelectComponentUrl : _singleSelectComponentUrl,
-                                           { "options": data.options, "contentItem": contentItem })
+            var requestId = String(data.id)
+            var request = _selectRequestComponent.createObject(root, { "requestId": requestId })
+            _selectRequests[requestId] = request
+            pageStack.animatorPush(
+                        data.multiple ? _multiSelectComponentUrl : _singleSelectComponentUrl,
+                        { "options": data.options, "contentItem": contentItem,
+                          "requestId": requestId, "requestState": request })
+            break
+        }
+        case "embed:selectabort": {
+            var cancelledRequest = _selectRequests[String(data.id)]
+            if (cancelledRequest) cancelledRequest.active = false
             break
         }
         case "embed:filepicker": {
@@ -80,7 +145,15 @@ QtObject {
             break
         }
         case "embed:downloadpicker": {
-            var page = pageStack.push(_downloadPickerComponentUrl, { "data": data })
+            var page = pageStack.push(_downloadPickerComponentUrl, {
+                                          "data": data,
+                                          "closedCallback": function() {
+                                              root.downloadPickerClosed()
+                                          }
+                                      })
+            if (!page) {
+                return false
+            }
             break
         }
         }
