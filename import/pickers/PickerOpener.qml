@@ -19,6 +19,8 @@ QtObject {
     property var pageStack
     property QtObject contentItem
     readonly property var listeners: [ "embed:colorpicker",
+                                       "embed:datepicker",
+                                       "embed:datepickerabort",
                                        "embed:filepicker",
                                        "embed:selectasync",
                                        "embed:selectabort",
@@ -28,6 +30,7 @@ QtObject {
     readonly property string _multiSelectComponentUrl: Qt.resolvedUrl("MultiSelectDialog.qml")
     readonly property string _singleSelectComponentUrl: Qt.resolvedUrl("SingleSelectPage.qml")
     readonly property string _colorPickerPageUrl: Qt.resolvedUrl("WebColorPickerPage.qml")
+    readonly property string _datePickerDialogUrl: Qt.resolvedUrl("WebDatePickerDialog.qml")
     readonly property string _filePickerComponentUrl: Qt.resolvedUrl("PickerCreator.qml")
     readonly property string _downloadPickerComponentUrl: Qt.resolvedUrl("DownloadPicker.qml")
     property Component _filePickerComponent
@@ -40,6 +43,19 @@ QtObject {
 
             function release() {
                 delete root._selectRequests[requestId]
+                destroy()
+            }
+        }
+    }
+
+    property var _dateRequests: ({})
+    property Component _dateRequestComponent: Component {
+        QtObject {
+            property bool active: true
+            property string requestId
+
+            function release() {
+                delete root._dateRequests[requestId]
                 destroy()
             }
         }
@@ -71,6 +87,28 @@ QtObject {
                                      "contentItem": contentItem,
                                      "initialColor": data.initialColor,
                                      "defaultColors": data.defaultColors })
+            break
+        }
+        case "embed:datepicker": {
+            var dateRequestId = String(data.id)
+            var dateRequest = _dateRequestComponent.createObject(root,
+                                                                 { "requestId": dateRequestId })
+            _dateRequests[dateRequestId] = dateRequest
+            pageStack.animatorPush(_datePickerDialogUrl,
+                                   { "winId": winId,
+                                     "requestId": dateRequestId,
+                                     "requestState": dateRequest,
+                                     "contentItem": contentItem,
+                                     "initialValue": data.value,
+                                     "minimumValue": data.min,
+                                     "maximumValue": data.max,
+                                     "stepValue": data.step,
+                                     "stepBase": data.stepBase })
+            break
+        }
+        case "embed:datepickerabort": {
+            var cancelledDateRequest = _dateRequests[String(data.id)]
+            if (cancelledDateRequest) cancelledDateRequest.active = false
             break
         }
         case "embed:selectasync": {
