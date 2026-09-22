@@ -38,11 +38,12 @@ Timer {
         "embed:popupblocked":   "blockedTabPopup",
         "embed:select":         "selectorPopup"
     })
-    readonly property var listeners: Object.keys(_messageTopicToPopupProviderPropertyMapping)
+    readonly property var listeners: Object.keys(_messageTopicToPopupProviderPropertyMapping).concat(["embed:promptabort"])
 
     property bool downloadsEnabled: true
 
     property Component _contextMenuComponent
+    property var _promptRequests: ({})
     property var _popupObject
     property var _delayedOpenValues
     property var _delayedResponse
@@ -120,6 +121,15 @@ Timer {
 
     // Returns true if message is handled.
     function message(topic, data) {
+        if (topic === "embed:promptabort") {
+            var request = _promptRequests[data.promptId]
+            if (request && request.winId === data.winId) {
+                request.cancelled = true
+                if (request.closeCancelled) request.closeCancelled()
+            }
+            return true
+        }
+
         if (!handlesMessage(topic)) {
             return false
         }
@@ -177,6 +187,7 @@ Timer {
         var checkbox = getCheckbox(data)
         var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
+        var target = contentItem
         var buttons = getButtonStringKeys(data, ["OK", ""])
         var props = {
             "text": data.text,
@@ -187,14 +198,15 @@ Timer {
         }
         var acceptFn = function(popup) {
             _popupObject = null
-            contentItem.sendAsyncMessage("alertresponse", {
+            target.sendAsyncMessage("alertresponse", {
                 "winId": winId,
+                "promptId": data.promptId,
                 "checkvalue": popup.preventDialogsValue
             })
         }
         var rejectFn = acceptFn
 
-        openPopupByTopic("embed:alert", null, props, acceptFn, rejectFn)
+        openPromptPopup(data, "embed:alert", null, props, acceptFn, rejectFn)
     }
 
     // Open confirm dialog
@@ -223,6 +235,7 @@ Timer {
             _popupObject = null
             var responseData = {
                 "winId": winId,
+                "promptId": data.promptId,
                 "accepted": buttonNumClicked === 0,
                 "buttonNumClicked": buttonNumClicked,
                 "checkvalue": popup.preventDialogsValue
@@ -253,7 +266,7 @@ Timer {
             respond(popup, popup.buttonNumClicked === 2 ? 2 : 1)
         }
 
-        openPopupByTopic("embed:confirm", null, props, acceptFn, rejectFn)
+        openPromptPopup(data, "embed:confirm", null, props, acceptFn, rejectFn)
     }
 
     // Open prompt dialog
@@ -267,6 +280,7 @@ Timer {
         var checkbox = getCheckbox(data)
         var checkboxPrefill = getCheckboxValue(checkbox)
         var winId = data.winId
+        var target = contentItem
         var buttons = getButtonStringKeys(data, ["OK", "Cancel"])
         var props = {
             "text": data.text,
@@ -278,8 +292,9 @@ Timer {
         }
         var acceptFn = function(popup) {
             _popupObject = null
-            contentItem.sendAsyncMessage("promptresponse", {
+            target.sendAsyncMessage("promptresponse", {
                 "winId": winId,
+                "promptId": data.promptId,
                 "accepted": true,
                 "promptvalue": popup.value,
                 "checkvalue": popup.preventDialogsValue
@@ -287,14 +302,15 @@ Timer {
         }
         var rejectFn = function(popup) {
             _popupObject = null
-            contentItem.sendAsyncMessage("promptresponse", {
+            target.sendAsyncMessage("promptresponse", {
                 "winId": winId,
+                "promptId": data.promptId,
                 "accepted": false,
                 "checkvalue": popup.preventDialogsValue
             })
         }
 
-        openPopupByTopic("embed:prompt", null, props, acceptFn, rejectFn)
+        openPromptPopup(data, "embed:prompt", null, props, acceptFn, rejectFn)
     }
 
     // Open login dialog
@@ -498,6 +514,7 @@ Timer {
 
     function selector(data) {
         var winId = data.winId
+        var target = contentItem
         var buttons = getButtonStringKeys(data, ["OK", ""])
         var props = {
             "title": data.title,
@@ -509,21 +526,23 @@ Timer {
 
         var acceptFn = function(popup) {
             _popupObject = null
-            contentItem.sendAsyncMessage("selectresponse", {
+            target.sendAsyncMessage("selectresponse", {
                 "winId": winId,
+                "promptId": data.promptId,
                 "button": 0,
                 "menulist0": popup.selectedIndex
             })
         }
         var rejectFn = function(popup) {
             _popupObject = null
-            contentItem.sendAsyncMessage("selectresponse", {
+            target.sendAsyncMessage("selectresponse", {
                 "winId": winId,
+                "promptId": data.promptId,
                 "button": 1
             })
         }
 
-        openPopupByTopic("embed:select", data.title, props, acceptFn, rejectFn)
+        openPromptPopup(data, "embed:select", data.title, props, acceptFn, rejectFn)
     }
 
     // Handle pagestack busy change
@@ -534,7 +553,8 @@ Timer {
                       root._delayedOpenValues[1],
                       root._delayedOpenValues[2],
                       root._delayedOpenValues[3],
-                      root._delayedOpenValues[4])
+                      root._delayedOpenValues[4],
+                      root._delayedOpenValues[5])
             root._delayedOpenValues = null
         }
     }
@@ -556,9 +576,46 @@ Timer {
         return listeners.indexOf(topic) >= 0
     }
 
-    function openPopup(comp, properties, isDialog, acceptedFn, rejectedFn) {
+    function openPromptPopup(data, topic, subtopic, properties, acceptedFn, rejectedFn) {
+        var request = { "winId": data.winId, "cancelled": false, "finished": false }
+        if (data.promptId !== undefined) _promptRequests[data.promptId] = request
+        function finish(popup, callback) {
+            if (request.finished) return
+            request.finished = true
+            if (request.disconnect) request.disconnect()
+            if (data.promptId !== undefined) delete _promptRequests[data.promptId]
+            callback(popup)
+        }
+        openPopupByTopic(topic, subtopic, properties,
+                         function(popup) { finish(popup, request.cancelled ? rejectedFn : acceptedFn) },
+                         function(popup) { finish(popup, rejectedFn) }, request)
+    }
+
+    function bindPromptPopup(request, popup, isDialog) {
+        if (!request) return
+        request.closeCancelled = function() {
+            if (!request.cancelled || request.finished) return
+            if (isDialog && (popup.status !== PageStatus.Active || pageStack.busy)) return
+            if (typeof popup.reject === "function") {
+                popup.reject()
+            } else {
+                popup.rejected()
+                popup.destroy()
+            }
+        }
+        if (isDialog) {
+            popup.statusChanged.connect(request.closeCancelled)
+            pageStack.busyChanged.connect(request.closeCancelled)
+            request.disconnect = function() {
+                pageStack.busyChanged.disconnect(request.closeCancelled)
+            }
+        }
+        request.closeCancelled()
+    }
+
+    function openPopup(comp, properties, isDialog, acceptedFn, rejectedFn, request) {
         if (pageStack.busy) {
-            _delayedOpenValues = [comp, properties, isDialog, acceptedFn, rejectedFn]
+            _delayedOpenValues = [comp, properties, isDialog, acceptedFn, rejectedFn, request]
             pageStack.busyChanged.connect(busyChanged)
             return
         }
@@ -571,6 +628,7 @@ Timer {
                 _popupObject = dialog // prevent gc()
                 dialog.accepted.connect(function() { acceptedFn(dialog) })
                 dialog.rejected.connect(function() { rejectedFn(dialog) })
+                bindPromptPopup(request, dialog, true)
             })
         } else {
             var component = comp.createObject === undefined
@@ -590,17 +648,18 @@ Timer {
                 _popupObject = obj // prevent gc()
                 obj.accepted.connect(function() { acceptedFn(obj) })
                 obj.rejected.connect(function() { rejectedFn(obj) })
+                bindPromptPopup(request, obj, false)
             }
         }
     }
 
-    function openPopupByTopic(topic, subtopic, properties, acceptedFn, rejectedFn) {
+    function openPopupByTopic(topic, subtopic, properties, acceptedFn, rejectedFn, request) {
         var comp = _resolveListenerComponent(topic, subtopic)
         var compIsDialog = _resolveListenerComponentType(topic, subtopic) === "dialog"
         if (comp === null || comp === undefined) {
             console.log("PopupOpener.qml: invalid component specified for: " + topic + " " + subtopic)
         } else {
-            openPopup(comp, properties, compIsDialog, acceptedFn, rejectedFn)
+            openPopup(comp, properties, compIsDialog, acceptedFn, rejectedFn, request)
         }
     }
 
