@@ -15,11 +15,20 @@ Module {
         Property { name: "initialized"; type: "bool"; isReadonly: true }
         Signal { name: "initialized" }
         Signal { name: "contextDestroyed" }
+        Signal { name: "lastViewDestroyed" }
         Signal { name: "lastWindowDestroyed" }
         Signal {
             name: "recvObserve"
             Parameter { name: "message"; type: "string" }
             Parameter { name: "data"; type: "QVariant" }
+        }
+        Method {
+            name: "setProfile"
+            Parameter { name: "profilePath"; type: "string" }
+        }
+        Method {
+            name: "addComponentManifest"
+            Parameter { name: "manifestPath"; type: "string" }
         }
         Method {
             name: "setIsAccelerated"

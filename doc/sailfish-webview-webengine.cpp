@@ -15,7 +15,7 @@ namespace SailfishOS {
     \class SailfishOS::WebEngine
     \brief Provides access to the web engine context.
     \inmodule SailfishWebView
-    \inherits QObject
+    \inherits QMozContext
 
     Singleton class which provides access to the global WebEngine context.
 */
@@ -331,5 +331,33 @@ void SailfishOS::WebEngine::removeUserStyleSheet(const QUrl &url);
     \sa {SailfishOS::WebEngine::initialize}{WebEngine::initialize}
 */
 bool SailfishOS::WebEngine::isInitialized() const;
+
+/*!
+    \brief Sets the profile directory before starting the engine.
+
+    Prefer passing the path to \l initialize. Applications performing custom
+    initialization may call this before \l runEmbedding.
+*/
+void SailfishOS::WebEngine::setProfile(const QString &profilePath);
+
+/*!
+    \brief Registers a component manifest before starting the engine.
+
+    The \a manifestPath must be an absolute path. Call \l initialize with
+    \c runEmbedding set to false, add application manifests, then call
+    \l runEmbedding. The component code must support the installed Gecko
+    version.
+*/
+void SailfishOS::WebEngine::addComponentManifest(const QString &manifestPath);
+
+/*!
+    \brief Emitted when the last hosted view has been destroyed by the engine.
+
+    Hosted views own chrome windows. This signal follows engine destruction
+    of the last such window and its content sessions, before
+    \l lastWindowDestroyed. Deleting a Qt item alone does not complete that
+    asynchronous destruction.
+*/
+void SailfishOS::WebEngine::lastViewDestroyed();
 
 } // namespace SailfishOS

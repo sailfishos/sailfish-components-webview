@@ -10,18 +10,17 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "webengine.h"
-#include "webengine_p.h"
 
 #include <QCoreApplication>
+#include <QTimer>
 #include <qmozcontext.h>
 
 Q_GLOBAL_STATIC(SailfishOS::WebEngine, webEngineInstance)
 
 namespace SailfishOS {
 
-WebEnginePrivate::WebEnginePrivate()
-    : context(QMozContext::instance())
-{
+namespace {
+const char UserStyleSheetsProperty[] = "_sailfishWebEngineUserStyleSheets";
 }
 
 void WebEngine::initialize(const QString &profilePath, bool runEmbedding)
@@ -42,11 +41,10 @@ void WebEngine::initialize(const QString &profilePath, bool runEmbedding)
            qApp->applicationName().toUtf8(), 1);
 
     WebEngine *webEngine = instance();
-    QMozContext *context = webEngine->d->context;
+    QMozContext *context = webEngine;
     context->setProfile(profilePath);
 
-    // These manifests are an implementation detail of WebView. Applications
-    // configure content with semantic WebView APIs instead.
+    // Register the default manifests before applications add their own.
     const QString componentsPath =
             QStringLiteral(SAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH);
     context->addComponentManifest(
@@ -59,7 +57,9 @@ void WebEngine::initialize(const QString &profilePath, bool runEmbedding)
             componentsPath + QStringLiteral("/chrome/EmbedLiteOverrides.manifest"));
 
     if (runEmbedding) {
-        webEngine->runEmbedding();
+        QTimer::singleShot(0, webEngine, [webEngine]() {
+            webEngine->runEmbedding();
+        });
     }
 
     isInitialized = true;
@@ -71,130 +71,47 @@ WebEngine *WebEngine::instance()
 }
 
 WebEngine::WebEngine(QObject *parent)
-    : QObject(parent)
-    , d(new WebEnginePrivate)
+    : QMozContext(parent)
 {
-    connect(d->context, &QMozContext::initialized,
-            this, &WebEngine::initialized);
-    connect(d->context, &QMozContext::contextDestroyed,
-            this, &WebEngine::contextDestroyed);
-    connect(d->context, &QMozContext::lastWindowDestroyed,
-            this, &WebEngine::lastWindowDestroyed);
-    connect(d->context, &QMozContext::recvObserve,
-            this, &WebEngine::recvObserve);
+    // Keep WebEngine's original size and QMozContext base. Per-instance
+    // additions belong in QObject storage, not in new public data members.
     connect(this, &WebEngine::initialized, this, [this]() {
-        Q_FOREACH (const QString &uri, d->userStyleSheets) {
-            d->context->loadUserStyleSheet(uri);
+        const QStringList sheets = property(UserStyleSheetsProperty).toStringList();
+        for (const QString &uri : sheets) {
+            loadUserStyleSheet(uri);
         }
     });
 }
 
 WebEngine::~WebEngine()
 {
-    delete d;
-}
-
-bool WebEngine::isInitialized() const
-{
-    return d->context->isInitialized();
-}
-
-bool WebEngine::isAccelerated() const
-{
-    return d->context->isAccelerated();
-}
-
-WebEngine::TaskHandle WebEngine::PostUITask(
-        TaskCallback callback, void *data, int timeout)
-{
-    return d->context->PostUITask(callback, data, timeout);
-}
-
-WebEngine::TaskHandle WebEngine::PostCompositorTask(
-        TaskCallback callback, void *data, int timeout)
-{
-    return d->context->PostCompositorTask(callback, data, timeout);
-}
-
-void WebEngine::CancelTask(TaskHandle handle)
-{
-    d->context->CancelTask(handle);
-}
-
-void WebEngine::addObservers(const std::vector<std::string> &observers)
-{
-    d->context->addObservers(observers);
-}
-
-void WebEngine::removeObservers(const std::vector<std::string> &observers)
-{
-    d->context->removeObservers(observers);
-}
-
-int WebEngine::getNumberOfWindows() const
-{
-    return d->context->getNumberOfWindows();
-}
-
-void WebEngine::setIsAccelerated(bool accelerated)
-{
-    d->context->setIsAccelerated(accelerated);
-}
-
-void WebEngine::addObserver(const QString &topic)
-{
-    d->context->addObserver(topic);
-}
-
-void WebEngine::removeObserver(const QString &topic)
-{
-    d->context->removeObserver(topic);
-}
-
-void WebEngine::notifyObservers(const QString &topic, const QString &value)
-{
-    d->context->notifyObservers(topic, value);
-}
-
-void WebEngine::notifyObservers(const QString &topic, const QVariant &value)
-{
-    d->context->notifyObservers(topic, value);
 }
 
 void WebEngine::addUserStyleSheet(const QUrl &url)
 {
     const QString uri = url.toString();
-    if (uri.isEmpty() || d->userStyleSheets.contains(uri)) {
+    QStringList sheets = property(UserStyleSheetsProperty).toStringList();
+    if (uri.isEmpty() || sheets.contains(uri)) {
         return;
     }
-    d->userStyleSheets.append(uri);
+    sheets.append(uri);
+    setProperty(UserStyleSheetsProperty, sheets);
     if (isInitialized()) {
-        d->context->loadUserStyleSheet(uri);
+        loadUserStyleSheet(uri);
     }
 }
 
 void WebEngine::removeUserStyleSheet(const QUrl &url)
 {
     const QString uri = url.toString();
-    if (!d->userStyleSheets.removeOne(uri) || !isInitialized()) {
+    QStringList sheets = property(UserStyleSheetsProperty).toStringList();
+    if (!sheets.removeOne(uri)) {
         return;
     }
-    d->context->loadUserStyleSheet(uri, false);
-}
-
-void WebEngine::runEmbedding(int delay)
-{
-    d->context->runEmbedding(delay);
-}
-
-void WebEngine::stopEmbedding()
-{
-    d->context->stopEmbedding();
-}
-
-void WebEngine::notifyFirstUIInitialized()
-{
-    d->context->notifyFirstUIInitialized();
+    setProperty(UserStyleSheetsProperty, sheets);
+    if (isInitialized()) {
+        loadUserStyleSheet(uri, false);
+    }
 }
 
 } // namespace SailfishOS

@@ -39,7 +39,7 @@ Q_GLOBAL_STATIC(SailfishOS::WebEngineSettingsPrivate, webEngineSettingsPrivateIn
     \class SailfishOS::WebEngineSettings
     \brief Provides access to the global web engine settings.
     \inmodule SailfishWebView
-    \inherits QObject
+    \inherits QMozEngineSettings
 
     Singleton class which provides access to the global Web engine settings.
 */
@@ -79,19 +79,12 @@ SailfishOS::WebEngineSettingsPrivate *SailfishOS::WebEngineSettingsPrivate::inst
 
 SailfishOS::WebEngineSettingsPrivate::WebEngineSettingsPrivate(QObject *parent)
     : QObject(parent)
-    , m_backend(QMozEngineSettings::instance())
 {
 }
 
 SailfishOS::WebEngineSettingsPrivate::~WebEngineSettingsPrivate()
 {
 }
-
-QMozEngineSettings *SailfishOS::WebEngineSettingsPrivate::backend() const
-{
-    return m_backend;
-}
-
 
 /*!
     \brief Initialises the WebEngineSettings class.
@@ -264,30 +257,9 @@ SailfishOS::WebEngineSettings *SailfishOS::WebEngineSettings::instance()
     \sa instance
 */
 SailfishOS::WebEngineSettings::WebEngineSettings(QObject *parent)
-    : QObject(parent)
+    : QMozEngineSettings(parent)
     , d(WebEngineSettingsPrivate::instance())
 {
-    QMozEngineSettings *backend = d->backend();
-    connect(backend, &QMozEngineSettings::autoLoadImagesChanged,
-            this, &WebEngineSettings::autoLoadImagesChanged);
-    connect(backend, &QMozEngineSettings::javascriptEnabledChanged,
-            this, &WebEngineSettings::javascriptEnabledChanged);
-    connect(backend, &QMozEngineSettings::popupEnabledChanged,
-            this, &WebEngineSettings::popupEnabledChanged);
-    connect(backend, &QMozEngineSettings::cookieBehaviorChanged,
-            this, &WebEngineSettings::cookieBehaviorChanged);
-    connect(backend, &QMozEngineSettings::useDownloadDirChanged,
-            this, &WebEngineSettings::useDownloadDirChanged);
-    connect(backend, &QMozEngineSettings::downloadDirChanged,
-            this, &WebEngineSettings::downloadDirChanged);
-    connect(backend, &QMozEngineSettings::initialized,
-            this, &WebEngineSettings::initialized);
-    connect(backend, &QMozEngineSettings::pixelRatioChanged,
-            this, &WebEngineSettings::pixelRatioChanged);
-    connect(backend, &QMozEngineSettings::doNotTrackChanged,
-            this, &WebEngineSettings::doNotTrackChanged);
-    connect(backend, &QMozEngineSettings::colorSchemeChanged,
-            this, &WebEngineSettings::colorSchemeChanged);
 }
 
 /*!
@@ -298,133 +270,4 @@ SailfishOS::WebEngineSettings::WebEngineSettings(QObject *parent)
 */
 SailfishOS::WebEngineSettings::~WebEngineSettings()
 {
-}
-
-bool SailfishOS::WebEngineSettings::isInitialized() const
-{
-    return d->backend()->isInitialized();
-}
-
-bool SailfishOS::WebEngineSettings::autoLoadImages() const
-{
-    return d->backend()->autoLoadImages();
-}
-
-void SailfishOS::WebEngineSettings::setAutoLoadImages(bool enabled)
-{
-    d->backend()->setAutoLoadImages(enabled);
-}
-
-bool SailfishOS::WebEngineSettings::javascriptEnabled() const
-{
-    return d->backend()->javascriptEnabled();
-}
-
-void SailfishOS::WebEngineSettings::setJavascriptEnabled(bool enabled)
-{
-    d->backend()->setJavascriptEnabled(enabled);
-}
-
-bool SailfishOS::WebEngineSettings::popupEnabled() const
-{
-    return d->backend()->popupEnabled();
-}
-
-void SailfishOS::WebEngineSettings::setPopupEnabled(bool enabled)
-{
-    d->backend()->setPopupEnabled(enabled);
-}
-
-SailfishOS::WebEngineSettings::CookieBehavior
-SailfishOS::WebEngineSettings::cookieBehavior() const
-{
-    return static_cast<CookieBehavior>(d->backend()->cookieBehavior());
-}
-
-void SailfishOS::WebEngineSettings::setCookieBehavior(CookieBehavior behavior)
-{
-    d->backend()->setCookieBehavior(
-            static_cast<QMozEngineSettings::CookieBehavior>(behavior));
-}
-
-bool SailfishOS::WebEngineSettings::useDownloadDir() const
-{
-    return d->backend()->useDownloadDir();
-}
-
-void SailfishOS::WebEngineSettings::setUseDownloadDir(bool useDownloadDir)
-{
-    d->backend()->setUseDownloadDir(useDownloadDir);
-}
-
-QString SailfishOS::WebEngineSettings::downloadDir() const
-{
-    return d->backend()->downloadDir();
-}
-
-void SailfishOS::WebEngineSettings::setDownloadDir(const QString &downloadDir)
-{
-    d->backend()->setDownloadDir(downloadDir);
-}
-
-void SailfishOS::WebEngineSettings::setTileSize(const QSize &size)
-{
-    Q_UNUSED(size)
-}
-
-void SailfishOS::WebEngineSettings::setPixelRatio(qreal pixelRatio)
-{
-    d->backend()->setPixelRatio(pixelRatio);
-}
-
-qreal SailfishOS::WebEngineSettings::pixelRatio() const
-{
-    return d->backend()->pixelRatio();
-}
-
-bool SailfishOS::WebEngineSettings::doNotTrack() const
-{
-    return d->backend()->doNotTrack();
-}
-
-void SailfishOS::WebEngineSettings::setDoNotTrack(bool doNotTrack)
-{
-    d->backend()->setDoNotTrack(doNotTrack);
-}
-
-SailfishOS::WebEngineSettings::ColorScheme
-SailfishOS::WebEngineSettings::colorScheme() const
-{
-    return static_cast<ColorScheme>(d->backend()->colorScheme());
-}
-
-void SailfishOS::WebEngineSettings::setColorScheme(ColorScheme colorScheme)
-{
-    d->backend()->setColorScheme(
-            static_cast<QMozEngineSettings::ColorScheme>(colorScheme));
-}
-
-void SailfishOS::WebEngineSettings::enableProgressivePainting(bool enabled)
-{
-    Q_UNUSED(enabled)
-}
-
-void SailfishOS::WebEngineSettings::enableLowPrecisionBuffers(bool enabled)
-{
-    Q_UNUSED(enabled)
-}
-
-void SailfishOS::WebEngineSettings::setPreference(
-        const QString &key, const QVariant &value)
-{
-    d->backend()->setPreference(key, value);
-}
-
-void SailfishOS::WebEngineSettings::setPreference(
-        const QString &key, const QVariant &value,
-        PreferenceType preferenceType)
-{
-    d->backend()->setPreference(
-            key, value,
-            static_cast<QMozEngineSettings::PreferenceType>(preferenceType));
 }

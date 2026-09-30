@@ -39,10 +39,13 @@ public:
 Q_SIGNALS:
     void initialized();
     void contextDestroyed();
+    void lastViewDestroyed();
     void lastWindowDestroyed();
     void recvObserve(const QString message, const QVariant data);
 
 public Q_SLOTS:
+    void setProfile(const QString &profilePath);
+    void addComponentManifest(const QString &manifestPath);
     void setIsAccelerated(bool accelerated);
     void addObserver(const QString &aTopic);
     void removeObserver(const QString  aTopic);
