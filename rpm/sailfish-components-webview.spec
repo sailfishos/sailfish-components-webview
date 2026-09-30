@@ -93,7 +93,7 @@ BuildRequires:  qt5-tools
 %postun -p /sbin/ldconfig
 
 %files
-%license LICENSE.txt
+%license LICENSES/MPL-2.0.txt
 %{_libdir}/libsailfishwebengine.so.*
 %{_datadir}/translations/sailfish_components_webview_qt5_eng_en.qm
 %{_datadir}/translations/sailfish_components_webview_controls_qt5_eng_en.qm
