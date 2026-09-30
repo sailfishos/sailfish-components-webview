@@ -236,7 +236,7 @@ RawWebView {
         height: webview.height
 
         opacity: 0
-        color: Theme.colorScheme === Theme.LightOnDark ? "black" : "white"
+        color: webview.backgroundColor
 
         NumberAnimation on opacity {
             id: orientationFadeOut
