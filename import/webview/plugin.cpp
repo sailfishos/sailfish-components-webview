@@ -80,7 +80,11 @@ public:
         m_shutdownWatchdog.setSingleShot(true);
         connect(&m_shutdownWatchdog, &QTimer::timeout, this, [this]() {
             qWarning() << "Timed out waiting for WebEngine shutdown";
+            m_shutdownTimedOut = true;
             restoreQuitOnLastWindowClosed();
+            if (m_quitAfterShutdown) {
+                QCoreApplication::quit();
+            }
         });
     }
 
@@ -95,7 +99,8 @@ public:
     {
         if (event->type() == QEvent::Close) {
             QWindow *window = qobject_cast<QWindow *>(object);
-            if (window && isLastVisibleWindow(window)) {
+            if (window && isLastVisibleWindow(window)
+                    && m_webEngine && !m_contextDestroyed && !m_shutdownTimedOut) {
                 scheduleShutdown(true);
                 // Keep the scene graph alive until hosted Gecko windows have
                 // drained. The contextDestroyed handler will quit the application.
@@ -153,14 +158,22 @@ private:
 
     void scheduleShutdown(bool quitAfterShutdown)
     {
+        // Engine destruction can start shutdown before the user closes the
+        // last window. Keep that later quit request even during shutdown.
+        m_quitAfterShutdown = m_quitAfterShutdown || quitAfterShutdown;
+        if (m_contextDestroyed || m_shutdownTimedOut || !m_webEngine) {
+            if (m_quitAfterShutdown) {
+                restoreQuitOnLastWindowClosed();
+                QCoreApplication::quit();
+            }
+            return;
+        }
+        if (m_quitAfterShutdown) {
+            disableQuitOnLastWindowClosed();
+        }
         if (m_shutdownScheduled || m_shutdownStarted || m_shutdownInProgress
                 || m_contextDestroyed || !m_webEngine) {
             return;
-        }
-
-        m_quitAfterShutdown = quitAfterShutdown;
-        if (quitAfterShutdown) {
-            disableQuitOnLastWindowClosed();
         }
 
         m_shutdownScheduled = true;
@@ -269,6 +282,7 @@ private:
     QTimer m_shutdownWatchdog;
     QEventLoop *m_waitLoop = nullptr;
     bool m_shutdownStarted = false;
+    bool m_shutdownTimedOut = false;
     bool m_shutdownInProgress = false;
     bool m_shutdownScheduled = false;
     bool m_quitAfterShutdown = false;
