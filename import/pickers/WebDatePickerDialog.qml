@@ -28,14 +28,12 @@ DatePickerDialog {
     property var timeMinimum
     property var timeMaximum
     property bool _completed
-    property bool _transferred
 
     date: _initialDate()
     canAccept: _isSelectable(selectedDate)
     acceptDestination: dateTime ? Qt.resolvedUrl("WebTimePickerDialog.qml") : undefined
     acceptDestinationAction: PageStackAction.Replace
     acceptDestinationProperties: ({ "winId": winId, "requestId": requestId,
-                                   "requestState": requestState, "contentItem": contentItem,
                                    "dateTime": true, "selectedDate": selectedDate,
                                    "timeValue": timeValue, "timeMinimum": timeMinimum,
                                    "timeMaximum": timeMaximum, "stepValue": stepValue,
@@ -99,36 +97,22 @@ DatePickerDialog {
     }
 
     function _nearestSelectable(milliseconds) {
-        var minimum = _number(minimumValue)
-        var maximum = _number(maximumValue)
+        // A datetime day need not have a valid midnight. Keep it if any time
+        // within its bounds is selectable, rather than rounding into yesterday.
+        if (_isSelectable(_localDate(milliseconds))) return milliseconds
+
+        var minimum = _number(dateTime ? timeMinimum : minimumValue)
+        var maximum = _number(dateTime ? timeMaximum : maximumValue)
         var step = _number(stepValue)
         var base = _number(stepBase)
-
-        if (!isNaN(minimum)) {
-            milliseconds = Math.max(milliseconds, minimum)
-        }
-        if (!isNaN(maximum)) {
-            milliseconds = Math.min(milliseconds, maximum)
-        }
-
+        if (isNaN(base)) base = 0
         if (!isNaN(step) && step > 0) {
-            if (isNaN(base)) {
-                base = 0
-            }
-            var remainder = ((milliseconds - base) % step + step) % step
-            if (remainder !== 0) {
-                var lower = milliseconds - remainder
-                var upper = lower + step
-                var lowerValid = isNaN(minimum) || lower >= minimum
-                var upperValid = isNaN(maximum)
-                        || upper <= maximum + (dateTime ? 86400000 - 1 : 0)
-                if (lowerValid && (!upperValid || remainder <= step - remainder)) {
-                    milliseconds = lower
-                } else if (upperValid) {
-                    milliseconds = upper
-                }
-            }
+            minimum = base + Math.ceil((minimum - base) / step) * step
+            maximum = base + Math.floor((maximum - base) / step) * step
+            milliseconds = base + Math.round((milliseconds - base) / step) * step
         }
+        if (!isNaN(minimum)) milliseconds = Math.max(milliseconds, minimum)
+        if (!isNaN(maximum)) milliseconds = Math.min(milliseconds, maximum)
         return milliseconds
     }
 
@@ -149,12 +133,12 @@ DatePickerDialog {
 
         var milliseconds = _dateMilliseconds(value.getFullYear(), value.getMonth() + 1,
                                               value.getDate())
-        var minimum = _number(minimumValue)
-        var maximum = _number(maximumValue)
-        if ((!isNaN(minimum) && milliseconds < minimum)
-                || (!isNaN(maximum) && milliseconds > maximum)) {
-            return false
-        }
+        var minimum = _number(dateTime ? timeMinimum : minimumValue)
+        var maximum = _number(dateTime ? timeMaximum : maximumValue)
+        var first = milliseconds
+        var last = milliseconds + (dateTime ? 86400000 - 1 : 0)
+        if (!isNaN(minimum)) first = Math.max(first, minimum)
+        if (!isNaN(maximum)) last = Math.min(last, maximum)
 
         var step = _number(stepValue)
         if (!isNaN(step) && step > 0) {
@@ -162,13 +146,9 @@ DatePickerDialog {
             if (isNaN(base)) {
                 base = 0
             }
-            var lastStep = Math.floor((milliseconds + 86400000 - 1 - base) / step)
-                    * step + base
-            if (dateTime ? lastStep < milliseconds : (milliseconds - base) % step !== 0) {
-                return false
-            }
+            first = base + Math.ceil((first - base) / step) * step
         }
-        return true
+        return first <= last
     }
 
     function _sendResponse(accepted, value) {
@@ -209,17 +189,21 @@ DatePickerDialog {
     }
 
     Component.onDestruction: {
-        if (!_completed && !_transferred) {
+        if (!_completed) {
             _finish(false, new Date(NaN))
         }
-        if (requestState && !_transferred) requestState.release()
+        if (requestState) requestState.release()
     }
 
     onAccepted: {
-        _transferred = dateTime
         if (dateTime) {
-            // The forward page can be created before the calendar selection changes.
-            acceptDestinationInstance.selectedDate = selectedDate
+            // Silica may destroy/recreate the preview when the year menu opens.
+            // Only the accepted clock takes ownership of the live web request.
+            acceptDestinationInstance.initialize(selectedDate)
+            acceptDestinationInstance.contentItem = contentItem
+            acceptDestinationInstance.requestState = requestState
+            requestState = null
+            _completed = true
         } else {
             _finish(true, selectedDate)
         }

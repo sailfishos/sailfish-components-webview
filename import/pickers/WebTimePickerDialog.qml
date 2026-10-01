@@ -29,9 +29,8 @@ Dialog {
     property bool dateTime
     property date selectedDate
     property bool _completed
-    readonly property real _initialMilliseconds: _initialTime()
-    readonly property int _second: Math.floor(_initialMilliseconds / 1000) % 60
-    readonly property int _millisecond: _initialMilliseconds % 1000
+    property int _second
+    property int _millisecond
 
     allowedOrientations: Orientation.All
     canAccept: _isSelectable(clock.hour, clock.minute)
@@ -119,8 +118,17 @@ Dialog {
         return isNaN(step) || step <= 0 || (value - base) % step === 0
     }
 
+    function initialize(date) {
+        selectedDate = date
+        var milliseconds = _initialTime()
+        _second = Math.floor(milliseconds / 1000) % 60
+        _millisecond = milliseconds % 1000
+        clock.hour = Math.floor(milliseconds / 3600000)
+        clock.minute = Math.floor(milliseconds / 60000) % 60
+    }
+
     function _finish(accepted) {
-        if (_completed) return
+        if (_completed || !requestState) return
         _completed = true
         if (contentItem) {
             contentItem.sendAsyncMessage("embedui:datepickerresponse", {
@@ -158,8 +166,6 @@ Dialog {
                 id: clock
 
                 anchors.horizontalCenter: parent.horizontalCenter
-                hour: Math.floor(timePickerDialog._initialMilliseconds / 3600000)
-                minute: Math.floor(timePickerDialog._initialMilliseconds / 60000) % 60
 
                 Label {
                     anchors.centerIn: parent
@@ -185,6 +191,7 @@ Dialog {
 
     onAccepted: _finish(true)
     onRejected: _finish(false)
+    Component.onCompleted: initialize(selectedDate)
     Component.onDestruction: {
         if (!_completed) _finish(false)
         if (requestState) requestState.release()

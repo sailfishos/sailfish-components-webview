@@ -19,7 +19,8 @@ const DAY = 86400000;
 const start = Date.UTC(2026, 8, 17);
 function picker(values) {
   const context = vm.createContext({ initialValue: '2026-09-17', dateTime: false,
-    minimumValue: null, maximumValue: null, stepValue: null, stepBase: null,
+    minimumValue: null, maximumValue: null, timeMinimum: null, timeMaximum: null,
+    stepValue: null, stepBase: null,
     ...values });
   vm.runInContext(functions, context);
   return context;
@@ -39,7 +40,8 @@ assert.equal(native._isSelectable(date(2026, 9, 19)), true);
 assert.equal(native._isSelectable(date(2026, 9, 20)), false);
 
 const datetime = picker({ dateTime: true, minimumValue: start,
-  maximumValue: start + 2 * DAY, stepValue: 2 * DAY,
+  maximumValue: start + 2 * DAY, timeMinimum: start + DAY / 2,
+  timeMaximum: start + 2 * DAY + 18 * 3600000, stepValue: 2 * DAY,
   stepBase: start + DAY / 2 });
 assert.equal(datetime._isSelectable(date(2026, 9, 17)), true);
 assert.equal(datetime._isSelectable(date(2026, 9, 18)), false);
@@ -56,7 +58,8 @@ for (const step of [60000, 37 * 60000, null]) {
   assert.equal(fractionalDay._isSelectable(date(2026, 9, 17)), true);
 }
 const beforeEpoch = picker({ dateTime: true, initialValue: '1969-12-31',
-  minimumValue: -DAY, maximumValue: -DAY, stepValue: DAY, stepBase: -DAY / 2 });
+  minimumValue: -DAY, maximumValue: -DAY, timeMinimum: -DAY,
+  timeMaximum: -1, stepValue: DAY, stepBase: -DAY / 2 });
 assert.equal(beforeEpoch._isSelectable(beforeEpoch._initialDate()), true);
 assert.equal(beforeEpoch._initialDate().getFullYear(), 1969);
 const ancient = picker({ initialValue: '0001-01-01' });
@@ -109,3 +112,109 @@ assert.equal(time.initial, DAY - 100);
 assert.equal(time.context._second, 59);
 assert.equal(time.context._millisecond, 900);
 console.log('Native clock precision, bounds, overnight ranges and step constraints passed');
+
+// A valid datetime day must survive initialization even when midnight is off-step.
+for (const step of [DAY, 37 * 60000]) {
+  const calendar = picker({ dateTime: true, initialValue: '2026-09-17',
+    timeMinimum: null, timeMaximum: null, stepValue: step, stepBase: start + DAY / 2 });
+  assert.equal(calendar._initialDate().getDate(), 17);
+}
+// A boundary day needs a step inside the actual time bounds, not merely that day.
+const bounded = picker({ dateTime: true, initialValue: '2026-09-18',
+  timeMinimum: start + DAY / 2, timeMaximum: start + DAY + 10 * 3600000,
+  minimumValue: start, maximumValue: start + DAY, stepValue: DAY,
+  stepBase: start + DAY / 2 });
+assert.equal(bounded._isSelectable(date(2026, 9, 17)), true);
+assert.equal(bounded._isSelectable(date(2026, 9, 18)), false);
+assert.equal(bounded._initialDate().getDate(), 17);
+assert.equal(bounded._isSelectable(bounded._initialDate()), true);
+bounded.timeMinimum = start + 13 * 3600000;
+assert.equal(bounded._isSelectable(date(2026, 9, 17)), false);
+
+// Execute the production signal handlers as well as the constraint functions.
+function handler(qml, name) {
+  const match = qml.match(new RegExp('^    ' + name + ': \\{([\\s\\S]*?)^    \\}', 'm'));
+  assert.ok(match, name);
+  return match[1];
+}
+function productionFunctions(qml) {
+  return [...qml.matchAll(/^    function \w+\([^\n]*\) \{[\s\S]*?^    \}/gm)]
+    .map(match => match[0]).join('\n');
+}
+const replies = [];
+let releases = 0;
+const request = { active: true, release() { ++releases; } };
+const contentItem = { sendAsyncMessage(topic, data) { replies.push({ topic, data }); } };
+function timePage(dateTime = true) {
+  const page = vm.createContext({ dateTime, selectedDate: date(2026, 9, 17),
+    timeValue: '2026-09-17T19:00', timeMinimum: start + 18 * 3600000,
+    timeMaximum: start + DAY + 12 * 3600000, stepValue: 60000, stepBase: 0,
+    requestState: null, contentItem: null, _completed: false,
+    winId: 42, requestId: 'test', clock: {} });
+  vm.runInContext(productionFunctions(timeSource), page);
+  page.initialize(page.selectedDate);
+  return page;
+}
+const calendar = vm.createContext({ dateTime: true, selectedDate: date(2026, 9, 18),
+  requestState: request, contentItem, _completed: false });
+vm.runInContext(productionFunctions(source), calendar);
+// Silica prepares the forward page, then destroys it to open the year menu.
+let preview = timePage();
+assert.equal(preview.clock.hour, 19);
+vm.runInContext(handler(timeSource, 'Component.onDestruction'), preview);
+assert.equal(replies.length, 0);
+assert.equal(releases, 0);
+// Returning from the year menu recreates the preview with the old initial date.
+preview = timePage();
+calendar.acceptDestinationInstance = preview;
+vm.runInContext(handler(source, 'onAccepted'), calendar);
+assert.equal(preview.selectedDate.getDate(), 18);
+assert.equal(preview.clock.hour, 12, 'Handoff resets the clock to the new day bounds');
+assert.equal(preview.clock.minute, 0);
+assert.equal(preview._isSelectable(preview.clock.hour, preview.clock.minute), true);
+assert.equal(preview.requestState, request);
+assert.equal(calendar.requestState, null);
+vm.runInContext(handler(source, 'Component.onDestruction'), calendar);
+assert.equal(releases, 0, 'Replacing the calendar leaves the clock request alive');
+preview._finish(true);
+vm.runInContext(handler(timeSource, 'Component.onDestruction'), preview);
+assert.equal(replies.length, 1);
+assert.equal(replies[0].data.accepted, true);
+assert.equal(replies[0].data.day, 18);
+assert.equal(replies[0].data.hour, 12);
+assert.equal(releases, 1);
+// Cancelling a standalone clock, or aborting during transition, answers once.
+for (const abort of [false, true]) {
+  const page = timePage(false);
+  page.requestState = { active: !abort, release() { ++releases; } };
+  page.contentItem = contentItem;
+  if (abort) {
+    page.status = 1;
+    page.PageStatus = { Active: 1 };
+    let pops = 0;
+    page.pageStack = { busy: true, pop() { ++pops; } };
+    page.closeCancelledRequest();
+    assert.equal(pops, 0);
+    page.pageStack.busy = false;
+    page.closeCancelledRequest();
+    assert.equal(pops, 1);
+  } else {
+    page._finish(false);
+  }
+  vm.runInContext(handler(timeSource, 'Component.onDestruction'), page);
+}
+assert.equal(replies.length, 3);
+assert.equal(releases, 3);
+assert.equal(replies[1].data.accepted, false);
+assert.equal(replies[2].data.accepted, false);
+const cancelledCalendar = vm.createContext({ dateTime: true, requestState: request,
+  contentItem, _completed: false, winId: 42, requestId: 'cancel' });
+vm.runInContext(productionFunctions(source), cancelledCalendar);
+const cancelledPreview = timePage();
+vm.runInContext(handler(source, 'onRejected'), cancelledCalendar);
+vm.runInContext(handler(source, 'Component.onDestruction'), cancelledCalendar);
+vm.runInContext(handler(timeSource, 'Component.onDestruction'), cancelledPreview);
+assert.equal(replies.length, 4, 'Calendar cancellation and preview destruction answer once');
+assert.equal(replies[3].data.accepted, false);
+assert.equal(releases, 4);
+console.log('Calendar boundary days, year-menu lifetime and clock handoff regressions passed');
