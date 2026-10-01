@@ -3,10 +3,12 @@ type to allow client applications to easily embed the Sailfish OS
 Browser WebView into their own application in order to render web
 webcontent.
 
-Note: currently you have to explicitly link against qtmozembed-qt5
-at build time, to avoid a symbol issue which leads to a crash:
+Applications which use WebView only from QML do not need to link against a
+WebEngine library. Applications which use the SailfishOS::WebEngine or
+SailfishOS::WebEngineSettings C++ APIs should link against the stable Sailfish
+WebEngine library:
 CONFIG += link_pkgconfig
-PKGCONFIG += qt5embedwidget
+PKGCONFIG += sailfishwebengine
 
 Example:
 

@@ -16,7 +16,7 @@
 
 #include <QtQml/QQmlExtensionPlugin>
 
-//mozembedlite-qt5
+// qtmozembed-qt5
 #include <quickmozview.h>
 
 namespace SailfishOS {

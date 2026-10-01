@@ -12,13 +12,9 @@
 
 // This file is used only for documentation purposes
 
-// These items are all part of QMozEngineSettings, but inherited by
-// WebEngineSettings, so we take some notational liberty and present them
-// as part of the the subclass.
-
 namespace SailfishOS {
 
-class WebEngineSettings : public QMozEngineSettings {
+class WebEngineSettings : public QObject {
     Q_OBJECT
     Q_PROPERTY(bool initialized READ isInitialized NOTIFY initialized)
     Q_PROPERTY(bool autoLoadImages READ autoLoadImages WRITE setAutoLoadImages NOTIFY autoLoadImagesChanged FINAL)
@@ -85,7 +81,7 @@ public:
     QString downloadDir() const;
     void setDownloadDir(const QString &downloadDir);
 
-    void setTileSize(const QSize &size);
+    QT_DEPRECATED void setTileSize(const QSize &size);
 
     void setPixelRatio(qreal pixelRatio);
     qreal pixelRatio() const;
@@ -96,8 +92,8 @@ public:
     ColorScheme colorScheme() const;
     void setColorScheme(ColorScheme colorScheme);
 
-    void enableProgressivePainting(bool enabled);
-    void enableLowPrecisionBuffers(bool enabled);
+    QT_DEPRECATED void enableProgressivePainting(bool enabled);
+    QT_DEPRECATED void enableLowPrecisionBuffers(bool enabled);
 
     // Low-level API to set engine preferences.
     Q_INVOKABLE void setPreference(const QString &key, const QVariant &value);
@@ -112,6 +108,8 @@ Q_SIGNALS:
     void downloadDirChanged();
     void initialized();
     void pixelRatioChanged();
+    void doNotTrackChanged();
+    void colorSchemeChanged();
 };
 
 } // namespace SailfishOS

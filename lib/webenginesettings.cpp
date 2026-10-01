@@ -13,6 +13,8 @@
 #include "webenginesettings.h"
 #include "webenginesettings_p.h"
 
+#include <qmozenginesettings.h>
+
 #include <silicatheme.h>
 
 #include <QtCore/QFile>
@@ -84,7 +86,6 @@ SailfishOS::WebEngineSettingsPrivate::~WebEngineSettingsPrivate()
 {
 }
 
-
 /*!
     \brief Initialises the WebEngineSettings class.
 
@@ -134,7 +135,7 @@ void SailfishOS::WebEngineSettings::initialize()
     if (engineSettings->isInitialized()) {
         engineSettings->d->notifyColorSchemeChanged();
     } else {
-        connect(engineSettings, &QMozEngineSettings::initialized,
+        connect(engineSettings, &SailfishOS::WebEngineSettings::initialized,
                 engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::notifyColorSchemeChanged);
     }
     connect(silicaTheme, &Silica::Theme::colorSchemeChanged,
@@ -148,14 +149,6 @@ void SailfishOS::WebEngineSettings::initialize()
     webEngine->addObserver(QStringLiteral("embedliteviewcreated"));
 
     isInitialized = true;
-
-    // Guard preferences that should be written only once. If a preference needs to be
-    // forcefully written upon each start that should happen before this.
-    QString appConfig = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QFile markerFile(QString("%1/__PREFS_WRITTEN__").arg(appConfig));
-    if (markerFile.exists()) {
-        return;
-    }
 
     qreal pixelRatio = SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO * silicaTheme->pixelRatio();
     // Round to nearest even rounding factor
@@ -175,13 +168,14 @@ void SailfishOS::WebEngineSettings::initialize()
 
     engineSettings->setPixelRatio(pixelRatio);
 
-    // Standard settings.
-    // TODO: Fix this so that it can be applied during runtime when QQuickItem based WebView is used with QQuickFlickable.
-    // At the moment just disable it to avoid unnecessary events being fired. JB#39581
-#if 0
-    engineSettings->setPreference(QStringLiteral("apz.asyncscroll.throttle"), QVariant::fromValue<int>(15));
-    engineSettings->setPreference(QStringLiteral("apz.asyncscroll.timeout"), QVariant::fromValue<int>(15));
-#endif
+    // Guard preferences that should be written only once. If a preference needs to be
+    // forcefully written upon each start that should happen before this.
+    QString appConfig = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QFile markerFile(QString("%1/__PREFS_WRITTEN__").arg(appConfig));
+    if (markerFile.exists()) {
+        return;
+    }
+
     engineSettings->setPreference(QStringLiteral("apz.fling_stopped_threshold"), QLatin1String("0.13"));
 
     // Theme settings.
@@ -197,27 +191,6 @@ void SailfishOS::WebEngineSettings::initialize()
         qCInfo(lcWebengineLog) << "Lower memory: disabling wasm_baselinejit";
         engineSettings->setPreference(QStringLiteral("javascript.options.wasm_baselinejit"), false);
     }
-
-    // DPI is passed to Gecko's View and APZTreeManager.
-    // Touch tolerance is calculated with formula: dpi * tolerance = pixel threshold
-    const int dragThreshold = QGuiApplication::styleHints()->startDragDistance();
-    qreal touchStartTolerance = dragThreshold / QGuiApplication::primaryScreen()->physicalDotsPerInch();
-    engineSettings->setPreference(QString("apz.touch_start_tolerance"), QString("%1").arg(touchStartTolerance));
-
-    int tileSize = screenWidth;
-
-    // With bigger than FullHD screen fill with two tiles in row (portrait).
-    // Landscape will be filled with same tile size.
-    if (screenWidth > 1080) {
-        tileSize = screenWidth / 2;
-    }
-    engineSettings->setTileSize(QSize(tileSize, tileSize));
-
-    // Zooming related preferences.
-    engineSettings->setPreference(QStringLiteral("embedlite.zoomMargin"),
-                                  QVariant::fromValue<qreal>(silicaTheme->paddingMedium()));
-    engineSettings->setPreference(QStringLiteral("embedlite.inputItemSize"),
-                                  QVariant::fromValue<qreal>(silicaTheme->fontSizeSmall()));
 
     engineSettings->setPreference(QStringLiteral("browser.enable_automatic_image_resizing"),
                                   QVariant::fromValue<bool>(true));

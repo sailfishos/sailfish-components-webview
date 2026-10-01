@@ -15,15 +15,12 @@
 #include <QtCore/QMargins>
 #include <QtQuick/QQuickItem>
 
-//mozembedlite-qt5
+// qtmozembed-qt5
 #include <quickmozview.h>
-#include <memory>
 
 namespace SailfishOS {
 
 namespace WebView {
-
-class ViewCreator;
 
 class RawWebView : public QuickMozView
 {
@@ -73,13 +70,11 @@ signals:
     void safeAreaChanged();
     void contentOrientationChanged(Qt::ScreenOrientation orientation);
     void acceptTouchEventsChanged();
-    void openUrlInNewWindow();
 
 private:
     void applySafeAreaInsets(const QMargins &insets);
     void onAsyncMessage(const QString &message, const QVariant &data);
 
-    std::shared_ptr<ViewCreator> m_viewCreator;
     qreal m_vkbMargin;
     qreal m_footerMargin;
     QMargins m_safeAreaInsets;

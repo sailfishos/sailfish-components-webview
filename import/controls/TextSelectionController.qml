@@ -35,7 +35,6 @@ MouseArea {
     // keep selection range we get from engine to move the draggers with
     // selection together when panning or zooming
     property var _cssRange
-    property var _selectionData
 
     property bool _phoneNumberSelected
 
@@ -44,9 +43,6 @@ MouseArea {
 
     function selectionRangeUpdated(data) {
         var resolution = contentItem.resolution
-        start.lineHeight = data.start.height * resolution
-        end.lineHeight = data.end.height * resolution
-
         var startHeightShift = data.start.height / 2
         var endHeightShift = data.end.height / 2
 
@@ -89,7 +85,6 @@ MouseArea {
             "visualViewport": visualViewport
         }
 
-        _selectionData = data
         selectionVisible = true
 
         text = data.text || ""
@@ -123,9 +118,10 @@ MouseArea {
         }
     }
 
+    // Retained for callers which forward Content:SelectionSwap. Gecko updates
+    // the selection endpoints and a subsequent range update repositions the
+    // handles, so no local action is required.
     function swap() {
-        // Should we implement this?
-        // Feels rather good this way as well.
     }
 
     function clearSelection() {

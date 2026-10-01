@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 Jolla Ltd.
-** Contact: Raine Makelainen <raine.makelaine@jolla.com>
+** Copyright (c) 2016 - 2022 Jolla Ltd.
+** Copyright (c) 2024 - 2026 Jolla Mobile Ltd
 **
 ****************************************************************************/
 

@@ -42,6 +42,13 @@ namespace WebView {
 
 namespace {
 
+QEvent::Type shutdownEventType()
+{
+    static const QEvent::Type type = static_cast<QEvent::Type>(
+            QEvent::registerEventType());
+    return type;
+}
+
 class WebViewShutdownController : public QObject
 {
 public:
@@ -73,7 +80,11 @@ public:
         m_shutdownWatchdog.setSingleShot(true);
         connect(&m_shutdownWatchdog, &QTimer::timeout, this, [this]() {
             qWarning() << "Timed out waiting for WebEngine shutdown";
+            m_shutdownTimedOut = true;
             restoreQuitOnLastWindowClosed();
+            if (m_quitAfterShutdown) {
+                QCoreApplication::quit();
+            }
         });
     }
 
@@ -88,12 +99,25 @@ public:
     {
         if (event->type() == QEvent::Close) {
             QWindow *window = qobject_cast<QWindow *>(object);
-            if (window && isLastVisibleWindow(window)) {
+            if (window && isLastVisibleWindow(window)
+                    && m_webEngine && !m_contextDestroyed && !m_shutdownTimedOut) {
                 scheduleShutdown(true);
+                // Keep the scene graph alive until hosted Gecko windows have
+                // drained. The contextDestroyed handler will quit the application.
+                return true;
             }
         }
 
         return QObject::eventFilter(object, event);
+    }
+
+    bool event(QEvent *event) override
+    {
+        if (event->type() == shutdownEventType()) {
+            shutdown();
+            return true;
+        }
+        return QObject::event(event);
     }
 
 private:
@@ -134,30 +158,36 @@ private:
 
     void scheduleShutdown(bool quitAfterShutdown)
     {
+        // Engine destruction can start shutdown before the user closes the
+        // last window. Keep that later quit request even during shutdown.
+        m_quitAfterShutdown = m_quitAfterShutdown || quitAfterShutdown;
+        if (m_contextDestroyed || m_shutdownTimedOut || !m_webEngine) {
+            if (m_quitAfterShutdown) {
+                restoreQuitOnLastWindowClosed();
+                QCoreApplication::quit();
+            }
+            return;
+        }
+        if (m_quitAfterShutdown) {
+            disableQuitOnLastWindowClosed();
+        }
         if (m_shutdownScheduled || m_shutdownStarted || m_shutdownInProgress
                 || m_contextDestroyed || !m_webEngine) {
             return;
         }
 
-        m_quitAfterShutdown = quitAfterShutdown;
-        if (quitAfterShutdown) {
-            disableQuitOnLastWindowClosed();
-        }
-
         m_shutdownScheduled = true;
-        QTimer::singleShot(0, this, [this]() {
-            shutdown();
-        });
+        QCoreApplication::postEvent(this, new QEvent(shutdownEventType()));
     }
 
-    bool hasGeckoViews() const
+    bool hasGeckoWindows() const
     {
-        return QMozContext::instance()->getNumberOfViews() != 0;
+        return QMozContext::instance()->getNumberOfWindows() != 0;
     }
 
     void destroyViewsAndWait()
     {
-        if ((!RawWebView::hasLiveViews() && !hasGeckoViews()) || !m_webEngine) {
+        if ((!RawWebView::hasLiveViews() && !hasGeckoWindows()) || !m_webEngine) {
             return;
         }
 
@@ -165,22 +195,22 @@ private:
         QTimer watchdog;
         watchdog.setSingleShot(true);
         connect(&watchdog, &QTimer::timeout, &waitLoop, &QEventLoop::quit);
-        connect(m_webEngine, &SailfishOS::WebEngine::lastViewDestroyed,
+        connect(m_webEngine, &SailfishOS::WebEngine::lastWindowDestroyed,
                 &waitLoop, &QEventLoop::quit);
 
         RawWebView::destroyLiveViews();
         QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
         QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 
-        if (RawWebView::hasLiveViews() || hasGeckoViews()) {
+        if (RawWebView::hasLiveViews() || hasGeckoWindows()) {
             watchdog.start(2000);
             waitLoop.exec(QEventLoop::ExcludeUserInputEvents);
             QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
             QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
         }
 
-        if (RawWebView::hasLiveViews() || hasGeckoViews()) {
-            qWarning() << "Timed out waiting for WebView items to be destroyed";
+        if (RawWebView::hasLiveViews() || hasGeckoWindows()) {
+            qWarning() << "Timed out waiting for hosted WebView windows to close";
         }
     }
 
@@ -252,6 +282,7 @@ private:
     QTimer m_shutdownWatchdog;
     QEventLoop *m_waitLoop = nullptr;
     bool m_shutdownStarted = false;
+    bool m_shutdownTimedOut = false;
     bool m_shutdownInProgress = false;
     bool m_shutdownScheduled = false;
     bool m_quitAfterShutdown = false;
@@ -302,14 +333,6 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
     SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
 
     SailfishOS::WebEngineSettings::initialize();
-    SailfishOS::WebEngineSettings *engineSettings = SailfishOS::WebEngineSettings::instance();
-
-    // For some yet unknown reason QmlMozView crashes when
-    // flicking quickly if progressive-paint is enabled.
-    engineSettings->setPreference("layers.progressive-paint", QVariant::fromValue<bool>(false));
-    // Disable low-precision-buffer so that background underdraw works
-    // correctly.
-    engineSettings->setPreference("layers.low-precision-buffer", QVariant::fromValue<bool>(false));
 
     shutdownController(webEngine)->watchEngine(engine);
 
@@ -382,8 +405,12 @@ void SailfishOSWebViewPlugin::initUserAgentOverrides(const QString &path)
         }
         if (changed) {
             // Content changed so write it
-            destFile.seek(0);
-            destFile.write(sourceDoc.toJson());
+            const QByteArray data = QJsonDocument(dest).toJson();
+            if (!destFile.resize(0)
+                    || !destFile.seek(0)
+                    || destFile.write(data) != data.size()) {
+                qWarning() << "Could not write" << destFile.fileName();
+            }
         }
         destFile.close();
     } else {

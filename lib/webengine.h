@@ -1,8 +1,7 @@
 /****************************************************************************
 **
-** Copyright (c) 2016 Jolla Ltd.
-** Copyright (c) 2020 Open Mobile Platform LLC.
-** Contact: Raine Makelainen <raine.makelaine@jolla.com>
+** Copyright (c) 2016 - 2021 Jolla Ltd.
+** Copyright (c) 2024 - 2026 Jolla Mobile Ltd
 **
 ****************************************************************************/
 
@@ -15,6 +14,9 @@
 
 #include <QObject>
 #include <QString>
+#include <QUrl>
+#include <string>
+#include <vector>
 #include <qmozcontext.h>
 
 #ifndef Q_QDOC
@@ -30,6 +32,10 @@ public:
 
     explicit WebEngine(QObject *parent = 0);
     virtual ~WebEngine();
+
+public slots:
+    void addUserStyleSheet(const QUrl &url);
+    void removeUserStyleSheet(const QUrl &url);
 };
 
 }

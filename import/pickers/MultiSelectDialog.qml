@@ -16,8 +16,34 @@ Dialog {
     id: selectDialog
 
     // input data
+    property QtObject requestState
+    property string requestId
     property var options
     property QtObject contentItem
+
+    Component.onDestruction: {
+        if (requestState) requestState.release()
+    }
+
+    function closeCancelledRequest() {
+        if (requestState && !requestState.active
+                && status === PageStatus.Active && !pageStack.busy) {
+            contentItem.sendAsyncMessage("embedui:selectresponse", {"id": requestId, "result": -1})
+            pageStack.pop()
+        }
+    }
+
+    onStatusChanged: closeCancelledRequest()
+
+    Connections {
+        target: requestState
+        onActiveChanged: selectDialog.closeCancelledRequest()
+    }
+
+    Connections {
+        target: pageStack
+        onBusyChanged: selectDialog.closeCancelledRequest()
+    }
 
     onOpened: {
         for (var i=0; i < options.length; i++) {
@@ -36,17 +62,15 @@ Dialog {
                 "index": item.index
             })
         }
-        contentItem.sendAsyncMessage("embedui:selectresponse", {"result": result})
+        contentItem.sendAsyncMessage("embedui:selectresponse", {"id": requestId, "result": result})
     }
 
     onRejected: {
-        contentItem.sendAsyncMessage("embedui:selectresponse", {"result": -1})
+        contentItem.sendAsyncMessage("embedui:selectresponse", {"id": requestId, "result": -1})
     }
 
     ListModel {
         id: selectModel
-
-        property int selectedIndex: -1
     }
 
     SilicaListView {

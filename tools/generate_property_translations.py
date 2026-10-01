@@ -3,7 +3,7 @@
 # Generates translation strings from gecko property files for lupdate
 # to process
 
-import os, os.path, sys, re, dataclasses, functools, argparse
+import sys, re, dataclasses, argparse
 
 DEFAULT_PREFIX = "sailfish_components_webview_popups-la"
 

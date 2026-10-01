@@ -16,8 +16,34 @@ Page {
     id: selectPage
 
     // input data
+    property QtObject requestState
+    property string requestId
     property var options
     property QtObject contentItem
+
+    Component.onDestruction: {
+        if (requestState) requestState.release()
+    }
+
+    function closeCancelledRequest() {
+        if (requestState && !requestState.active
+                && status === PageStatus.Active && !pageStack.busy) {
+            contentItem.sendAsyncMessage("embedui:selectresponse", {"id": requestId, "result": -1})
+            pageStack.pop()
+        }
+    }
+
+    onStatusChanged: closeCancelledRequest()
+
+    Connections {
+        target: requestState
+        onActiveChanged: selectPage.closeCancelledRequest()
+    }
+
+    Connections {
+        target: pageStack
+        onBusyChanged: selectPage.closeCancelledRequest()
+    }
 
     Component.onCompleted: {
         for (var i=0; i < options.length; i++) {
@@ -39,14 +65,14 @@ Page {
                 "index": item.index
             })
         }
-        contentItem.sendAsyncMessage("embedui:selectresponse", {"result": result})
+        contentItem.sendAsyncMessage("embedui:selectresponse", {"id": requestId, "result": result})
         pageStack.pop()
     }
 
     on_NavigationChanged: {
         if (_navigation == PageNavigation.Back) {
             // swiped back
-            contentItem.sendAsyncMessage("embedui:selectresponse", {"result": -1})
+            contentItem.sendAsyncMessage("embedui:selectresponse", {"id": requestId, "result": -1})
         }
     }
 
