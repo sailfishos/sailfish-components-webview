@@ -23,10 +23,23 @@ DatePickerDialog {
     property var maximumValue
     property var stepValue
     property var stepBase
+    property bool dateTime
+    property var timeValue
+    property var timeMinimum
+    property var timeMaximum
     property bool _completed
+    property bool _transferred
 
     date: _initialDate()
     canAccept: _isSelectable(selectedDate)
+    acceptDestination: dateTime ? Qt.resolvedUrl("WebTimePickerDialog.qml") : undefined
+    acceptDestinationAction: PageStackAction.Replace
+    acceptDestinationProperties: ({ "winId": winId, "requestId": requestId,
+                                   "requestState": requestState, "contentItem": contentItem,
+                                   "dateTime": true, "selectedDate": selectedDate,
+                                   "timeValue": timeValue, "timeMinimum": timeMinimum,
+                                   "timeMaximum": timeMaximum, "stepValue": stepValue,
+                                   "stepBase": stepBase })
 
     function closeCancelledRequest() {
         if (requestState && !requestState.active
@@ -107,7 +120,8 @@ DatePickerDialog {
                 var lower = milliseconds - remainder
                 var upper = lower + step
                 var lowerValid = isNaN(minimum) || lower >= minimum
-                var upperValid = isNaN(maximum) || upper <= maximum
+                var upperValid = isNaN(maximum)
+                        || upper <= maximum + (dateTime ? 86400000 - 1 : 0)
                 if (lowerValid && (!upperValid || remainder <= step - remainder)) {
                     milliseconds = lower
                 } else if (upperValid) {
@@ -148,7 +162,9 @@ DatePickerDialog {
             if (isNaN(base)) {
                 base = 0
             }
-            if ((milliseconds - base) % step !== 0) {
+            var lastStep = Math.floor((milliseconds + 86400000 - 1 - base) / step)
+                    * step + base
+            if (dateTime ? lastStep < milliseconds : (milliseconds - base) % step !== 0) {
                 return false
             }
         }
@@ -193,14 +209,20 @@ DatePickerDialog {
     }
 
     Component.onDestruction: {
-        if (!_completed) {
+        if (!_completed && !_transferred) {
             _finish(false, new Date(NaN))
         }
-        if (requestState) requestState.release()
+        if (requestState && !_transferred) requestState.release()
     }
 
     onAccepted: {
-        _finish(true, selectedDate)
+        _transferred = dateTime
+        if (dateTime) {
+            // The forward page can be created before the calendar selection changes.
+            acceptDestinationInstance.selectedDate = selectedDate
+        } else {
+            _finish(true, selectedDate)
+        }
     }
 
     onRejected: {

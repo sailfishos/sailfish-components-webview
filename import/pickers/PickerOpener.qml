@@ -31,6 +31,7 @@ QtObject {
     readonly property string _singleSelectComponentUrl: Qt.resolvedUrl("SingleSelectPage.qml")
     readonly property string _colorPickerPageUrl: Qt.resolvedUrl("WebColorPickerPage.qml")
     readonly property string _datePickerDialogUrl: Qt.resolvedUrl("WebDatePickerDialog.qml")
+    readonly property string _timePickerDialogUrl: Qt.resolvedUrl("WebTimePickerDialog.qml")
     readonly property string _filePickerComponentUrl: Qt.resolvedUrl("PickerCreator.qml")
     readonly property string _downloadPickerComponentUrl: Qt.resolvedUrl("DownloadPicker.qml")
     property Component _filePickerComponent
@@ -94,7 +95,7 @@ QtObject {
             var dateRequest = _dateRequestComponent.createObject(root,
                                                                  { "requestId": dateRequestId })
             _dateRequests[dateRequestId] = dateRequest
-            pageStack.animatorPush(_datePickerDialogUrl,
+            pageStack.animatorPush(data.type === "time" ? _timePickerDialogUrl : _datePickerDialogUrl,
                                    { "winId": winId,
                                      "requestId": dateRequestId,
                                      "requestState": dateRequest,
@@ -103,7 +104,11 @@ QtObject {
                                      "minimumValue": data.min,
                                      "maximumValue": data.max,
                                      "stepValue": data.step,
-                                     "stepBase": data.stepBase })
+                                     "stepBase": data.stepBase,
+                                     "dateTime": !!data.dateTime,
+                                     "timeValue": data.timeValue,
+                                     "timeMinimum": data.timeMin,
+                                     "timeMaximum": data.timeMax })
             break
         }
         case "embed:datepickerabort": {
