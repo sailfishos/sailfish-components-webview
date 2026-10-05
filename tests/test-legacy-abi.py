@@ -10,7 +10,7 @@ compile the real context/settings and WebView implementations; only Gecko,
 window draining and Silica are controlled test backends. This checks ELF loading,
 old symbol imports, inherited calls, shared state and Qt signals, not rendering
 or target-device compatibility. The production qmake .so.1 target is built and
-staged to check that it cannot overwrite the unversioned v2 linker name.
+staged to check its runtime symlink layout and WebView-provided symbol resolution.
 """
 from pathlib import Path
 import hashlib
@@ -111,10 +111,12 @@ run(['make', '-j2'], cwd=compat)
 run(['make', 'install', 'INSTALL_ROOT=' + str(build / 'stage')], cwd=compat)
 soname = capture(['readelf', '-d', compat / 'libqt5embedwidget.so.1'])
 assert re.search(r'\(SONAME\).*\[libqt5embedwidget.so.1\]', soname)
-assert re.search(r'\(NEEDED\).*\[libqt5embedwidget.so.2\]', soname)
+assert 'libqt5embedwidget.so.2' not in soname
 staged = list((build / 'stage').rglob('libqt5embedwidget.so*'))
-assert staged and not any(path.name == 'libqt5embedwidget.so' for path in staged)
+assert staged
 installed = next(path.parent for path in staged if path.name == 'libqt5embedwidget.so.1')
+assert (installed / 'libqt5embedwidget.so.1').is_symlink()
+assert (installed / 'libqt5embedwidget.so.1.0').is_symlink()
 # Run the identical executable twice, swapping only its library search path.
 env = dict(os.environ, LD_LIBRARY_PATH=str(new) + ':' + str(installed),
            LD_BIND_NOW='1', QT_QPA_PLATFORM='offscreen', DISABLE_PLAT_EGL_FIX='1')
