@@ -14,24 +14,32 @@ BuildRequires:  pkgconfig(qt5embedwidget) >= %{min_qtmozembed_version}
 BuildRequires:  pkgconfig(sailfishsilica)
 BuildRequires:  qt5-qttools
 BuildRequires:  qt5-qttools-linguist
+Requires: %{name}-common = %{version}-%{release}
+
+%description
+%{summary}.
+
+%package common
+Summary: Sailfish WebEngine and shared WebView controls
 Requires: sailfishsilica-qt5 >= 1.1.123
 Requires: qtmozembed-qt5 >= %{min_qtmozembed_version}
 Requires: sailfish-components-pickers-qt5
 Requires: libqofono-qt5-declarative >= 0.117
 
-%description
-%{summary}.
+
+%description common
+Engine runtime and controls usable without the public Sailfish.WebView module.
 
 %package ts-devel
 Summary:   Translation source for sailfish-components-webview-qt5
-Requires:  %{name} = %{version}
+Requires:  %{name}-common = %{version}-%{release}
 
 %description ts-devel
 %{summary}.
 
 %package popups
 Summary:   Popup and alert QML components used by sailfish-components-webview
-Requires:  %{name} = %{version}
+Requires:  %{name}-common = %{version}-%{release}
 Requires:  declarative-transferengine-qt5 >= 0.3.1
 Requires:  nemo-qml-plugin-systemsettings
 
@@ -40,14 +48,14 @@ Requires:  nemo-qml-plugin-systemsettings
 
 %package pickers
 Summary:   Picker and selector QML components used by sailfish-components-webview
-Requires:  %{name} = %{version}
+Requires:  %{name}-common = %{version}-%{release}
 
 %description pickers
 %{summary}.
 
 %package devel
 Summary:    Sailfish WebEngine development files
-Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-common = %{version}-%{release}
 
 %description devel
 Development package for libsailfishwebengine.
@@ -89,26 +97,32 @@ BuildRequires:  qt5-tools
 %install
 %qmake5_install
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%post common -p /sbin/ldconfig
+%postun common -p /sbin/ldconfig
 
 %files
 %license LICENSES/MPL-2.0.txt
-%{_libdir}/libsailfishwebengine.so.*
 %{_datadir}/translations/sailfish_components_webview_qt5_eng_en.qm
-%{_datadir}/translations/sailfish_components_webview_controls_qt5_eng_en.qm
-%{_libdir}/qt5/qml/Sailfish/WebEngine/libsailfishwebengineplugin.so
-%{_libdir}/qt5/qml/Sailfish/WebEngine/qmldir
-%{_libdir}/qt5/qml/Sailfish/WebEngine/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/libsailfishwebviewplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/*.qml
-%{_libdir}/qt5/qml/Sailfish/WebView/*.js
+
+%files common
+%license LICENSES/MPL-2.0.txt
+%{_libdir}/libsailfishwebengine.so.*
+%{_datadir}/translations/sailfish_components_webview_controls_qt5_eng_en.qm
+%{_libdir}/qt5/qml/Sailfish/WebEngine/libsailfishwebengineplugin.so
+%{_libdir}/qt5/qml/Sailfish/WebEngine/qmldir
+%{_libdir}/qt5/qml/Sailfish/WebEngine/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/libsailfishwebviewcontrolsplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/*.qml
+%dir %{_libdir}/qt5/qml/Sailfish/WebEngine
+%dir %{_libdir}/qt5/qml/Sailfish/WebView
+%dir %{_libdir}/qt5/qml/Sailfish/WebView/Controls
+%{_libdir}/qt5/qml/Sailfish/WebView/Controls/*.js
 
 %files ts-devel
 %{_datadir}/translations/source/sailfish_components_webview_qt5.ts
