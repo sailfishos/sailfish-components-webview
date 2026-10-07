@@ -12,6 +12,7 @@
 #include "rawwebview.h"
 #include "webengine.h"
 #include "webenginesettings.h"
+#include "../theme/themeadapter.h"
 
 #include <QtCore/QStandardPaths>
 #include <QtCore/QCoreApplication>
@@ -332,6 +333,7 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
 
     SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
 
+    SailfishOS::initializeWebEngineTheme(engine);
     SailfishOS::WebEngineSettings::initialize();
 
     shutdownController(webEngine)->watchEngine(engine);
