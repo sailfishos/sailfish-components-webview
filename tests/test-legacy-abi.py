@@ -3,14 +3,15 @@
 # SPDX-License-Identifier: MPL-2.0
 """Run a frozen v1-header client with current WebView/QtMoz context and settings.
 
-Usage: test-legacy-abi.py /path/to/qtmozembed [build-directory]
+Usage: test-legacy-abi.py /path/to/qtmozembed [build-directory] [--theme-only]
+The --theme-only mode skips the independent QtMoz legacy-loader packaging check.
 Requires host Qt5 development tools, a C++ compiler, and the pinned Git history.
 The v1 DSOs are link-only symbol fixtures, never executed. The replacement DSOs
 compile the real context/settings and WebView implementations; only Gecko,
-window draining and Silica are controlled test backends. This checks ELF loading,
+window draining are controlled test backends. This checks ELF loading,
 old symbol imports, inherited calls, shared state and Qt signals, not rendering
 or target-device compatibility. The production qmake .so.1 target is built and
-staged to check that it cannot overwrite the unversioned v2 linker name.
+staged to check its runtime symlink layout and WebView-provided symbol resolution.
 """
 from pathlib import Path
 import hashlib
@@ -22,8 +23,9 @@ import sys
 import tempfile
 
 root = Path(__file__).resolve().parents[1]
-qtmoz = Path(sys.argv[1]).resolve()
-build = Path(sys.argv[2]).resolve() if len(sys.argv) > 2 else Path(tempfile.mkdtemp(prefix='webview-abi-'))
+arguments = [arg for arg in sys.argv[1:] if arg != '--theme-only']
+qtmoz = Path(arguments[0]).resolve()
+build = Path(arguments[1]).resolve() if len(arguments) > 1 else Path(tempfile.mkdtemp(prefix='webview-abi-'))
 build.mkdir(parents=True, exist_ok=True)
 fixture = root / 'tests/abi'
 qt_flags = shlex.split(subprocess.check_output(['pkg-config', '--cflags', 'Qt5Core', 'Qt5Gui', 'Qt5Qml'], text=True))
@@ -88,8 +90,13 @@ def moc(header):
 
 context_mocs = [moc(qtmoz / 'src' / name) for name in
                 ['qmozcontext.h', 'qmozcontext_p.h', 'qmozenginesettings.h', 'qmozenginesettings_p.h']]
+media_sources = []
+if (qtmoz / 'src/qmozmediacontroller.cpp').exists():
+    media_sources = [qtmoz / 'src/qmozmediacontroller.cpp',
+                     moc(qtmoz / 'src/qmozmediacontroller_p.h')]
 run([*base, *includes, '-DBUILD_GRE_HOME="/test/gecko"', '-shared',
      qtmoz / 'src/qmozcontext.cpp', qtmoz / 'src/qmozenginesettings.cpp',
+     *media_sources,
      fixture / 'backend.cpp', *context_mocs, *qt_libs, '-ldl',
      '-Wl,-z,defs', '-Wl,-soname,libqt5embedwidget.so.2', '-o', new / 'libqt5embedwidget.so.2'])
 webview_mocs = [moc(root / 'lib' / name) for name in
@@ -101,9 +108,24 @@ extern "C" size_t abiSettingsSize() { return sizeof(SailfishOS::WebEngineSetting
 ''')
 run([*base, *includes, '-DSAILFISHOS_WEBVIEW_MOZILLA_COMPONENTS_PATH="/test/gecko"', '-shared',
      root / 'lib/webengine.cpp', root / 'lib/webenginesettings.cpp', root / 'lib/logging.cpp',
-     *webview_mocs, new / 'layout.cpp', moc(fixture / 'silicatheme.h'), '-L' + str(new),
+     *webview_mocs, new / 'layout.cpp', '-L' + str(new),
      '-l:libqt5embedwidget.so.2', *qt_libs, '-Wl,-z,defs',
      '-Wl,-soname,libsailfishwebengine.so.1', '-o', new / 'libsailfishwebengine.so.1'])
+# Exercise the actual QML adapter with a controlled runtime-only Silica module.
+theme_client = build / 'theme-client'
+run([*base, *includes, fixture / 'theme-client.cpp', moc(fixture / 'silicatheme.h'),
+     '-L' + str(new), '-l:libsailfishwebengine.so.1', '-l:libqt5embedwidget.so.2',
+     *qt_libs, '-o', theme_client])
+env = dict(os.environ, LD_LIBRARY_PATH=str(new), QT_QPA_PLATFORM='offscreen',
+           DISABLE_PLAT_EGL_FIX='1')
+for arguments in [[], ['late']]:
+    run([theme_client, root / 'import/theme/WebEngineTheme.qml', *arguments], env=env)
+assert 'silica' not in capture(['readelf', '-d', new / 'libsailfishwebengine.so.1']).lower()
+print('PASS: QML theme before/after engine startup, colour changes, view notification and repeated imports')
+
+if '--theme-only' in sys.argv:
+    sys.exit(0)
+
 compat = build / 'compat'
 compat.mkdir(exist_ok=True)
 run(['qmake', qtmoz / 'compat/compat.pro', 'VERSION=2.0.0'], cwd=compat)
@@ -111,10 +133,12 @@ run(['make', '-j2'], cwd=compat)
 run(['make', 'install', 'INSTALL_ROOT=' + str(build / 'stage')], cwd=compat)
 soname = capture(['readelf', '-d', compat / 'libqt5embedwidget.so.1'])
 assert re.search(r'\(SONAME\).*\[libqt5embedwidget.so.1\]', soname)
-assert re.search(r'\(NEEDED\).*\[libqt5embedwidget.so.2\]', soname)
+assert 'libqt5embedwidget.so.2' not in soname
 staged = list((build / 'stage').rglob('libqt5embedwidget.so*'))
-assert staged and not any(path.name == 'libqt5embedwidget.so' for path in staged)
+assert staged
 installed = next(path.parent for path in staged if path.name == 'libqt5embedwidget.so.1')
+assert (installed / 'libqt5embedwidget.so.1').is_symlink()
+assert (installed / 'libqt5embedwidget.so.1.0').is_symlink()
 # Run the identical executable twice, swapping only its library search path.
 env = dict(os.environ, LD_LIBRARY_PATH=str(new) + ':' + str(installed),
            LD_BIND_NOW='1', QT_QPA_PLATFORM='offscreen', DISABLE_PLAT_EGL_FIX='1')

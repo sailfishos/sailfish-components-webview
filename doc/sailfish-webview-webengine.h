@@ -13,6 +13,7 @@ namespace SailfishOS {
 
 class WebEngine : public QObject {
     Q_OBJECT
+    Q_PROPERTY(QObject *mediaController READ mediaController CONSTANT)
     Q_PROPERTY(bool initialized READ isInitialized NOTIFY initialized)
 public:
     // C++ API
@@ -29,6 +30,7 @@ public:
     void removeObservers(const std::vector<std::string> &aObserversList);
     int getNumberOfWindows() const;
 
+    QObject *mediaController() const;
     Q_INVOKABLE bool isInitialized() const;
     Q_INVOKABLE bool isAccelerated() const;
 

@@ -52,6 +52,31 @@
 
 /*!
     \readonly
+    \qmlproperty QtObject WebEngine::mediaController
+    \brief Gecko's current main media controller.
+
+    The object is application-owned and its identity is stable. Gecko chooses
+    its owner independently of tab selection. Read availability before using
+    ownerView, ownerViewId or ownerTabId; IDs are opaque strings. The
+    privateBrowsing flag must be checked before publishing system metadata.
+
+    playbackState is Playing, Paused or Stopped. metadata contains title,
+    artist and album. duration and position are seconds; hasPosition indicates
+    whether Gecko provides them. canPlay, canPause, canPlayPause, canStop,
+    canGoNext, canGoPrevious and canSeek reflect native supported commands.
+
+    play(), pause(), playPause(), stop(), next() and previous() return whether
+    Gecko accepted the request. seek(trackId, seconds) validates the current
+    opaque track ID and absolute position. Closed or replaced controllers reject
+    stale requests. This interface does not register an MPRIS player.
+
+    Hosted QuickMozView.backgroundMediaEnabled is opt-in and defaults to false.
+    It preserves eligible native media sessions independently of presentation;
+    per-tab mediaPlaying is available in the hosted tab model.
+*/
+
+/*!
+    \readonly
     \qmlproperty bool WebEngine::initialized
     \brief Returns true if the component has been initialized, false otherwise.
 */
