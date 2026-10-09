@@ -226,6 +226,7 @@ Module {
         }
         Signal { name: "dynamicToolbarHeightChanged" }
         Signal { name: "marginsChanged" }
+        Signal { name: "safeAreaInsetsChanged" }
         Method {
             name: "loadHtml"
             Parameter { name: "html"; type: "string" }
@@ -243,6 +244,7 @@ Module {
         Method { name: "goBack" }
         Method { name: "goForward" }
         Method { name: "stop" }
+        Method { name: "cancelPendingNavigation" }
         Method { name: "reload" }
         Method {
             name: "load"
