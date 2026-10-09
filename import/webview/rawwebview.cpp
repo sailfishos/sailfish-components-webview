@@ -45,6 +45,8 @@ RawWebView::RawWebView(QQuickItem *parent)
     , m_footerMargin(0.0)
     , m_acceptTouchEvents(true)
 {
+    SailfishOS::WebEngineSettings::initialize();
+
     // Use Gecko's remote browser backend.  The initial tab must exist before
     // QuickMozView replays a URL assigned during QML component construction.
     setProperty("_qmozChromeInitialUrl", QStringLiteral("about:blank"));

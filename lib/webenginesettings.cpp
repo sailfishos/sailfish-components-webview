@@ -28,6 +28,11 @@
 
 #include "logging.h"
 
+#include <QQmlComponent>
+#include <QQmlContext>
+#include <QQmlEngine>
+#include <QLibraryInfo>
+
 Q_GLOBAL_STATIC(SailfishOS::WebEngineSettings, webEngineSettingsInstance)
 Q_GLOBAL_STATIC(SailfishOS::WebEngineSettingsPrivate, webEngineSettingsPrivateInstance)
 
@@ -94,8 +99,8 @@ SailfishOS::WebEngineSettingsPrivate::~WebEngineSettingsPrivate()
     recommended that you do so after this initialisation has been called, to
     avoid your settings being overwritten by it.
 
-    Theme-derived pixel ratio and ambience updates are supplied by the QML
-    theme adapter when Sailfish.WebEngine or Sailfish.WebView is imported.
+    Theme defaults are read synchronously through a private QML engine.
+    Application overrides applied after this method returns are preserved.
 
     This will be called automatically during QML initialisation, but it can
     also be called manually in your code in order to control the order of
@@ -114,6 +119,7 @@ void SailfishOS::WebEngineSettings::initialize()
 {
     static bool isInitialized = false;
     if (isInitialized) {
+        instance()->d->initializeTheme();
         return;
     }
 
@@ -146,6 +152,7 @@ void SailfishOS::WebEngineSettings::initialize()
     webEngine->addObserver(QStringLiteral("embedliteviewcreated"));
 
     isInitialized = true;
+    engineSettings->d->initializeTheme();
 
     // Guard preferences that should be written only once. If a preference needs to be
     // forcefully written upon each start that should happen before this.
@@ -180,6 +187,38 @@ void SailfishOS::WebEngineSettings::initialize()
 
     markerFile.open(QIODevice::ReadWrite | QIODevice::Truncate);
     markerFile.close();
+}
+
+void SailfishOS::WebEngineSettingsPrivate::initializeTheme()
+{
+    if (themeEngine) {
+        return;
+    }
+
+    // Theme imports may initialize WebEngine again. Publish the engine before
+    // loading QML, and keep it separate from application import initialization.
+    themeEngine = new QQmlEngine(QCoreApplication::instance());
+    connect(themeEngine, &QObject::destroyed, this, [this]() {
+        themeEngine = nullptr;
+    });
+    themeEngine->rootContext()->setContextProperty(
+            QStringLiteral("webEngineThemeSettings"), this);
+    QObject *theme = nullptr;
+    {
+        const QUrl url = QUrl::fromLocalFile(
+                QLibraryInfo::location(QLibraryInfo::Qml2ImportsPath)
+                + QStringLiteral("/Sailfish/WebEngine/WebEngineTheme.qml"));
+        QQmlComponent component(themeEngine, url);
+        theme = component.create();
+        if (!theme) {
+            qWarning() << "Could not initialize WebEngine theme:" << component.errors();
+        }
+    }
+    if (theme) {
+        theme->setParent(themeEngine);
+    } else {
+        delete themeEngine;
+    }
 }
 
 void SailfishOS::WebEngineSettingsPrivate::setThemePixelRatio(qreal themePixelRatio)

@@ -10,6 +10,12 @@
            <case manual="false" name="tst_downloadhelper">
                <step>/opt/tests/sailfish-components-webview/auto/tst_downloadhelper</step>
            </case>
+           <case manual="false" name="tst_themeinitialization_native">
+               <step>/opt/tests/sailfish-components-webview/auto/tst_themeinitialization</step>
+           </case>
+           <case manual="false" name="tst_themeinitialization_qml">
+               <step>/opt/tests/sailfish-components-webview/auto/tst_themeinitialization --qml-first</step>
+           </case>
            <post_steps>
                <step>/usr/bin/stop-ui-test.sh</step>
            </post_steps>
