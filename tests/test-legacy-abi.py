@@ -118,8 +118,25 @@ run([*base, *includes, fixture / 'theme-client.cpp', moc(fixture / 'silicatheme.
      *qt_libs, '-o', theme_client])
 env = dict(os.environ, LD_LIBRARY_PATH=str(new), QT_QPA_PLATFORM='offscreen',
            DISABLE_PLAT_EGL_FIX='1')
-for arguments in [[], ['late']]:
-    run([theme_client, root / 'import/theme/WebEngineTheme.qml', *arguments], env=env)
+# Resolve the installed theme path without writing to the host Qt installation.
+qml_root = build / 'qml'
+qml_root.mkdir(exist_ok=True)
+qt_qml = Path(capture(['qmake', '-query', 'QT_INSTALL_QML']).strip())
+for child in qt_qml.iterdir():
+    # Keep the mock Sailfish namespace local even on a Sailfish development host.
+    if child.name == 'Sailfish':
+        continue
+    destination = qml_root / child.name
+    if not destination.exists():
+        destination.symlink_to(child, target_is_directory=child.is_dir())
+write(qml_root / 'Sailfish/WebEngine/WebEngineTheme.qml',
+      (root / 'import/theme/WebEngineTheme.qml').read_text())
+write(build / 'qt.conf', '[Paths]\nPrefix='
+      + capture(['qmake', '-query', 'QT_INSTALL_PREFIX']).strip()
+      + '\nPlugins=' + capture(['qmake', '-query', 'QT_INSTALL_PLUGINS']).strip()
+      + '\nQml2Imports=' + str(qml_root) + '\n')
+for startup in [[], ['--late']]:
+    run([theme_client, *startup], env=env)
 assert 'silica' not in capture(['readelf', '-d', new / 'libsailfishwebengine.so.1']).lower()
 print('PASS: QML theme before/after engine startup, colour changes, view notification and repeated imports')
 
