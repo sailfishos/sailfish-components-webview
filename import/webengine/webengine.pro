@@ -24,7 +24,7 @@ import.path = $$TARGETPATH
 target.path = $$TARGETPATH
 
 theme.files = ../theme/WebEngineTheme.qml
-theme.path = /usr/share/sailfish-webview
+theme.path = $$TARGETPATH
 
 INSTALLS += target import theme
 
