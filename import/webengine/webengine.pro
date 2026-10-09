@@ -23,10 +23,7 @@ import.files = qmldir plugins.qmltypes
 import.path = $$TARGETPATH
 target.path = $$TARGETPATH
 
-theme.files = ../theme/WebEngineTheme.qml
-theme.path = /usr/share/sailfish-webview
-
-INSTALLS += target import theme
+INSTALLS += target import
 
 # The module is verbose on stdout, hence the use of dedicated FD for output.
 qmltypes.commands = qmlplugindump -noinstantiate -nonrelocatable \

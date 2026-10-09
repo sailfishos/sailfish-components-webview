@@ -11,7 +11,6 @@
 
 #include "webengine.h"
 #include "webenginesettings.h"
-#include "../theme/themeadapter.h"
 #include "downloadhelper.h"
 
 #include <QtCore/QStandardPaths>
@@ -31,12 +30,11 @@ class SailfishOSWebEnginePlugin : public QQmlExtensionPlugin
     Q_PLUGIN_METADATA(IID "Sailfish.WebEngine" )
 
 public:
-    void initializeEngine(QQmlEngine *engine, const char *)
+    void initializeEngine(QQmlEngine *, const char *)
     {
         // TODO : How to deal with custom default UA. We have also means to customize
         // site specific UA overrides.
         SailfishOS::WebEngine::initialize(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
-        SailfishOS::initializeWebEngineTheme(engine);
         SailfishOS::WebEngineSettings::initialize();
     }
 

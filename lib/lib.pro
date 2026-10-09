@@ -7,7 +7,7 @@ include(../defaults.pri)
 
 CONFIG += qt create_pc create_prl no_install_prl link_pkgconfig
 QT += gui
-PKGCONFIG += qt5embedwidget
+PKGCONFIG += qt5embedwidget sailfishsilica
 
 SOURCES += downloadhelper.cpp \
            logging.cpp \
