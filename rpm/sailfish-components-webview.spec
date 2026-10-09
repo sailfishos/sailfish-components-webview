@@ -100,12 +100,12 @@ BuildRequires:  qt5-tools
 
 %files
 %license LICENSES/MPL-2.0.txt
-%{_datadir}/sailfish-webview/
 %{_datadir}/translations/sailfish_components_webview_qt5_eng_en.qm
 %{_datadir}/translations/sailfish_components_webview_controls_qt5_eng_en.qm
 %{_libdir}/qt5/qml/Sailfish/WebEngine/libsailfishwebengineplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebEngine/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebEngine/plugins.qmltypes
+%{_libdir}/qt5/qml/Sailfish/WebEngine/WebEngineTheme.qml
 %{_libdir}/qt5/qml/Sailfish/WebView/libsailfishwebviewplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/plugins.qmltypes
