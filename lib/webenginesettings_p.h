@@ -11,6 +11,8 @@
 
 #ifndef Q_QDOC
 
+class QQmlEngine;
+
 namespace SailfishOS {
 
 class WebEngineSettingsPrivate : public QObject
@@ -23,11 +25,20 @@ public:
     explicit WebEngineSettingsPrivate(QObject *parent = 0);
     ~WebEngineSettingsPrivate();
 
+    void initializeTheme();
+
 public slots:
+    void setThemePixelRatio(qreal themePixelRatio);
+    void setDarkTheme(bool dark);
     void notifyColorSchemeChanged();
     void oneShotNotifyColorSchemeChanged(const QString &message, const QVariant &data);
 
     friend class WebEngineSettings;
+
+private:
+    QQmlEngine *themeEngine = nullptr;
+    bool darkTheme = false;
+    bool themePixelRatioInitialized = false;
 };
 
 }

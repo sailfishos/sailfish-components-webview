@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS += tst_downloadhelper
+SUBDIRS += tst_downloadhelper tst_themeinitialization

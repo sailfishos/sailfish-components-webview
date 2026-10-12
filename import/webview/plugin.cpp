@@ -332,8 +332,6 @@ void SailfishOSWebViewPlugin::initializeEngine(QQmlEngine *engine, const char *u
 
     SailfishOS::WebEngine *webEngine = SailfishOS::WebEngine::instance();
 
-    SailfishOS::WebEngineSettings::initialize();
-
     shutdownController(webEngine)->watchEngine(engine);
 
     connect(webEngine, &SailfishOS::WebEngine::recvObserve, [](const QString &message, const QVariant &data) {

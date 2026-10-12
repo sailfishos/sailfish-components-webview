@@ -15,8 +15,6 @@
 
 #include <qmozenginesettings.h>
 
-#include <silicatheme.h>
-
 #include <QtCore/QFile>
 #include <QtCore/QLocale>
 #include <QtCore/QSettings>
@@ -29,6 +27,11 @@
 #include <sys/sysinfo.h>
 
 #include "logging.h"
+
+#include <QQmlComponent>
+#include <QQmlContext>
+#include <QQmlEngine>
+#include <QLibraryInfo>
 
 Q_GLOBAL_STATIC(SailfishOS::WebEngineSettings, webEngineSettingsInstance)
 Q_GLOBAL_STATIC(SailfishOS::WebEngineSettingsPrivate, webEngineSettingsPrivateInstance)
@@ -96,6 +99,9 @@ SailfishOS::WebEngineSettingsPrivate::~WebEngineSettingsPrivate()
     recommended that you do so after this initialisation has been called, to
     avoid your settings being overwritten by it.
 
+    Theme defaults are read synchronously through a private QML engine.
+    Application overrides applied after this method returns are preserved.
+
     This will be called automatically during QML initialisation, but it can
     also be called manually in your code in order to control the order of
     initialisation. Calling this method after intialialisation has already
@@ -113,6 +119,7 @@ void SailfishOS::WebEngineSettings::initialize()
 {
     static bool isInitialized = false;
     if (isInitialized) {
+        instance()->d->initializeTheme();
         return;
     }
 
@@ -129,8 +136,6 @@ void SailfishOS::WebEngineSettings::initialize()
     engineSettings->setPreference(QStringLiteral("intl.accept_languages"),
                                   QVariant::fromValue<QString>(langs));
 
-    Silica::Theme *silicaTheme = Silica::Theme::instance();
-
     // Notify gecko when the ambience switches between light and dark
     if (engineSettings->isInitialized()) {
         engineSettings->d->notifyColorSchemeChanged();
@@ -138,8 +143,6 @@ void SailfishOS::WebEngineSettings::initialize()
         connect(engineSettings, &SailfishOS::WebEngineSettings::initialized,
                 engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::notifyColorSchemeChanged);
     }
-    connect(silicaTheme, &Silica::Theme::colorSchemeChanged,
-            engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::notifyColorSchemeChanged);
 
     // Subscribe to gecko messages
     // When the embedliteviewcreated notification is received the ambience notification will be sent again
@@ -149,24 +152,7 @@ void SailfishOS::WebEngineSettings::initialize()
     webEngine->addObserver(QStringLiteral("embedliteviewcreated"));
 
     isInitialized = true;
-
-    qreal pixelRatio = SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO * silicaTheme->pixelRatio();
-    // Round to nearest even rounding factor
-    pixelRatio = qRound(pixelRatio / 0.5) * 0.5;
-
-    int screenWidth = QGuiApplication::primaryScreen()->size().width();
-
-    // Do not floor the pixel ratio if the pixel ratio less than 2.0 (1.5 is minimum).
-    if (pixelRatio >= 2.0 && !testScreenDimensions(pixelRatio)) {
-        qreal tempPixelRatio = qFloor(pixelRatio);
-        if (testScreenDimensions(tempPixelRatio)) {
-            pixelRatio = tempPixelRatio;
-        }
-    } else if (screenWidth >= 1080) {
-        pixelRatio = qRound(pixelRatio);
-    }
-
-    engineSettings->setPixelRatio(pixelRatio);
+    engineSettings->d->initializeTheme();
 
     // Guard preferences that should be written only once. If a preference needs to be
     // forcefully written upon each start that should happen before this.
@@ -203,16 +189,82 @@ void SailfishOS::WebEngineSettings::initialize()
     markerFile.close();
 }
 
+void SailfishOS::WebEngineSettingsPrivate::initializeTheme()
+{
+    if (themeEngine) {
+        return;
+    }
+
+    // Theme imports may initialize WebEngine again. Publish the engine before
+    // loading QML, and keep it separate from application import initialization.
+    themeEngine = new QQmlEngine(QCoreApplication::instance());
+    connect(themeEngine, &QObject::destroyed, this, [this]() {
+        themeEngine = nullptr;
+    });
+    themeEngine->rootContext()->setContextProperty(
+            QStringLiteral("webEngineThemeSettings"), this);
+    QObject *theme = nullptr;
+    {
+        const QUrl url = QUrl::fromLocalFile(
+                QLibraryInfo::location(QLibraryInfo::Qml2ImportsPath)
+                + QStringLiteral("/Sailfish/WebEngine/WebEngineTheme.qml"));
+        QQmlComponent component(themeEngine, url);
+        theme = component.create();
+        if (!theme) {
+            qWarning() << "Could not initialize WebEngine theme:" << component.errors();
+        }
+    }
+    if (theme) {
+        theme->setParent(themeEngine);
+    } else {
+        delete themeEngine;
+    }
+}
+
+void SailfishOS::WebEngineSettingsPrivate::setThemePixelRatio(qreal themePixelRatio)
+{
+    // Match the original one-time initialization, including across QML engines.
+    if (themePixelRatioInitialized) {
+        return;
+    }
+    themePixelRatioInitialized = true;
+
+    qreal pixelRatio = SAILFISH_WEBENGINE_DEFAULT_PIXEL_RATIO * themePixelRatio;
+    // Round to nearest even rounding factor
+    pixelRatio = qRound(pixelRatio / 0.5) * 0.5;
+
+    int screenWidth = QGuiApplication::primaryScreen()->size().width();
+
+    // Do not floor the pixel ratio if the pixel ratio less than 2.0 (1.5 is minimum).
+    if (pixelRatio >= 2.0 && !testScreenDimensions(pixelRatio)) {
+        qreal tempPixelRatio = qFloor(pixelRatio);
+        if (testScreenDimensions(tempPixelRatio)) {
+            pixelRatio = tempPixelRatio;
+        }
+    } else if (screenWidth >= 1080) {
+        pixelRatio = qRound(pixelRatio);
+    }
+
+    WebEngineSettings::instance()->setPixelRatio(pixelRatio);
+}
+
+void SailfishOS::WebEngineSettingsPrivate::setDarkTheme(bool dark)
+{
+    if (darkTheme != dark) {
+        darkTheme = dark;
+        if (WebEngineSettings::instance()->isInitialized()) {
+            notifyColorSchemeChanged();
+        }
+    }
+}
+
 /*!
     \internal
     \brief Notifies gecko about ambience color scheme changes.
 */
 void SailfishOS::WebEngineSettingsPrivate::notifyColorSchemeChanged()
 {
-    Silica::Theme *silicaTheme = Silica::Theme::instance();
-    QString scheme = silicaTheme->colorScheme() == Silica::Theme::LightOnDark
-            ? QStringLiteral("dark")
-            : QStringLiteral("light");
+    const QString scheme = darkTheme ? QStringLiteral("dark") : QStringLiteral("light");
     SailfishOS::WebEngine::instance()->notifyObservers(QStringLiteral("ambience-theme-changed"), scheme);
 }
 
