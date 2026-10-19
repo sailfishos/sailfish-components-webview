@@ -14,32 +14,34 @@ BuildRequires:  pkgconfig(qt5embedwidget) >= %{min_qtmozembed_version}
 BuildRequires:  pkgconfig(sailfishsilica)
 BuildRequires:  qt5-qttools
 BuildRequires:  qt5-qttools-linguist
-Requires: %{name}-common = %{version}-%{release}
+Requires: %{name}-core = %{version}-%{release}
 
 %description
 %{summary}.
 
-%package common
+%package core
 Summary: Sailfish WebEngine and shared WebView controls
+Provides: %{name}-common = %{version}-%{release}
+Obsoletes: %{name}-common <= %{version}-%{release}
 Requires: sailfishsilica-qt5 >= 1.1.123
 Requires: qtmozembed-qt5 >= %{min_qtmozembed_version}
 Requires: sailfish-components-pickers-qt5
 Requires: libqofono-qt5-declarative >= 0.117
 
 
-%description common
+%description core
 Engine runtime and controls usable without the public Sailfish.WebView module.
 
 %package ts-devel
 Summary:   Translation source for sailfish-components-webview-qt5
-Requires:  %{name}-common = %{version}-%{release}
+Requires:  %{name}-core = %{version}-%{release}
 
 %description ts-devel
 %{summary}.
 
 %package popups
 Summary:   Popup and alert QML components used by sailfish-components-webview
-Requires:  %{name}-common = %{version}-%{release}
+Requires:  %{name}-core = %{version}-%{release}
 Requires:  declarative-transferengine-qt5 >= 0.3.1
 Requires:  nemo-qml-plugin-systemsettings
 
@@ -48,7 +50,7 @@ Requires:  nemo-qml-plugin-systemsettings
 
 %package pickers
 Summary:   Picker and selector QML components used by sailfish-components-webview
-Requires:  %{name}-common = %{version}-%{release}
+Requires:  %{name}-core = %{version}-%{release}
 
 %description pickers
 %{summary}.
@@ -97,8 +99,8 @@ BuildRequires:  qt5-tools
 %install
 %qmake5_install
 
-%post common -p /sbin/ldconfig
-%postun common -p /sbin/ldconfig
+%post core -p /sbin/ldconfig
+%postun core -p /sbin/ldconfig
 
 %files
 %license LICENSES/MPL-2.0.txt
@@ -108,7 +110,7 @@ BuildRequires:  qt5-tools
 %{_libdir}/qt5/qml/Sailfish/WebView/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/*.qml
 
-%files common
+%files core
 %license LICENSES/MPL-2.0.txt
 %{_libdir}/libsailfishwebengine.so.*
 %{_datadir}/translations/sailfish_components_webview_controls_qt5_eng_en.qm
