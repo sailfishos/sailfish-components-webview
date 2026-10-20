@@ -229,6 +229,11 @@ RawWebView {
         }
     }
 
+    ExternalUrlHandler {
+        webView: webview
+        pageStack: pickerOpener.pageStack
+    }
+
     Rectangle {
         id: orientationDelayOverlay
 
