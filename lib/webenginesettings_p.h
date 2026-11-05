@@ -7,6 +7,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QVariantMap>
 #include <webenginesettings.h>
 
 #ifndef Q_QDOC
@@ -26,6 +27,14 @@ public:
 public slots:
     void notifyColorSchemeChanged();
     void oneShotNotifyColorSchemeChanged(const QString &message, const QVariant &data);
+    void queueThemeUpdate();
+    void flushThemeUpdate();
+
+private:
+    void sendTheme(bool forcePalette);
+    QVariantMap paletteFor(bool dark) const;
+    QVariantMap lastPalette;
+    bool themeUpdatePending = false;
 
     friend class WebEngineSettings;
 };
