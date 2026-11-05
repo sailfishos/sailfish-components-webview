@@ -26,6 +26,8 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtGui/QStyleHints>
+#include <QtGui/QColor>
+#include <QtCore/QTimer>
 #include <sys/sysinfo.h>
 
 #include "logging.h"
@@ -139,7 +141,19 @@ void SailfishOS::WebEngineSettings::initialize()
                 engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::notifyColorSchemeChanged);
     }
     connect(silicaTheme, &Silica::Theme::colorSchemeChanged,
-            engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::notifyColorSchemeChanged);
+            engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::queueThemeUpdate);
+    connect(silicaTheme, &Silica::Theme::highlightColorChanged,
+            engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::queueThemeUpdate);
+    connect(silicaTheme, &Silica::Theme::highlightBackgroundColorChanged,
+            engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::queueThemeUpdate);
+    connect(silicaTheme, &Silica::Theme::primaryColorChanged,
+            engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::queueThemeUpdate);
+    connect(silicaTheme, &Silica::Theme::secondaryColorChanged,
+            engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::queueThemeUpdate);
+    connect(silicaTheme, &Silica::Theme::overlayBackgroundColorChanged,
+            engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::queueThemeUpdate);
+    connect(silicaTheme, &Silica::Theme::secondaryHighlightColorChanged,
+            engineSettings->d, &SailfishOS::WebEngineSettingsPrivate::queueThemeUpdate);
 
     // Subscribe to gecko messages
     // When the embedliteviewcreated notification is received the ambience notification will be sent again
@@ -209,11 +223,139 @@ void SailfishOS::WebEngineSettings::initialize()
 */
 void SailfishOS::WebEngineSettingsPrivate::notifyColorSchemeChanged()
 {
+    sendTheme(false);
+}
+
+static qreal relativeLuminance(const QColor &color)
+{
+    const auto linear = [](qreal value) {
+        return value <= 0.04045 ? value / 12.92 : qPow((value + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * linear(color.redF()) + 0.7152 * linear(color.greenF())
+            + 0.0722 * linear(color.blueF());
+}
+
+static QColor contrastingText(const QColor &background)
+{
+    return relativeLuminance(background) > 0.179 ? QColor(Qt::black) : QColor(Qt::white);
+}
+
+static QColor blendColor(const QColor &color, const QColor &background, qreal opacity)
+{
+    return QColor(qRound(color.red() * opacity + background.red() * (1 - opacity)),
+                  qRound(color.green() * opacity + background.green() * (1 - opacity)),
+                  qRound(color.blue() * opacity + background.blue() * (1 - opacity)));
+}
+
+static qreal contrastRatio(const QColor &foreground, const QColor &background)
+{
+    const qreal first = relativeLuminance(foreground) + 0.05;
+    const qreal second = relativeLuminance(background) + 0.05;
+    return qMax(first, second) / qMin(first, second);
+}
+
+static QColor readableColor(QColor color, const QColor &background, qreal minimum)
+{
+    color = blendColor(color, background, color.alphaF());
+    const QColor foreground = contrastingText(background);
+    for (int step = 0; step < 100; ++step) {
+        const QColor candidate = blendColor(color, foreground, 1 - step / 100.0);
+        if (contrastRatio(candidate, background) >= minimum) {
+            return candidate;
+        }
+    }
+    return foreground;
+}
+
+static QString colorName(const QColor &color)
+{
+    return color.name(QColor::HexRgb);
+}
+
+QVariantMap SailfishOS::WebEngineSettingsPrivate::paletteFor(bool dark) const
+{
+    Silica::Theme *theme = Silica::Theme::instance();
+    const Silica::Theme::ColorScheme scheme = dark
+            ? Silica::Theme::LightOnDark : Silica::Theme::DarkOnLight;
+    const bool currentDark = theme->colorScheme() == Silica::Theme::LightOnDark;
+    const QColor base = dark ? QColor(Qt::black) : QColor(Qt::white);
+    QColor canvas = base;
+    if (dark == currentDark) {
+        canvas = theme->overlayBackgroundColor();
+        if (!canvas.isValid()) {
+            canvas = base;
+        }
+        canvas = blendColor(canvas, base, canvas.alphaF());
+    }
+    if ((dark && relativeLuminance(canvas) > 0.179)
+            || (!dark && relativeLuminance(canvas) <= 0.179)) {
+        canvas = base;
+    }
+    const QColor text = readableColor(dark == currentDark
+            ? theme->primaryColor()
+            : (dark ? theme->lightPrimaryColor() : theme->darkPrimaryColor()), canvas, 4.5);
+    const QColor disabled = readableColor(dark == currentDark
+            ? theme->secondaryColor()
+            : (dark ? theme->lightSecondaryColor() : theme->darkSecondaryColor()), canvas, 3.0);
+    const QColor reference = theme->highlightColor();
+    const QColor accent = dark == currentDark ? reference
+            : Silica::Theme::highlightFromColor(reference, scheme);
+    const QColor secondary = dark == currentDark ? theme->secondaryHighlightColor()
+            : Silica::Theme::secondaryHighlightFromColor(reference, scheme);
+    const QColor highlight = dark == currentDark ? theme->highlightBackgroundColor()
+            : Silica::Theme::highlightBackgroundFromColor(reference, scheme);
+    const QColor opaqueAccent = blendColor(accent, canvas, accent.alphaF());
+    const QColor mark = blendColor(highlight, canvas, highlight.alphaF());
+
+    QVariantMap colors;
+    colors.insert(QStringLiteral("canvas"), colorName(canvas));
+    colors.insert(QStringLiteral("text"), colorName(text));
+    colors.insert(QStringLiteral("disabled"), colorName(disabled));
+    colors.insert(QStringLiteral("surface"), colorName(canvas));
+    colors.insert(QStringLiteral("border"), colorName(disabled));
+    colors.insert(QStringLiteral("accent"), colorName(opaqueAccent));
+    colors.insert(QStringLiteral("accentText"), colorName(contrastingText(opaqueAccent)));
+    colors.insert(QStringLiteral("link"), colorName(readableColor(accent, canvas, 4.5)));
+    colors.insert(QStringLiteral("visited"), colorName(readableColor(secondary, canvas, 4.5)));
+    colors.insert(QStringLiteral("active"), colorName(readableColor(highlight, canvas, 4.5)));
+    colors.insert(QStringLiteral("mark"), colorName(mark));
+    colors.insert(QStringLiteral("markText"), colorName(contrastingText(mark)));
+    return colors;
+}
+
+void SailfishOS::WebEngineSettingsPrivate::sendTheme(bool forcePalette)
+{
+    if (!SailfishOS::WebEngineSettings::instance()->isInitialized()) {
+        return;
+    }
+    QVariantMap palette;
+    palette.insert(QStringLiteral("light"), paletteFor(false));
+    palette.insert(QStringLiteral("dark"), paletteFor(true));
+    if (forcePalette || palette != lastPalette) {
+        SailfishOS::WebEngine::instance()->notifyObservers(
+                QStringLiteral("ambience-colors-changed"), palette);
+        lastPalette = palette;
+    }
     Silica::Theme *silicaTheme = Silica::Theme::instance();
     QString scheme = silicaTheme->colorScheme() == Silica::Theme::LightOnDark
             ? QStringLiteral("dark")
             : QStringLiteral("light");
     SailfishOS::WebEngine::instance()->notifyObservers(QStringLiteral("ambience-theme-changed"), scheme);
+}
+
+void SailfishOS::WebEngineSettingsPrivate::queueThemeUpdate()
+{
+    if (themeUpdatePending || !SailfishOS::WebEngineSettings::instance()->isInitialized()) {
+        return;
+    }
+    themeUpdatePending = true;
+    QTimer::singleShot(0, this, &SailfishOS::WebEngineSettingsPrivate::flushThemeUpdate);
+}
+
+void SailfishOS::WebEngineSettingsPrivate::flushThemeUpdate()
+{
+    themeUpdatePending = false;
+    notifyColorSchemeChanged();
 }
 
 /*!
@@ -231,7 +373,7 @@ void SailfishOS::WebEngineSettingsPrivate::oneShotNotifyColorSchemeChanged(const
                    this, &SailfishOS::WebEngineSettingsPrivate::oneShotNotifyColorSchemeChanged);
 
         // Notify about the ambience state
-        notifyColorSchemeChanged();
+        sendTheme(true);
     }
 }
 
