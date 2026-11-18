@@ -32,6 +32,25 @@ namespace SailfishOS {
 
 namespace WebView {
 
+// Printing asks the embedder for a second, hidden view into which Gecko can
+// create the static print clone.  RawWebView is normally completed by QML;
+// this small subclass lets the ViewCreator complete a print-only child after
+// assigning the parent browsing context.
+class PrintWebView : public RawWebView
+{
+public:
+    explicit PrintWebView(RawWebView *parent)
+        : RawWebView(parent)
+    {
+        classBegin();
+    }
+
+    void complete()
+    {
+        componentComplete();
+    }
+};
+
 class ViewCreator : public QMozViewCreator
 {
 public:
@@ -64,17 +83,38 @@ ViewCreator::~ViewCreator()
 
 quint32 ViewCreator::createView(const quint32 &parentId, const uintptr_t &parentBrowsingContext, const bool hidden)
 {
-    Q_UNUSED(parentBrowsingContext)
-    Q_UNUSED(hidden)
-
-    for (RawWebView *view : views) {
-        if (view->uniqueId() == parentId) {
-            view->openUrlInNewWindow();
+    RawWebView *view = nullptr;
+    for (RawWebView *candidate : views) {
+        if (candidate->uniqueId() == parentId) {
+            view = candidate;
             break;
         }
     }
 
-    return 0;
+    if (!view) {
+        return 0;
+    }
+
+    if (!hidden) {
+        view->openUrlInNewWindow();
+        return 0;
+    }
+
+    // QtMozEmbed's ESR115 componentComplete() creates the native view
+    // synchronously.  Create a fresh child for each print request so that its
+    // browsing context cannot be reused after Gecko closes the print browser.
+    PrintWebView *printView = new PrintWebView(view);
+    printView->setParentId(parentId);
+    printView->setParentBrowsingContext(parentBrowsingContext);
+    printView->setPrivateMode(view->privateMode());
+    printView->setDesktopMode(view->desktopMode());
+    printView->setVisible(false);
+    printView->setWidth(qMax<qreal>(1, view->width()));
+    printView->setHeight(qMax<qreal>(1, view->height()));
+    QObject::connect(printView, &QuickMozView::windowCloseRequested,
+            printView, &QObject::deleteLater);
+    printView->complete();
+    return printView->uniqueId();
 }
 
 std::shared_ptr<ViewCreator> ViewCreator::instance()
