@@ -11,7 +11,6 @@ BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(qt5embedwidget) >= %{min_qtmozembed_version}
-BuildRequires:  pkgconfig(sailfishsilica)
 BuildRequires:  qt5-qttools
 BuildRequires:  qt5-qttools-linguist
 Requires: %{name}-core = %{version}-%{release}
@@ -23,6 +22,7 @@ Requires: %{name}-core = %{version}-%{release}
 Summary: Sailfish WebEngine and shared WebView controls
 Provides: %{name}-common = %{version}-%{release}
 Obsoletes: %{name}-common <= %{version}-%{release}
+Requires: %{name}-webengine = %{version}-%{release}
 Requires: sailfishsilica-qt5 >= 1.1.123
 Requires: qtmozembed-qt5 >= %{min_qtmozembed_version}
 Requires: sailfish-components-pickers-qt5
@@ -55,9 +55,15 @@ Requires:  %{name}-core = %{version}-%{release}
 %description pickers
 %{summary}.
 
+%package webengine
+Summary:    Sailfish WebEngine runtime library
+
+%description webengine
+Native WebEngine library without the Sailfish QML user interface.
+
 %package devel
 Summary:    Sailfish WebEngine development files
-Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-webengine = %{version}-%{release}
 
 %description devel
 Development package for libsailfishwebengine.
@@ -99,8 +105,8 @@ BuildRequires:  qt5-tools
 %install
 %qmake5_install
 
-%post core -p /sbin/ldconfig
-%postun core -p /sbin/ldconfig
+%post webengine -p /sbin/ldconfig
+%postun webengine -p /sbin/ldconfig
 
 %files
 %license LICENSES/MPL-2.0.txt
@@ -112,11 +118,11 @@ BuildRequires:  qt5-tools
 
 %files core
 %license LICENSES/MPL-2.0.txt
-%{_libdir}/libsailfishwebengine.so.*
 %{_datadir}/translations/sailfish_components_webview_controls_qt5_eng_en.qm
 %{_libdir}/qt5/qml/Sailfish/WebEngine/libsailfishwebengineplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebEngine/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebEngine/plugins.qmltypes
+%{_libdir}/qt5/qml/Sailfish/WebEngine/WebEngineTheme.qml
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/libsailfishwebviewcontrolsplugin.so
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/Controls/plugins.qmltypes
@@ -146,6 +152,10 @@ BuildRequires:  qt5-tools
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/qmldir
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/plugins.qmltypes
 %{_libdir}/qt5/qml/Sailfish/WebView/Pickers/*.qml
+
+%files webengine
+%license LICENSES/MPL-2.0.txt
+%{_libdir}/libsailfishwebengine.so.*
 
 %files devel
 %{_libdir}/libsailfishwebengine.so
